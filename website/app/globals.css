@@ -1408,6 +1408,7 @@ h3 {
   }
 
   .paper-featured .paper-cover-link {
+    aspect-ratio: auto;
     height: 100%;
     min-height: 30rem;
     border-right: 1px solid var(--line);

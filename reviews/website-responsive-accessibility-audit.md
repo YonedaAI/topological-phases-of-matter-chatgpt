@@ -150,4 +150,22 @@ After the export gained exact LaTeX cross-reference text and visible equation nu
 
 At 320 pixels, the locality, physical-realizability, and synthesis papers had zero visible raw label tokens. All 68 nonempty KaTeX equation tags were numeric (16 locality, 19 realizability, 33 synthesis) and stayed within horizontally scrollable display containers. The seven diagram captions across the latter two papers, including four captions carrying visible equation references, remained within their 254-pixel caption boxes and the viewport.
 
+## Featured synthesis card regression
+
+A later wide-screen screenshot exposed an internal overlap that did not enlarge the page and therefore was not detected by the original `scrollWidth === clientWidth` gate. In the featured synthesis card, the cover link inherited `aspect-ratio: 1.08 / 1` while also receiving `height: 100%`. Its computed width was therefore 518.39 pixels even when its grid track was only 386.25 pixels, placing the cover 132.14 pixels into the text column at the 1,445-pixel test viewport.
+
+A browser geometry check was run before the source change and failed at all five horizontal test widths:
+
+| Viewport | Cover/body overlap before fix |
+| ---: | ---: |
+| 768 px | 249.14 px |
+| 992 px | 226.38 px |
+| 1,280 px | 137.09 px |
+| 1,445 px | 132.14 px |
+| 1,920 px | 132.14 px |
+
+The featured-card rule now resets the inherited ratio with `aspect-ratio: auto`, allowing the image column to obey the grid track while retaining the full-height cover treatment. The identical geometry check then reported exactly 0 pixels of overlap at all five widths.
+
+The broader post-fix audit covered 320, 375, 735, 736, 768, 992, 1,280, 1,445, and 1,920 pixels. All nine cases passed with cover and body separation at 0 pixels, every metadata/title/description/action box contained within the card body, no page-level horizontal overflow, successful cover decoding, and zero console errors, page errors, failed requests, or HTTP error responses. Visual captures at the breakpoint and wide layout confirmed that the page-one artifact and the full text panel remain legible and separated.
+
 FINAL VERDICT: PASS
