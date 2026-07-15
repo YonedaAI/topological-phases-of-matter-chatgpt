@@ -22,7 +22,7 @@ This checklist tracks research artifacts, not agent infrastructure.
 - [x] Compile final PDFs and page-one images from reviewed sources.
 - [x] Build and verify the mobile-first website, including math and accessibility.
 - [x] Write the repository README, description, and publication metadata.
-- [ ] Publish approved artifacts and verify every public link.
-- [ ] Notify Slack channel `C0AK269AVSA` using clean labeled links.
+- [x] Publish approved artifacts and verify every public link.
+- [x] Notify Slack channel `C0AK269AVSA` using clean labeled links.
 
 All claims use explicit statuses: `ESTABLISHED`, `PROPOSED`, `CONJECTURAL`, `OPEN`, or `OBSTRUCTED`.
