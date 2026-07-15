@@ -1,0 +1,33 @@
+.DS_Store
+
+# LaTeX build products. Final PDFs live in papers/pdf/.
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+papers/latex/*.pdf
+
+# Haskell build products.
+*.hi
+*.o
+dist-newstyle/
+
+# Lean build products.
+lean/.lake/
+
+# Website build products.
+node_modules/
+.next/
+.vercel/
+coverage/
+website/out/
+
+# Local visual-inspection scratch files.
+tmp/
+.playwright-mcp/
+.env*

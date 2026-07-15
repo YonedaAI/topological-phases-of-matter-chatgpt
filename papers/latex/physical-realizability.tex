@@ -1,0 +1,1374 @@
+\documentclass[12pt]{article}
+
+% Core mathematics
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+
+% Diagrams
+\usepackage{tikz-cd}
+\usepackage{tikz}
+
+% References
+\usepackage{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+% Graphics and tables
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+
+% Page layout
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+% GrokRxiv sidebar
+\usepackage{everypage}
+\usepackage{xcolor}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=green!40!black,
+  urlcolor=blue!60!black,
+  pdftitle={Physical Realizability of Invertible Phase Classes},
+  pdfauthor={Matthew Long and the YonedaAI Collaboration}
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Mic}{\mathfrak{Mic}}
+\newcommand{\Inv}{\mathfrak{Inv}}
+\newcommand{\FH}{\mathfrak{FH}}
+\newcommand{\Cond}{\mathfrak{Cond}}
+\newcommand{\IP}{\mathit{IP}}
+\newcommand{\Gap}{\operatorname{Gap}}
+\newcommand{\Spec}{\operatorname{Spec}}
+\newcommand{\Th}{\operatorname{Th}}
+\newcommand{\Pf}{\operatorname{Pf}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\EST}{\textnormal{\textsc{Established}}}
+\newcommand{\REAL}{\textnormal{\textsc{Realized}}}
+\newcommand{\CAND}{\textnormal{\textsc{Candidate}}}
+\newcommand{\PROP}{\textnormal{\textsc{Proposed}}}
+\newcommand{\OPEN}{\textnormal{\textsc{Open}}}
+\newcommand{\OBST}{\textnormal{\textsc{Obstructed}}}
+
+\definecolor{grokgray}{RGB}{110,110,110}
+\AddEverypageHook{%
+  \ifnum\value{page}=1
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[
+        rotate=90,
+        anchor=south,
+        font=\Large\sffamily\bfseries\color{grokgray},
+        inner sep=0pt
+      ] at ([xshift=38pt,yshift=0.52\paperheight]current page.south west)
+      {GrokRxiv:2026.07.physical-realizability\quad
+       [\,math-ph\,]\quad
+       14 Jul 2026};
+    \end{tikzpicture}
+  \fi
+}
+
+\title{Physical Realizability of Invertible Phase Classes:\\
+Microscopic Witnesses, Bordism Targets, and Relative Charges}
+\author{Matthew Long \\
+\textit{The YonedaAI Collaboration} \\
+\textit{YonedaAI Research Collective} \\
+Chicago, IL \\
+\texttt{matthew@yonedaai.com} $\cdot$ \url{https://yonedaai.com}}
+\date{14 July 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+An abstract class in bordism, stable homotopy, or generalized cohomology is
+not yet a quantum material.  A microscopic realization also needs a local
+Hilbert space, an interaction, a symmetry action, a ground-state convention,
+and a spectral gap bounded below independently of system size.  This paper
+turns that observation into a realizability matrix.  Each row records an
+explicit Hamiltonian, its symmetry, the theorem or exact calculation behind
+its uniform gap, a microscopic invariant, and the status of its comparison
+with an abstract class.
+
+Three one-dimensional tests are worked out.  The class-D Kitaev chain has an
+exactly flat bulk spectrum at its solvable point and realizes the nontrivial
+fermionic $\mathbb Z_2$ phase.  A stack of BDI chains realizes the free
+integer index, while the Fidkowski-Kitaev interaction identifies indices
+differing by eight.  The spin-1 AKLT chain has a rigorous bulk gap and carries
+the nontrivial projective $SO(3)$ edge representation.  These examples verify
+specific low-dimensional rows.  They do not prove that every class counted
+by a field-theory formula has a lattice representative.
+
+We keep three spectra separate.  Freed and Hopkins classify deformation
+classes of reflection-positive invertible field theories under stated
+field-theoretic hypotheses.  Kubota constructs an operator-algebraic
+$\Omega$-spectrum from invertible gapped quantum spin systems.  A condensed
+phase spectrum remains a proposed organization of parameterized microscopic
+families.  No comparison theorem presently identifies these objects.
+
+Finally, for a family on $B$ with gapless locus $\Sigma$ and
+$U=B\setminus\Sigma$, we state the exact hypotheses under which the
+connecting morphism
+$E^q(U)\to E^{q+1}(B,U)$ defines a relative class, localizes by excision, and
+becomes a Thom class on $\Sigma$.  Its interpretation as a physical
+transition charge still requires a specified microscopic comparison map.
+The accompanying Haskell registry checks witness completeness, dimension
+bookkeeping, and the degrees in this relative-charge construction.
+\end{abstract}
+
+\tableofcontents
+
+\section{The realization problem}
+
+Classifications of invertible phases appear in several mathematical forms.
+Free fermions lead to operator K-groups.  Low-energy invertible field
+theories lead to bordism and Anderson-dual groups.  Microscopic spin systems
+can themselves be organized into homotopy types.  These outputs look similar
+because stacking supplies addition and spatial suspension shifts degrees.
+They are nevertheless built from different objects and different notions of
+homotopy.
+
+The question addressed here is deliberately concrete:
+
+\begin{quote}
+Given an abstract invertible class, is there a local symmetric Hamiltonian
+whose thermodynamic phase maps to that class, with a gap controlled uniformly
+in volume?
+\end{quote}
+
+The phrase ``maps to'' is essential.  A table in which two groups happen to
+be isomorphic does not supply a map between them.  Nor does it prove that an
+abstract generator has a representative satisfying a chosen microscopic
+notion of locality.
+
+\subsection{Spatial dimension and spacetime dimension}
+
+Throughout the paper,
+
+\begin{equation}
+  d=\text{spatial dimension},
+  \qquad
+  n=d+1=\text{spacetime dimension}.
+  \label{eq:dimension-rule}
+\end{equation}
+
+Hamiltonians and lattices are indexed by $d$.  The tangential symmetry type
+in the Freed-Hopkins formula is indexed by $n$.  Thus every comparison row
+must visibly apply the shift in \cref{eq:dimension-rule}.  In particular, a
+one-dimensional chain has $d=1$ but contributes to a two-dimensional
+spacetime theory with $n=2$.
+
+\subsection{What this paper proves}
+
+The main result is a verified portfolio, not a surjectivity theorem.
+
+\begin{theorem}[Low-dimensional witness portfolio]
+\label{thm:portfolio}
+With the boundary conventions stated below, the following systems satisfy
+the microscopic columns of the realizability matrix:
+
+\begin{enumerate}[leftmargin=2.2em]
+\item the solvable class-D Kitaev chain realizes the nontrivial free and
+interacting one-dimensional fermionic $\mathbb Z_2$ class;
+\item $r$ copies of the BDI chain realize free index $r$, and the
+symmetry-preserving interacting classification depends on $r$ modulo eight;
+\item the spin-1 AKLT chain realizes the nontrivial $SO(3)$-protected bosonic
+one-dimensional phase detected by its spin-$1/2$ boundary representation.
+\end{enumerate}
+
+For each row there is an explicit finite-range interaction, an explicit
+symmetry, a uniform bulk-gap calculation or theorem, and a microscopic
+invariant.  The corresponding bordism or field-theory comparison is a
+low-dimensional agreement using an effective-theory interpretation.  The
+theorem does not construct a general map from microscopic phases to the
+Freed-Hopkins spectrum.
+\end{theorem}
+
+The proof occupies \cref{sec:kitaev,sec:bdi,sec:aklt}.  The last sentence is
+part of the theorem's scope, not a disclaimer added after the fact.
+
+\subsection{Status language}
+
+We use four statuses for realization questions.
+
+\begin{definition}[Realization status]
+Fix the microscopic rules, including locality, symmetry, stabilization,
+boundary convention, and target invariant.
+
+\begin{itemize}[leftmargin=2.1em]
+\item \REAL{} means an explicit interaction, symmetry action, uniform-gap
+verification, and invariant computation are all present.
+\item \CAND{} means a model is explicit but at least one required witness is
+missing.
+\item \OPEN{} means no realization or obstruction theorem is asserted.
+\item \OBST{} means a theorem rules out realization under the fixed rules.
+\end{itemize}
+\end{definition}
+
+The absence of a known model gives status \OPEN{}, never \OBST{}.
+
+\section{Three phase objects that must remain distinct}
+
+\subsection{Microscopic stabilized phases}
+
+Let $\Gamma$ be a lattice of bounded geometry.  Each site $x$ carries a
+finite-dimensional Hilbert space $\mathcal H_x$, or a finite-dimensional
+graded local algebra in a fermionic formulation.  A finite-range or
+uniformly almost-local interaction $\Phi$ assigns a self-adjoint local
+operator $\Phi(X)$ to each finite $X\Subset\Gamma$.
+
+\begin{definition}[Microscopic phase datum]
+A microscopic datum in spatial dimension $d$ is a tuple
+
+\begin{equation}
+  W=(\Gamma,\{\mathcal H_x\},\Phi,G,\alpha,\omega,\gamma,\nu),
+  \label{eq:witness-tuple}
+\end{equation}
+
+where $G$ acts on the quasi-local algebra by $\alpha$, $\Phi$ is
+$G$-invariant, $\omega$ specifies the ground-state sector, $\gamma>0$ is a
+volume-independent bulk-gap lower bound, and $\nu$ is a phase invariant with
+a declared codomain.  Fermionic parity is included in the symmetry data when
+appropriate.
+\end{definition}
+
+For a periodic sequence of finite volumes $\Lambda_L$, the uniform-gap
+condition used in the examples is
+
+\begin{equation}
+  \inf_{L\ge L_0}
+  \left(E_{m_L+1}(H_{\Lambda_L})-E_{m_L}(H_{\Lambda_L})\right)
+  \ge \gamma>0.
+  \label{eq:uniform-gap}
+\end{equation}
+
+Here $m_L$ is the dimension of the prescribed low-energy sector.  For a
+periodic chain with a unique ground state, $m_L=1$.  For an open AKLT chain,
+the four edge states form the low-energy sector and the relevant bulk gap is
+the gap above that sector.
+
+Two data represent the same stabilized phase if, after adding atomic
+product-state ancillas, they are joined by a symmetry-preserving path of
+interactions that remains uniformly local and satisfies
+\cref{eq:uniform-gap} along the path.  Invertibility means that stacking with
+some second datum is gapped-homotopic, after stabilization, to the chosen
+atomic phase.
+
+\begin{remark}
+An additive numerical invariant does not prove invertibility.  Invertibility
+requires an inverse under stacking in the microscopic phase space.
+\end{remark}
+
+\subsection{Freed-Hopkins deformation classes}
+
+Fix a spacetime symmetry type $(H_n,\rho_n)$, where
+$\rho_n:H_n\to O_n$ has compact internal kernel.  Let $MTH$ be its
+Madsen-Tillmann spectrum and let $I\mathbb Z(1)$ denote the indicated
+Anderson-dual target.
+
+\begin{theorem}[Freed-Hopkins, discrete topological sector]
+\label{thm:fh}
+\EST{}  Deformation classes of reflection-positive invertible extended
+topological field theories of the fixed symmetry type are computed, in the
+discrete topological sector, by the torsion subgroup
+
+\begin{equation}
+  \FH_n(H)
+  :=[MTH,\Sigma^{n+1}I\mathbb Z(1)]_{\mathrm{tors}}.
+  \label{eq:fh-group}
+\end{equation}
+
+The application of this result to lattice phases assumes the existence and
+validity of an appropriate low-energy effective field theory.
+\end{theorem}
+
+The theorem is a field-theory classification.  It is not a theorem that each
+element of \cref{eq:fh-group} has a finite-range lattice Hamiltonian.  The
+broader extension to all nontopological reflection-positive invertible
+theories is also not silently imported here.
+
+\subsection{Kubota's microscopic Omega-spectrum}
+
+\begin{theorem}[Kubota]
+\label{thm:kubota}
+\EST{}  There is an $\Omega$-spectrum $\IP_*$ constructed from invertible
+gapped quantum spin systems on Euclidean spaces.  Its homotopy groups recover
+the corresponding smooth homotopy groups of microscopic invertible systems.
+The construction uses operator algebras, uniformly almost-local
+interactions, relaxed lattices, stabilization by atomic systems, and sheaves
+of smooth parameter families.  It also has variants for crystallographic
+spatial symmetry.
+\end{theorem}
+
+The objects in this theorem include a chosen nondegenerate gapped GNS ground
+state.  Compact Lie on-site symmetry yields the stated naive equivariant
+variant.  This should not be upgraded without proof to a genuine
+representation-graded equivariant spectrum.
+
+\subsection{The proposed condensed spectrum}
+
+A condensed moduli stack would evaluate parameterized Hamiltonian families
+on profinite or more general condensed test objects.  Its invertible sector
+could then be group-completed and stabilized.  This is a useful proposed
+target for disorder and inverse-limit parameter spaces.  It is not Kubota's
+smooth-manifold sheaf and it is not the bordism spectrum in
+\cref{thm:fh}.
+
+The current comparison situation is therefore
+
+\begin{equation}
+\begin{tikzcd}[column sep=large,row sep=large]
+\Inv(\Mic_d^G)
+  \arrow[r,dashed,"\text{partial microscopic packaging}"]
+  \arrow[dr,dotted,swap,"\text{low-energy comparison}"]
+& \IP_d^G
+  \arrow[d,dotted,"\text{comparison open}"] \\
+& \FH_{d+1}(H)
+\end{tikzcd}
+\qquad
+\begin{tikzcd}[column sep=large]
+\IP_d^G \arrow[r,dotted,"\text{no theorem}"]
+& \Cond_d^G.
+\end{tikzcd}
+\label{eq:comparison-diagram}
+\end{equation}
+
+Solid arrows would require definitions on a common domain and proofs of
+continuity, symmetry compatibility, stabilization compatibility, and
+homotopy invariance.  The dotted arrows in \cref{eq:comparison-diagram} are
+research questions.
+
+\section{The realizability matrix}
+
+\subsection{Witness columns}
+
+\begin{definition}[Realizability row]
+A realizability row for a proposed class $c$ contains the following fields:
+
+\begin{enumerate}[leftmargin=2.2em]
+\item spatial dimension $d$ and spacetime dimension $n=d+1$;
+\item microscopic kinematics and boundary convention;
+\item a local interaction $\Phi$;
+\item an exact symmetry action and its square or extension law;
+\item a uniform-gap witness, either an exact calculation or a cited theorem;
+\item a microscopic invariant $\nu_{\mathrm{mic}}$;
+\item an abstract target and a stated comparison status;
+\item one of the four realization statuses.
+\end{enumerate}
+\end{definition}
+
+The row is complete only if every required field is populated.  Numerical
+evidence from finitely many lengths is not a uniform-gap theorem.
+
+\subsection{The verified low-dimensional matrix}
+
+\renewcommand{\arraystretch}{1.28}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.14\textwidth}
+                  >{\raggedright\arraybackslash}p{0.13\textwidth}
+                  >{\raggedright\arraybackslash}p{0.17\textwidth}
+                  >{\raggedright\arraybackslash}p{0.18\textwidth}
+                  >{\raggedright\arraybackslash}p{0.21\textwidth}}
+\toprule
+System & Dimensions & Gap witness & Microscopic invariant & Abstract comparison \\
+\midrule
+\endfirsthead
+\toprule
+System & Dimensions & Gap witness & Microscopic invariant & Abstract comparison \\
+\midrule
+\endhead
+Class-D Kitaev chain
+& $d=1$, $n=2$
+& Exact flat BdG spectrum at the solvable periodic point
+& Pfaffian parity $-1$, equivalently one Majorana per open end
+& Spin/Arf $\mathbb Z_2$ agreement in the effective-theory sector; no general spectrum map \\
+
+BDI stack
+& $d=1$, $n=2$
+& Exact free bulk gap plus the Fidkowski-Kitaev symmetric interacting path for eight copies
+& Free index $r$, interacting class $r\bmod 8$
+& $\mathrm{Pin}^-$ and Arf-Brown-Kervaire $\mathbb Z_8$ agreement; comparison uses the field-theory interpretation \\
+
+Spin-1 AKLT chain
+& $d=1$, $n=2$
+& Rigorous AKLT bulk-gap theorem
+& Nontrivial projective $SO(3)$ edge representation
+& Agreement with the $H^2(SO(3),U(1))\cong\mathbb Z_2$ sector; no general bordism realization theorem \\
+\bottomrule
+\end{longtable}
+
+Each row has microscopic status \REAL{}.  Its last column states a more
+limited comparison claim.  The word ``agreement'' does not mean that the
+three spectra in \cref{eq:comparison-diagram} have been identified.
+
+\begin{proposition}[Matrix verification criterion]
+\label{prop:matrix-criterion}
+A row has status \REAL{} if the interaction and symmetry are explicit, the
+bulk gap satisfies \cref{eq:uniform-gap}, the microscopic invariant is
+computed and stable under the chosen phase relation, and the row claims no
+abstract comparison stronger than the supplied map or effective-theory
+argument.
+\end{proposition}
+
+\begin{proof}
+This is a contract rather than a classification theorem.  The first three
+conditions produce a microscopic witness of the claimed phase.  The last
+condition prevents a microscopic witness from being re-labelled as a
+surjectivity theorem for a different classification object.
+\end{proof}
+
+\section{The class-D Kitaev chain}
+\label{sec:kitaev}
+
+\subsection{Hamiltonian and symmetry}
+
+On a chain of $L$ complex fermions, let $c_j,c_j^*$ satisfy the canonical
+anticommutation relations.  With periodic or open boundary convention as
+specified, set
+
+\begin{align}
+H_D(\mu,t,\Delta)
+={}&-\mu\sum_j\left(c_j^*c_j-\frac12\right)
+-t\sum_j\left(c_j^*c_{j+1}+c_{j+1}^*c_j\right) \notag\\
+&+\Delta\sum_j\left(c_jc_{j+1}+c_{j+1}^*c_j^*\right),
+\label{eq:kitaev-hamiltonian}
+\end{align}
+
+where $t,\Delta\in\mathbb R$.  Fermion parity $(-1)^F$ is exact.  In BdG
+form, particle-hole conjugation is intrinsic and squares to $+1$.  No
+time-reversal symmetry is imposed, so the system is in class D.
+
+Introduce Majorana operators
+
+\begin{equation}
+  a_j=c_j+c_j^*,
+  \qquad
+  b_j=\frac{c_j-c_j^*}{i}.
+\end{equation}
+
+At the solvable point $\mu=0$ and $\Delta=t>0$, an open chain has
+
+\begin{equation}
+  H_D=it\sum_{j=1}^{L-1}b_j a_{j+1},
+  \label{eq:majorana-dimers}
+\end{equation}
+
+up to the conventional overall normalization.  The operators $a_1$ and
+$b_L$ do not occur in \cref{eq:majorana-dimers}.  They form the two boundary
+Majorana zero modes.
+
+\subsection{Uniform periodic gap}
+
+For a periodic chain, the BdG symbol may be chosen as
+
+\begin{equation}
+  h_D(k)=(-\mu-2t\cos k)\tau_z+2\Delta\sin k\,\tau_y.
+  \label{eq:class-d-symbol}
+\end{equation}
+
+Here the Nambu spinor is
+$\Psi_k=(c_k,c_{-k}^*)^{\mathsf T}$.  The matrices $\tau_y$ and $\tau_z$ are
+Pauli matrices in this ordered particle-hole basis, with the pairing phase
+chosen so that real $\Delta$ multiplies $\tau_y$.
+
+Its positive quasiparticle energy is
+
+\begin{equation}
+  E(k)=\sqrt{(\mu+2t\cos k)^2+4\Delta^2\sin^2 k}.
+  \label{eq:kitaev-dispersion}
+\end{equation}
+
+\begin{proposition}[Exact solvable-point gap]
+\label{prop:kitaev-gap}
+At $\mu=0$ and $\Delta=t>0$, every allowed periodic momentum satisfies
+$E(k)=2t$.  Hence the periodic many-body bulk gap is bounded below by $2t$
+for every $L$.
+\end{proposition}
+
+\begin{proof}
+Substitution in \cref{eq:kitaev-dispersion} gives
+
+\begin{equation}
+  E(k)^2=4t^2\cos^2k+4t^2\sin^2k=4t^2.
+\end{equation}
+
+A quadratic BdG Hamiltonian diagonalizes into independent positive-energy
+quasiparticles.  The least excitation energy is therefore $2t$, independent
+of the momentum mesh and of $L$.
+If one restricts the periodic Hilbert space to a fixed even-fermion-parity
+sector, a single quasiparticle is excluded and the first allowed excitation
+at this point has two quasiparticles and energy $4t$.  The stated $2t$
+volume-independent lower bound is valid with or without that restriction.
+\end{proof}
+
+\subsection{The microscopic invariant}
+
+At the particle-hole fixed momenta $k=0,\pi$, the class-D invariant can be
+written as the sign of a product of Pfaffians.  In the convention of
+\cref{eq:class-d-symbol},
+
+\begin{equation}
+  \nu_D=\operatorname{sgn}\bigl((\mu+2t)(\mu-2t)\bigr)\in\{+1,-1\}.
+  \label{eq:pfaffian-invariant}
+\end{equation}
+
+Thus $|\mu|<2|t|$ gives $\nu_D=-1$.  The solvable point lies in this region.
+The open-chain boundary Majoranas supply a second diagnostic of the same
+phase.
+
+\begin{corollary}[Class-D row]
+The tuple consisting of \cref{eq:kitaev-hamiltonian}, fermion parity and BdG
+particle-hole structure, periodic boundary conditions for the bulk gap, open
+boundary conditions for the edge diagnostic, the lower bound $2t$, and
+$\nu_D=-1$ is a \REAL{} microscopic row.
+\end{corollary}
+
+\subsection{Comparison status}
+
+In spacetime dimension $n=2$, the corresponding invertible spin field theory
+is the nontrivial Arf theory.  Both the microscopic interacting class-D
+classification and this low-dimensional field-theory sector are
+$\mathbb Z_2$.  The Kitaev chain is the standard microscopic representative
+of the nontrivial element.
+
+This agreement is strong evidence for the expected low-energy comparison.
+It does not define the dotted arrow in \cref{eq:comparison-diagram} on all
+microscopic phases, parameter families, or dimensions.
+
+\section{BDI and the interaction reduction}
+\label{sec:bdi}
+
+\subsection{Free integer index}
+
+Take $r$ copies of the real Kitaev chain.  Let the antiunitary symmetry $T$
+act by complex conjugation in the real-fermion basis, so that
+
+\begin{equation}
+  T i T^{-1}=-i,
+  \qquad
+  T c_{j,\alpha}T^{-1}=c_{j,\alpha},
+  \qquad
+  T^2=+1.
+  \label{eq:bdi-time-reversal}
+\end{equation}
+
+Together with BdG particle-hole structure this is class BDI.  The real
+off-diagonal symbol has an integer winding number.  A stack of $r$ solvable
+chains has
+
+\begin{equation}
+  \nu_{\mathrm{free}}=r\in\mathbb Z
+\end{equation}
+
+and carries $r$ Majorana zero modes at each open end.  Its periodic bulk gap
+is again $2t$.
+
+\subsection{Why the integer is not an interacting invariant}
+
+\begin{theorem}[Fidkowski-Kitaev reduction]
+\label{thm:fk}
+\EST{}  For one-dimensional BDI fermions with the symmetry in
+\cref{eq:bdi-time-reversal}, symmetry-preserving local interactions reduce
+the free $\mathbb Z$ classification to $\mathbb Z_8$.  Eight boundary
+Majorana modes can be gapped without a fermion bilinear and without breaking
+the symmetry.  Correspondingly, eight copies of the nontrivial free chain
+are connected to the trivial interacting phase by a symmetry-preserving
+gapped path.
+\end{theorem}
+
+The interaction is local and quartic in the boundary Majoranas, and its bulk
+extension supplies the gapped interpolation.  The cited construction, not a
+finite-size numerical extrapolation, is the gap witness for the reduction.
+For eight stacked chains, write $\gamma_a$ for the eight unpaired boundary
+operators selected from the $a_j,b_j$ basis used in
+\cref{eq:majorana-dimers}.  At an end where these $\gamma_a$ are $T$-even, a monomial
+$\gamma_a\gamma_b\gamma_c\gamma_d$ with a real coefficient is also
+$T$-even and preserves fermion parity.  The Fidkowski-Kitaev interaction is
+built from such quartic terms, so the mechanism gaps the boundary multiplet
+without violating \cref{eq:bdi-time-reversal}.
+
+\begin{proposition}[Interacting BDI row]
+\label{prop:bdi-row}
+The microscopic invariant of the interacting BDI stack is
+
+\begin{equation}
+  \nu_{\mathrm{int}}=r\pmod 8.
+  \label{eq:bdi-mod-eight}
+\end{equation}
+
+Rows $r$ and $r+8$ represent the same stabilized interacting phase, whereas
+their free integer invariants differ.
+\end{proposition}
+
+\begin{proof}
+The equivalence $r\sim r+8$ follows by stacking the Fidkowski-Kitaev gapped
+trivialization of eight chains.  Their interacting classification also
+distinguishes the remaining residue classes, for example through the
+symmetry action and algebra of boundary degrees of freedom.  Hence the
+quotient is precisely $\mathbb Z_8$.
+\end{proof}
+
+\begin{counterexample}[Free K-theory is not the universal interacting answer]
+The free phases with indices $0$ and $8$ are distinct in the integer
+classification.  By \cref{thm:fk}, they are equal after symmetry-preserving
+interactions are admitted.  Therefore a free K-group cannot be identified
+with the interacting microscopic phase group in general.
+\end{counterexample}
+
+\subsection{Pin structure and the abstract class}
+
+The antiunitary relation $T^2=+1$ for the BDI fermion corresponds to the
+$\mathrm{Pin}^-$ tangential structure in two spacetime dimensions.  The
+Arf-Brown-Kervaire invariant has values in $\mathbb Z_8$, matching
+\cref{eq:bdi-mod-eight}.  This is a particularly sharp low-dimensional
+agreement between microscopic interaction reduction and bordism data.
+
+The comparison still uses the low-energy field-theory interpretation in
+\cref{thm:fh}.  It is not a construction of a natural equivalence between
+Kubota's $\IP_*$ and the Freed-Hopkins mapping spectrum.
+
+\section{The SO(3)-protected AKLT chain}
+\label{sec:aklt}
+
+\subsection{Interaction and symmetry}
+
+At each site place the spin-1 irreducible representation of $SO(3)$.  Write
+$\mathbf S_j=(S_j^x,S_j^y,S_j^z)$.  For neighboring sites let
+$P^{(2)}_{j,j+1}$ be the orthogonal projection onto total spin two.  Since
+$x=\mathbf S_j\cdot\mathbf S_{j+1}$ has eigenvalues $-2,-1,1$ in total-spin
+sectors zero, one, and two,
+
+\begin{equation}
+  P^{(2)}_{j,j+1}
+  =\frac16\left(
+      (\mathbf S_j\cdot\mathbf S_{j+1})^2
+      +3\mathbf S_j\cdot\mathbf S_{j+1}
+      +2
+    \right).
+  \label{eq:aklt-projector}
+\end{equation}
+
+The AKLT Hamiltonian is
+
+\begin{equation}
+  H_{\mathrm{AKLT}}=\sum_j P^{(2)}_{j,j+1}.
+  \label{eq:aklt-hamiltonian}
+\end{equation}
+
+Every term is a positive nearest-neighbor projection.  The diagonal on-site
+$SO(3)$ action commutes with each term.
+
+\subsection{Ground states, edges, and bulk gap}
+
+The valence-bond construction represents each spin one as the symmetric
+subspace of two virtual spin-$1/2$ variables and pairs neighboring virtual
+spins into singlets.  On a periodic chain it gives the unique ground state.
+On an open chain, one virtual spin-$1/2$ remains at each boundary, giving a
+four-dimensional ground-state sector.
+
+\begin{theorem}[AKLT bulk gap]
+\label{thm:aklt-gap}
+\EST{}  The one-dimensional AKLT interaction has a strictly positive bulk
+spectral gap.  Equivalently, the periodic finite-volume gaps have a positive
+lower bound for sufficiently large volume, and the open-chain spectrum has a
+positive gap above its edge-state ground sector.
+\end{theorem}
+
+This is the imported gap theorem for the row.  Frustration freeness alone
+would not have been enough.
+
+\subsection{Projective boundary invariant}
+
+The physical spin-1 representation descends from $SU(2)$ to a linear
+representation of $SO(3)$.  A single virtual edge spin transforms in the
+spin-$1/2$ representation of $SU(2)$.  The central element $-1\in SU(2)$
+acts on it as $-\id$, so this action does not descend to a linear
+representation of $SO(3)$.  It defines the nontrivial projective class
+
+\begin{equation}
+  [\omega_{\mathrm{edge}}]
+  \in H^2(SO(3),U(1))\cong\mathbb Z_2.
+  \label{eq:aklt-edge-class}
+\end{equation}
+
+\begin{proposition}[Stability of the AKLT edge class]
+\label{prop:aklt-edge}
+Along a uniformly gapped $SO(3)$-symmetric path of one-dimensional spin
+interactions, the projective equivalence class of the boundary
+representation is constant.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Quasi-adiabatic spectral flow transports the ground-state sector by a
+quasi-local automorphism that intertwines the symmetry.  The induced
+half-chain boundary representations are therefore unitarily equivalent up
+to tensoring with linear on-site representations.  Such tensor factors do
+not change the class in $H^2(SO(3),U(1))$.  The operator-algebraic version is
+proved for compact symmetry groups by Bachmann and Nachtergaele.
+\end{proof}
+
+\begin{corollary}[AKLT row]
+The interaction \cref{eq:aklt-hamiltonian}, diagonal spin-1 $SO(3)$ action,
+AKLT bulk-gap theorem, periodic and open boundary conventions, and
+nontrivial class \cref{eq:aklt-edge-class} form a \REAL{} microscopic row.
+\end{corollary}
+
+The same $\mathbb Z_2$ appears in the low-dimensional bosonic field-theory
+sector with $SO(3)$ background.  As in the fermionic examples, this row
+checks a generator and not the essential surjectivity of a general
+comparison functor.
+
+\section{Relative transition charge}
+\label{sec:relative}
+
+\subsection{The exact sequence of a pair}
+
+Let $E$ be a multiplicative generalized cohomology theory represented by a
+spectrum.  Let $B$ be a space in a category where the pair axiom and excision
+hold, and let $\Sigma\subset B$ be closed.  Put
+$U=B\setminus\Sigma$.  We assume the inclusions have been replaced by
+cofibrant pairs when necessary, so that the cofiber model computes relative
+cohomology.
+
+The pair $(B,U)$ has the long exact sequence
+
+\begin{equation}
+\cdots\longrightarrow E^q(B)
+\xrightarrow{j^*}E^q(U)
+\xrightarrow{\partial}E^{q+1}(B,U)
+\xrightarrow{i^*}E^{q+1}(B)
+\longrightarrow\cdots.
+\label{eq:long-exact-sequence}
+\end{equation}
+
+\begin{definition}[Relative class]
+For $\nu\in E^q(U)$, define
+
+\begin{equation}
+  Q_\Sigma(\nu):=\partial\nu\in E^{q+1}(B,U).
+  \label{eq:relative-charge}
+\end{equation}
+
+As algebraic topology this is an \EST{} connecting class.  Calling it a
+physical transition charge is \PROP{} until $\nu$ is tied to a microscopic
+family by a specified comparison map.
+\end{definition}
+
+\begin{proposition}[Extension criterion]
+\label{prop:extension-criterion}
+The class $Q_\Sigma(\nu)$ vanishes if $\nu$ is the restriction of a class in
+$E^q(B)$.  Conversely, exactness implies that
+$Q_\Sigma(\nu)=0$ precisely when $\nu$ lies in the image of $j^*$.
+\end{proposition}
+
+\begin{proof}
+Exactness at $E^q(U)$ gives
+$\ker\partial=\operatorname{im}j^*$.
+\end{proof}
+
+The converse concerns extension in the chosen cohomology theory.  It does
+not say that a Hamiltonian family itself extends across $\Sigma$ while
+remaining gapped.
+
+\subsection{Excision near the gapless locus}
+
+\begin{theorem}[Localization by excision]
+\label{thm:excision}
+Assume $B$ is paracompact Hausdorff and has the homotopy type required by
+$E$.  Let $N$ be an open neighborhood of $\Sigma$ such that excision applies
+to the pair $(B,U)$.  Then inclusion of pairs induces an isomorphism
+
+\begin{equation}
+  E^{q+1}(B,B\setminus\Sigma)
+  \xrightarrow{\cong}
+  E^{q+1}(N,N\setminus\Sigma).
+  \label{eq:excision-isomorphism}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Choose $N$ so that the closure of $B\setminus N$ is contained in the open
+set $U$.  Excision removes $B\setminus N$ from both entries of the pair.
+The resulting pair is $(N,N\setminus\Sigma)$.  Generalized cohomology
+represented on cofibrant pairs satisfies this excision axiom.
+\end{proof}
+
+This theorem is the precise sense in which \cref{eq:relative-charge} is
+supported near $\Sigma$.
+
+\subsection{Thom identification}
+
+Suppose now that $B$ is a smooth manifold and $\Sigma\hookrightarrow B$ is a
+closed smooth submanifold of codimension $c$.  Let $\mathcal N\to\Sigma$ be
+its normal bundle.  Assume $\mathcal N$ is $E$-oriented, meaning it has a
+Thom class
+
+\begin{equation}
+  u_E\in\widetilde E^c(\Th(\mathcal N))
+\end{equation}
+
+whose restriction to every normal fiber is a generator in the required
+sense.
+
+\begin{theorem}[Relative class on the critical locus]
+\label{thm:thom-charge}
+Under the excision and orientation hypotheses above, a tubular neighborhood
+and the Thom isomorphism give
+
+\begin{align}
+E^{q+1}(B,B\setminus\Sigma)
+&\cong E^{q+1}(N,N\setminus\Sigma) \notag\\
+&\cong \widetilde E^{q+1}(\Th(\mathcal N)) \notag\\
+&\cong E^{q+1-c}(\Sigma).
+\label{eq:thom-localization}
+\end{align}
+
+Thus $Q_\Sigma(\nu)$ determines a localized class of degree $q+1-c$ on
+$\Sigma$.
+\end{theorem}
+
+\begin{proof}
+The first isomorphism is \cref{thm:excision}.  Radial deformation in a
+tubular neighborhood identifies the pair with the disk and sphere bundles
+$(D\mathcal N,S\mathcal N)$, whose quotient is the Thom space.  Cup product
+with $u_E$ is the Thom isomorphism and shifts degree by $c$.
+\end{proof}
+
+Without an $E$-orientation, the last line must use the corresponding twisted
+cohomology.  Omitting that twist can change or destroy the purported charge.
+
+\subsection{Linking spheres}
+
+At a point $x\in\Sigma$ where the normal bundle is locally trivial, restrict
+the Thom representative to a normal disk $D^c$ and its boundary $S^{c-1}$.
+The resulting local class measures the obstruction on a linking sphere.
+For ordinary cohomology this is the familiar local degree.  For K-theory or
+another spectrum it is the corresponding generalized cohomology class.
+
+\begin{remark}
+A linking sphere must live in the full parameter space relevant to the
+invariant.  For a band Hamiltonian this may include momentum together with a
+tuning parameter.  A loop in the tuning parameter alone can miss the charge.
+For example, an isolated codimension-three Weyl-type degeneracy is linked by
+an $S^2$.  Its three normal coordinates may be three momentum components, or
+two momenta together with a tuning mass in a parameterized two-dimensional
+model.
+\end{remark}
+
+\subsection{Naturality required for physics}
+
+Suppose a microscopic family $H$ on $U$ has an invariant
+$\nu_{\mathrm{mic}}(H)$.  To interpret \cref{eq:relative-charge} physically,
+one needs a natural transformation
+
+\begin{equation}
+  \kappa:\nu_{\mathrm{mic}}(H)\longmapsto \nu_E(H)\in E^q(U)
+  \label{eq:comparison-map}
+\end{equation}
+
+that is invariant under the chosen gapped homotopies and compatible with
+restriction to open sets.  Naturality then makes the connecting morphism
+commute with the microscopic restriction maps.
+
+\begin{proposition}[Conditional physical charge]
+If the map \cref{eq:comparison-map} exists with these properties, then
+$Q_\Sigma(\nu_E(H))$ is an invariant of the microscopic gapped family on
+$U$ and is supported near the gapless locus by \cref{thm:excision}.
+\end{proposition}
+
+\begin{proof}
+Homotopy invariance of $\kappa$ makes $\nu_E(H)$ a phase invariant.
+Naturality of the long exact sequence transports this invariance through
+$\partial$.  Excision supplies the support statement.
+\end{proof}
+
+The proposition is conditional.  A relative group by itself does not create
+the microscopic map $\kappa$.
+
+\section{Failures that a realizability claim must avoid}
+
+\begin{counterexample}[Equal groups without a comparison]
+Suppose two independently defined phase theories both produce
+$\mathbb Z_8$.  Choosing generators gives many abstract group isomorphisms.
+None of those choices proves that a microscopic Hamiltonian flows to a
+particular field theory, respects families, or commutes with stacking.
+\end{counterexample}
+
+\begin{counterexample}[A finite-size gap table]
+Assume exact diagonalization gives gaps above $0.2$ for lengths up to twenty.
+The sequence could still decrease to zero at larger lengths.  The table is
+evidence, not a witness for \cref{eq:uniform-gap}.
+\end{counterexample}
+
+\begin{counterexample}[Edge modes without a bulk convention]
+An open finite chain can have nearly zero-energy boundary states for reasons
+unrelated to a stable bulk phase.  Without a periodic bulk-gap statement and
+a symmetry-stable boundary invariant, zero modes alone do not complete a
+realizability row.
+\end{counterexample}
+
+\begin{counterexample}[Pointwise representatives without a family]
+Choosing one Hamiltonian for each abstract class does not automatically give
+a continuous map of phase spaces or spectra.  Parameter continuity and
+uniform locality and gap bounds are additional data.
+\end{counterexample}
+
+\begin{remark}[Open is not obstructed]
+If no lattice model is known for a bordism class, the correct status is
+\OPEN{}.  Status \OBST{} requires a theorem such as an anomaly, locality, or
+finite-dimensionality obstruction formulated for the same microscopic
+rules.
+\end{remark}
+
+\section{What condensed organization contributes}
+
+Condensed mathematics can organize families over profinite sets, disorder
+hulls, and inverse limits.  It can impose descent on compatible local data
+and make stacking functorial.  For the realizability problem, a condensed
+test object could record how a portfolio of witnesses varies over a totally
+disconnected compact parameter space.
+
+It does not provide any missing witness in \cref{eq:witness-tuple}.  In
+particular, sheaf descent does not prove the operator inequality behind a
+gap, construct an inverse phase, or identify a low-energy field theory.
+
+\begin{definition}[Proposed condensed realizability subfunctor]
+For a condensed test object $S$, let $\mathcal R_d^G(S)$ consist, when
+defined, of $S$-families of microscopic witnesses with a common locality
+bound, a common positive gap, continuous local coefficients, and a locally
+constant realizability status.  Pullback is by parameter restriction.
+\end{definition}
+
+This definition is \PROP{}.  A full construction must specify higher
+isomorphisms, stabilization, and the topology on symmetry actions.  Even
+after construction, a morphism
+$\mathcal R_d^G\to\FH_{d+1}(H)$ remains a separate comparison problem.
+
+\section{Executable witness registry}
+
+The Haskell program under
+
+\begin{center}
+\path{src/physical-realizability/}
+\end{center}
+
+implements a finite registry rather than a symbolic classifier.  A row has
+separate fields for $d$, $n$, interaction, symmetry, gap evidence,
+microscopic invariant, abstract comparison, and status.  Validation checks
+that $n=d+1$, that a \REAL{} row has every microscopic witness, and that no
+row describes effective-theory agreement as a general spectrum equivalence.
+
+The program also implements the degree bookkeeping
+
+\begin{equation}
+  q\xmapsto{\partial}q+1
+  \xmapsto{\text{Thom, codim }c}q+1-c.
+\end{equation}
+
+It records whether extension forces the connecting class to vanish and
+whether an $E$-orientation is available for the Thom step.
+
+These are contract checks.  A Boolean value cannot prove the AKLT gap or the
+Fidkowski-Kitaev interpolation.  The registry stores those results as cited
+theorem witnesses and rejects rows in which the citation field is absent.
+
+\section{Status ledger}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.28\textwidth}
+                  >{\raggedright\arraybackslash}p{0.15\textwidth}
+                  >{\raggedright\arraybackslash}p{0.48\textwidth}}
+\toprule
+Statement & Status & Basis \\
+\midrule
+\endfirsthead
+\toprule
+Statement & Status & Basis \\
+\midrule
+\endhead
+Freed-Hopkins classification of discrete reflection-positive invertible TFTs
+& \EST{} & Stable homotopy and bordism theorem under its field-theory hypotheses \\
+
+Kubota $\Omega$-spectrum for invertible gapped spin systems
+& \EST{} & Operator-algebraic construction with smooth families and almost-local interactions \\
+
+Kitaev class-D row
+& \REAL{} & Explicit interaction, exact periodic gap, Pfaffian invariant, edge Majoranas \\
+
+BDI mod-eight row
+& \REAL{} & Explicit free stacks and Fidkowski-Kitaev interacting reduction \\
+
+AKLT $SO(3)$ row
+& \REAL{} & Explicit projector interaction, rigorous bulk gap, projective edge class \\
+
+General microscopic to Freed-Hopkins comparison
+& \OPEN{} & No map with all required functorial and analytic properties is supplied \\
+
+Identification of Kubota and Freed-Hopkins spectra
+& \OPEN{} & Domains and homotopies differ; no equivalence theorem is imported \\
+
+Identification with a condensed phase spectrum
+& \OPEN{} & Condensed spectrum remains a proposed construction \\
+
+Connecting morphism in a pair
+& \EST{} & Long exact sequence for generalized cohomology \\
+
+Physical interpretation of every relative class
+& \PROP{} & Requires a microscopic invariant and natural comparison map \\
+\bottomrule
+\end{longtable}
+
+\section{Limitations and open problems}
+
+\subsection{Restricted model portfolio}
+
+All verified rows are one-dimensional.  They do not test chiral phases in
+two spatial dimensions, intrinsic topological order, noninvertible phases,
+or higher-form symmetry.  The AKLT row is a spin system, while the class-D
+and BDI rows are fermionic.  Moving between these settings can involve a
+choice of graded tensor product or Jordan-Wigner transformation and is not
+treated as invisible.
+
+\subsection{No general field-theory emergence theorem}
+
+We do not prove that a gapped lattice model has a relativistic infrared
+limit, that its low-energy theory is fully extended, or that this theory is
+faithful to microscopic phase equivalence.  These are among the assumptions
+needed to apply \cref{thm:fh} to lattice systems.
+
+\subsection{No surjectivity}
+
+Nothing here proves that every element of
+$[MTH,\Sigma^{n+1}I\mathbb Z(1)]_{\mathrm{tors}}$ is realized by a local
+Hamiltonian.  Nothing proves that every homotopy class in a proposed
+condensed spectrum comes from Kubota's construction, or conversely.
+
+\subsection{Boundaries and degeneracy}
+
+Uniform bulk gaps and open-boundary spectral gaps are different statements.
+We explicitly retain the low-energy edge sector in \cref{eq:uniform-gap}.
+Boundary perturbations can split that sector while leaving the bulk gap
+open.  A realizability row must state which notion it uses.
+
+\subsection{Relative charge needs orientation and comparison}
+
+The Thom identification in \cref{eq:thom-localization} can fail without an
+$E$-orientation of the normal bundle.  Excision can fail if one works
+outside a category of good pairs without a supported-cohomology
+replacement.  Most importantly, a relative generalized cohomology class is
+not automatically measurable until the microscopic invariant and response
+map are specified.
+
+\subsection{A useful next theorem}
+
+A major next step would be a natural transformation from a controlled
+microscopic invertible phase spectrum to an Anderson-dual bordism target,
+defined on smooth parameter families and compatible with stacking,
+suspension, spatial symmetry, and spectral flow.  Its value on the three
+rows in this paper should recover the stated low-dimensional comparisons.
+Constructing that map is \OPEN{}.
+
+\section{Conclusion}
+
+Physical realizability is a witness problem.  A class earns microscopic
+status only after locality, symmetry, a thermodynamic gap, and an invariant
+have been checked on an explicit system.  The Kitaev, BDI, and AKLT chains
+pass that test in one spatial dimension.  Their agreement with spin,
+$\mathrm{Pin}^-$, and $SO(3)$ field-theory data is informative and exact at
+the level stated, but it is not a universal realization theorem.
+
+The broader condensed program therefore has a clear boundary.  Condensed
+objects can organize parameterized witnesses and their descent.  Kubota's
+$\Omega$-spectrum supplies a genuine microscopic stable-homotopy object for
+quantum spin systems.  Freed-Hopkins supplies a genuine bordism-based
+classification of reflection-positive invertible field theories.  The maps
+between these constructions remain mathematical work to be done.
+
+\appendix
+
+\section{Detailed witness sheets}
+
+\subsection{Class D}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.26\textwidth}
+                  >{\raggedright\arraybackslash}p{0.65\textwidth}}
+\toprule
+Field & Witness \\
+\midrule
+Spatial and spacetime dimensions & $d=1$, $n=2$ \\
+Local degrees of freedom & One complex fermion per site \\
+Interaction & Nearest-neighbor hopping and pairing in \cref{eq:kitaev-hamiltonian} \\
+Symmetry & Fermion parity; BdG particle-hole structure with square $+1$ \\
+Bulk boundary convention & Periodic chain \\
+Edge convention & Open chain \\
+Gap & Exact $2t$ at $\mu=0$, $\Delta=t>0$ \\
+Invariant & Pfaffian parity $\nu_D=-1$ \\
+Edge diagnostic & One unpaired Majorana at each end \\
+Microscopic status & \REAL{} \\
+Abstract comparison & Nontrivial Arf/spin $\mathbb Z_2$ class under low-energy interpretation \\
+Global comparison theorem & \OPEN{} \\
+\bottomrule
+\end{longtable}
+
+\subsection{BDI}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.26\textwidth}
+                  >{\raggedright\arraybackslash}p{0.65\textwidth}}
+\toprule
+Field & Witness \\
+\midrule
+Spatial and spacetime dimensions & $d=1$, $n=2$ \\
+Local degrees of freedom & $r$ real copies of the Kitaev chain \\
+Interaction & Stacked quadratic chain plus allowed local quartic interactions \\
+Symmetry & Antiunitary $T^2=+1$ and fermion parity \\
+Free bulk gap & Exact $2t$ at the stacked solvable point \\
+Interaction witness & Fidkowski-Kitaev gapped trivialization of eight copies \\
+Free invariant & $r\in\mathbb Z$ \\
+Interacting invariant & $r\bmod 8$ \\
+Microscopic status & \REAL{} \\
+Abstract comparison & $\mathrm{Pin}^-$ Arf-Brown-Kervaire $\mathbb Z_8$ agreement \\
+Spectrum equivalence & \OPEN{} \\
+\bottomrule
+\end{longtable}
+
+\subsection{AKLT}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.26\textwidth}
+                  >{\raggedright\arraybackslash}p{0.65\textwidth}}
+\toprule
+Field & Witness \\
+\midrule
+Spatial and spacetime dimensions & $d=1$, $n=2$ \\
+Local degrees of freedom & Spin one per site \\
+Interaction & Nearest-neighbor total-spin-two projectors \\
+Symmetry & Diagonal linear $SO(3)$ action \\
+Bulk convention & Unique periodic ground state \\
+Edge convention & Four-dimensional open-chain ground sector \\
+Gap & Rigorous AKLT bulk-gap theorem \\
+Invariant & Nontrivial class in $H^2(SO(3),U(1))$ \\
+Edge diagnostic & Projective spin-$1/2$ representation at each end \\
+Microscopic status & \REAL{} \\
+Abstract comparison & Nontrivial bosonic $SO(3)$ field-theory sector \\
+General realization theorem & \OPEN{} \\
+\bottomrule
+\end{longtable}
+
+\section{A direct check of the AKLT projector}
+
+Let $x=\mathbf S_j\cdot\mathbf S_{j+1}$.  For two spin-one variables,
+
+\begin{equation}
+  x=\frac12\left(J(J+1)-2\cdot1(1+1)\right)
+\end{equation}
+
+in the total-spin-$J$ sector.  Hence $x=-2,-1,1$ for $J=0,1,2$.  The
+polynomial
+
+\begin{equation}
+  p(x)=\frac{(x+2)(x+1)}6
+\end{equation}
+
+has values $0,0,1$ on those sectors.  Functional calculus therefore gives
+$p(x)=P^{(2)}$, proving \cref{eq:aklt-projector}.  Positivity of every term
+and annihilation of the valence-bond state follow immediately.  The
+spectral gap remains a separate theorem because a sum of positive local
+projectors need not be uniformly gapped.
+
+\section{Relative-degree bookkeeping}
+
+For reference, the exact sequence and Thom shifts are
+
+\begin{equation}
+\begin{tikzcd}[column sep=large]
+E^q(B) \arrow[r,"j^*"]
+& E^q(U) \arrow[r,"\partial"]
+& E^{q+1}(B,U) \arrow[r,"i^*"]
+& E^{q+1}(B)
+\end{tikzcd}
+\end{equation}
+
+and, for an $E$-oriented normal bundle of rank $c$,
+
+\begin{equation}
+\begin{tikzcd}[column sep=large]
+E^{q+1}(B,U)
+  \arrow[r,"\text{excision}","\cong"']
+& E^{q+1}(D\mathcal N,S\mathcal N)
+  \arrow[r,"u_E^{-1}","\cong"']
+& E^{q+1-c}(\Sigma).
+\end{tikzcd}
+\end{equation}
+
+If $\nu=j^*\widetilde\nu$, then
+$\partial\nu=\partial j^*\widetilde\nu=0$.  If the normal bundle is not
+$E$-oriented, the final group must be replaced by the correctly twisted
+group.  If $\Sigma$ is singular, one needs a stratified normal datum or a
+supported-cohomology formulation rather than the smooth Thom statement used
+here.
+
+\section{Machine-checkable registry contract}
+
+The finite registry validates the following implications:
+
+\begin{align}
+\texttt{REALIZED}
+&\Longrightarrow
+\texttt{interaction}\wedge\texttt{symmetry}, \\
+&\phantom{\Longrightarrow{}}
+\texttt{gap witness}\wedge\texttt{microscopic invariant}, \\
+\texttt{dimension valid}
+&\Longleftrightarrow n=d+1, \\
+\texttt{extends globally}
+&\Longrightarrow Q_\Sigma(\nu)=0, \\
+\texttt{Thom degree}
+&=q+1-c
+\quad\text{when an orientation is present.}
+\end{align}
+
+It deliberately does not encode the false implication
+
+\begin{equation}
+  \texttt{same finite group}
+  \Longrightarrow
+  \texttt{equivalent phase spectra}.
+\end{equation}
+
+\section{Glossary of scope-sensitive terms}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.68\textwidth}}
+\toprule
+Term & Meaning in this paper \\
+\midrule
+Microscopic phase & Stabilized uniformly gapped homotopy class of local interactions with fixed symmetry rules \\
+Invertible & Has a stacking inverse up to stabilized gapped homotopy \\
+Uniform gap & Positive lower bound independent of volume, with a declared low-energy sector \\
+Abstract class & Element of a stated K-theory, bordism, homotopy, or generalized cohomology group \\
+Realized & Complete microscopic witness for the specific claimed invariant \\
+Candidate & Explicit model with at least one missing witness \\
+Open & Neither realization nor obstruction is asserted \\
+Obstructed & Nonrealizability follows from a theorem under the same rules \\
+Relative class & Image under the connecting morphism in a long exact sequence \\
+Physical charge & Relative class equipped with a microscopic comparison and response interpretation \\
+Condensed family & Proposed family organized on condensed test objects with uniform analytic bounds \\
+\bottomrule
+\end{longtable}
+
+\begin{thebibliography}{99}
+
+\bibitem{FreedHopkins}
+D. S. Freed and M. J. Hopkins,
+\emph{Reflection positivity and invertible topological phases},
+Geometry and Topology \textbf{25} (2021), 1165 to 1330,
+\url{https://arxiv.org/abs/1604.06527}.
+
+\bibitem{Kubota}
+Y. Kubota,
+\emph{Stable homotopy theory of invertible gapped quantum spin systems I:
+Kitaev's Omega-spectrum},
+arXiv:2503.12618 (2025),
+\url{https://arxiv.org/abs/2503.12618}.
+
+\bibitem{KitaevWire}
+A. Y. Kitaev,
+\emph{Unpaired Majorana fermions in quantum wires},
+Physics-Uspekhi \textbf{44} (2001), 131 to 136,
+\url{https://arxiv.org/abs/cond-mat/0010440}.
+
+\bibitem{KitaevPeriodic}
+A. Kitaev,
+\emph{Periodic table for topological insulators and superconductors},
+AIP Conference Proceedings \textbf{1134} (2009), 22 to 30,
+\url{https://arxiv.org/abs/0901.2686}.
+
+\bibitem{FidkowskiKitaev2009}
+L. Fidkowski and A. Kitaev,
+\emph{The effects of interactions on the topological classification of free
+fermion systems},
+Physical Review B \textbf{81} (2010), 134509,
+\url{https://arxiv.org/abs/0904.2197}.
+
+\bibitem{FidkowskiKitaev2011}
+L. Fidkowski and A. Kitaev,
+\emph{Topological phases of fermions in one dimension},
+Physical Review B \textbf{83} (2011), 075103,
+\url{https://arxiv.org/abs/1008.4138}.
+
+\bibitem{AKLT1987}
+I. Affleck, T. Kennedy, E. H. Lieb, and H. Tasaki,
+\emph{Rigorous results on valence-bond ground states in antiferromagnets},
+Physical Review Letters \textbf{59} (1987), 799 to 802,
+\url{https://doi.org/10.1103/PhysRevLett.59.799}.
+
+\bibitem{AKLT1988}
+I. Affleck, T. Kennedy, E. H. Lieb, and H. Tasaki,
+\emph{Valence bond ground states in isotropic quantum antiferromagnets},
+Communications in Mathematical Physics \textbf{115} (1988), 477 to 528,
+\url{https://doi.org/10.1007/BF01218021}.
+
+\bibitem{BachmannNachtergaele}
+S. Bachmann and B. Nachtergaele,
+\emph{On gapped phases with a continuous symmetry and boundary operators},
+Journal of Statistical Physics \textbf{154} (2014), 91 to 112,
+\url{https://arxiv.org/abs/1307.0716}.
+
+\bibitem{ChenGuWen}
+X. Chen, Z.-C. Gu, and X.-G. Wen,
+\emph{Classification of gapped symmetric phases in one-dimensional spin
+systems},
+Physical Review B \textbf{83} (2011), 035107,
+\url{https://arxiv.org/abs/1008.3745}.
+
+\bibitem{PollmannTurnerBergOshikawa}
+F. Pollmann, A. M. Turner, E. Berg, and M. Oshikawa,
+\emph{Entanglement spectrum of a topological phase in one dimension},
+Physical Review B \textbf{81} (2010), 064439,
+\url{https://arxiv.org/abs/0910.1811}.
+
+\bibitem{BMNS}
+S. Bachmann, S. Michalakis, B. Nachtergaele, and R. Sims,
+\emph{Automorphic equivalence within gapped phases of quantum lattice
+systems},
+Communications in Mathematical Physics \textbf{309} (2012), 835 to 871,
+\url{https://arxiv.org/abs/1102.0842}.
+
+\bibitem{Thiang}
+G. C. Thiang,
+\emph{On the K-theoretic classification of topological phases of matter},
+Annales Henri Poincare \textbf{17} (2016), 757 to 794,
+\url{https://arxiv.org/abs/1406.7366}.
+
+\bibitem{TeoKane}
+J. C. Y. Teo and C. L. Kane,
+\emph{Topological defects and gapless modes in insulators and
+superconductors},
+Physical Review B \textbf{82} (2010), 115120,
+\url{https://arxiv.org/abs/1006.0690}.
+
+\bibitem{Brown}
+E. H. Brown, Jr.,
+\emph{Cohomology theories},
+Annals of Mathematics \textbf{75} (1962), 467 to 484,
+\url{https://doi.org/10.2307/1970209}.
+
+\bibitem{AtiyahBottShapiro}
+M. F. Atiyah, R. Bott, and A. Shapiro,
+\emph{Clifford modules},
+Topology \textbf{3} Supplement 1 (1964), 3 to 38,
+\url{https://doi.org/10.1016/0040-9383(64)90003-5}.
+
+\end{thebibliography}
+
+\end{document}

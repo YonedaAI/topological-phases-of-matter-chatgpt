@@ -1,0 +1,2108 @@
+\documentclass[12pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage{everypage}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{microtype}
+\usepackage{array}
+\usepackage{longtable}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=green!45!black,
+  urlcolor=blue!65!black
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{warning}[theorem]{Warning}
+
+\newcommand{\A}{\mathcal A}
+\newcommand{\B}{\mathcal B}
+\newcommand{\K}{\mathcal K}
+\newcommand{\Ham}{\mathfrak{Ham}}
+\newcommand{\EFT}{\mathfrak{EFT}}
+\newcommand{\Class}{\mathfrak{Class}}
+\newcommand{\Real}{\mathfrak{Real}}
+\newcommand{\spec}{\operatorname{spec}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\dist}{\operatorname{dist}}
+\newcommand{\Cont}{\operatorname{Cont}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\id}{\operatorname{id}}
+\newcommand{\im}{\operatorname{im}}
+\newcommand{\status}[1]{\textsc{#1}}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\newcommand{\T}{\mathbb T}
+
+\definecolor{grokgray}{RGB}{110,110,110}
+\AddEverypageHook{%
+  \ifnum\value{page}=1
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[
+        rotate=90,
+        anchor=south,
+        font=\Large\sffamily\bfseries\color{grokgray},
+        inner sep=0pt
+      ] at ([xshift=38pt,yshift=0.52\paperheight]current page.south west)
+      {GrokRxiv:2026.07.microscopic-effective-theories\quad
+       [\,math-ph\,]\quad14 Jul 2026};
+    \end{tikzpicture}
+  \fi
+}
+
+\title{From Microscopic Lattice Hamiltonians to Effective Theories:\\
+Controlled K-Theory Maps, Information Loss, and Realization Limits}
+
+\author{Matthew Long\\
+\textit{The YonedaAI Collaboration}\\
+\textit{YonedaAI Research Collective}\\
+Chicago, IL\\
+\texttt{matthew@yonedaai.com} $\cdot$ \url{https://yonedaai.com}}
+
+\date{14 July 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We separate three maps that are often compressed into a claim of
+``microscopic and effective equivalence.''  The first sends a specified
+microscopic Hamiltonian to a low-energy description, when a scaling or
+spectral reduction exists.  The second sends controlled low-energy data to a
+stable homotopy, operator K-theory, or bordism class.  The third asks for an
+explicit local lattice representative of an abstract class.  No theorem
+identifies all three maps for general interacting matter.
+
+Our strongest result concerns bounded free-fermion Hamiltonians in a unital
+C*-algebra.  A common Fermi-level gap permits continuous functional calculus,
+spectral flattening, a Fermi projection, and a relative operator K-class.
+We prove naturality in compact parameter spaces, homotopy invariance, and
+additivity under stacking.  We then give an information-loss contract: the
+class retains stable occupied-sector and symmetry data, while it discards gap
+magnitude, dispersion, velocity, locality constants, and microscopic
+couplings.  Covariant disordered systems fit the same construction through a
+crossed-product algebra when a genuine spectral gap is present.
+
+The Su-Schrieffer-Heeger family supplies a complete finite example.  Its
+gap, flattening, winding difference, and local transition charge are computed
+explicitly.  A staggered sublattice mass gives a gapped detour between the two
+chiral phases once chiral symmetry is dropped.  The Fidkowski-Kitaev reduction
+of the one-dimensional BDI free classification from $\Z$ to $\Z/8$ under
+interactions supplies a different boundary: free operator K-theory cannot be
+promoted unchanged to a universal interacting classification.  Condensed
+parameter objects organize continuous and profinite families, but they do not
+create a scaling limit, prove an EFT equivalence, or solve the inverse
+realization problem.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+The phrase ``the effective theory of a lattice model'' can refer to several
+different constructions.
+A Bloch Hamiltonian may be linearized near a band crossing.
+A gapped one-particle Hamiltonian may be flattened to an involution.
+A many-body system may have a continuum scaling limit.
+An invertible low-energy theory may determine a bordism class.
+These operations have different hypotheses and forget different data.
+
+This paper treats the fourth problem in a program on topological phases in a
+condensed-mathematics setting:
+
+\[
+\begin{tikzcd}[row sep=large]
+\text{local quantum interactions}
+  \arrow[d]
+\\
+\text{condensed moduli stack of Hamiltonians}
+  \arrow[d]
+\\
+\text{uniformly gapped substack}
+  \arrow[d]
+\\
+\text{stabilized phase }\infty\text{-groupoid}
+  \arrow[d]
+\\
+\text{invertible condensed phase spectrum.}
+\end{tikzcd}
+\]
+
+The earlier analytic steps remain input here.
+Locality supplies a quasi-local observable algebra and controlled dynamics.
+Positivity and the C*-norm make functional calculus meaningful.
+A thermodynamic gap supplies the physical phase condition.
+The present question is what can be transported from a microscopic system to
+an effective or homotopical target, and whether that transport can be
+reversed.
+
+\subsection{The three arrows}
+
+We insist on the following factorization:
+
+\[
+\begin{tikzcd}[column sep=large]
+\Ham_{\mathrm{micro}}
+  \arrow[r,"L"]
+&
+\EFT_{\mathrm{low}}
+  \arrow[r,"I"]
+&
+\Class_{\mathrm{stable}}
+\end{tikzcd}
+\qquad
+\begin{tikzcd}
+\Class_{\mathrm{stable}}
+  \arrow[r,dashed,"R"]
+&
+\Real_{\mathrm{lattice}}.
+\end{tikzcd}
+\]
+
+Here $L$ is a low-energy or spectral-reduction map.
+The map $I$ extracts a stable invariant.
+The dashed map $R$ is a realization problem.
+It is not a formal inverse of $I\circ L$.
+
+\begin{definition}[Microscopic-to-low-energy comparison]
+A microscopic-to-low-energy comparison consists of a domain
+$\mathcal D\subset\Ham_{\mathrm{micro}}$, a target category
+$\EFT_{\mathrm{low}}$, and a rule
+\[
+L:\mathcal D\longrightarrow\EFT_{\mathrm{low}}
+\]
+together with a stated limit, approximation, or functional-calculus theorem
+that controls the rule.
+\end{definition}
+
+\begin{definition}[Invariant extraction]
+An invariant extraction is a map
+\[
+I:\EFT_{\mathrm{low}}\longrightarrow\Class_{\mathrm{stable}}
+\]
+defined after fixing dimension, symmetry, stabilization, and equivalence.
+It is an equivalence only if faithfulness, fullness, and essential
+surjectivity are separately proved.
+\end{definition}
+
+\begin{definition}[Microscopic realization]
+A realization of $c\in\Class_{\mathrm{stable}}$ is an explicit local or
+uniformly almost-local interaction, symmetry action, ground-state convention,
+and system-size-independent gap witness whose comparison class is $c$.
+\end{definition}
+
+The definitions prevent a common reversal error.
+The existence of an invariant map does not provide a microscopic model for
+every target class.
+Agreement of invariants does not imply a microscopic gapped path unless a
+completeness theorem has been proved in the chosen domain.
+
+\subsection{Contributions}
+
+The paper makes six claims of different strength.
+
+\begin{enumerate}[label=\arabic*.]
+  \item We prove a controlled functional-calculus theorem for compact
+  families of bounded free-fermion Hamiltonians with a common Fermi gap.
+
+  \item We define a relative operator K-class with respect to a chosen
+  reference Hamiltonian and prove homotopy invariance and stacking
+  additivity.
+
+  \item We give a precise retention and loss table for spectral flattening.
+  Positive energy rescaling supplies a simple nonfaithfulness proof.
+
+  \item We extend the controlled construction to covariant disordered
+  one-particle systems represented in
+  $C(\Omega)\rtimes\Z^d$, under a genuine C*-spectral gap.
+
+  \item We compute the SSH transition charge on a linking circle and prove
+  that a staggered mass provides a gapped symmetry-breaking detour.
+
+  \item We use the BDI interaction reduction to show why the free result has
+  a sharp domain boundary.
+\end{enumerate}
+
+The paper does not claim a general microscopic/EFT equivalence.
+It also does not claim that every bordism or homotopy class has a local
+gapped lattice representative.
+
+\subsection{Status vocabulary}
+
+Every substantive result is assigned one of the following labels.
+
+\begin{center}
+\begin{tabular}{p{0.18\textwidth}p{0.70\textwidth}}
+\toprule
+Label & Meaning \\
+\midrule
+\status{established} & A cited theorem or standard construction under the assumptions displayed here.\\
+\status{proposed} & A definition or condensed organization introduced by this program.\\
+\status{conjectural} & A precise assertion for which this paper gives no proof.\\
+\status{open} & No proof or counterexample is known in the stated scope.\\
+\status{obstructed} & A theorem or explicit counterexample rules out the claim as stated.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The functional-calculus statements below are \status{established}.
+The condensed packaging is \status{proposed}.
+A general lattice/EFT equivalence is \status{open}.
+An unchanged extension of free K-theory to all interacting BDI phases is
+\status{obstructed}.
+
+\section{Domains, targets, and equivalences}
+
+\subsection{Microscopic quadratic systems}
+
+Let $\Gamma$ be a countable metric lattice and let $\mathcal H$ be the
+one-particle Hilbert space.
+In the simplest translation-invariant case,
+\[
+\mathcal H=\ell^2(\Z^d)\otimes\C^N.
+\]
+A finite-range one-particle Hamiltonian is a bounded self-adjoint operator
+whose matrix elements vanish beyond a fixed lattice distance.
+Exponential or summable decay gives broader controlled classes.
+
+After Fourier transform, a translation-invariant finite-range Hamiltonian is
+a matrix-valued trigonometric polynomial
+\[
+h:\T^d\longrightarrow M_N(\C),
+\qquad
+h(k)^*=h(k).
+\]
+More generally, one works with a self-adjoint element
+\[
+h\in M_N(\A)
+\]
+of a unital C*-algebra $\A$ encoding position, covariance, disorder, or
+symmetry.
+
+\begin{definition}[Controlled free-fermion datum]
+A controlled free-fermion datum is a tuple
+\[
+(\A,N,h,\mu,\mathcal S,h_{\mathrm{ref}})
+\]
+where $\A$ is a specified real, complex, graded, or twisted C*-algebra,
+$h=h^*\in M_N(\A)$, $\mu\in\R$ is a Fermi level,
+$\mathcal S$ records the symmetry constraints, and
+$h_{\mathrm{ref}}$ is a reference datum of the same type.
+The datum is spectrally gapped when
+\[
+\dist(\mu,\spec(h))>0.
+\]
+\end{definition}
+
+We set $\mu=0$ after replacing $h$ by $h-\mu$.
+The algebra and the representation class are part of the problem.
+Changing them can change the relevant K-group.
+
+\subsection{Interacting lattice systems}
+
+An interacting microscopic system is not generally described by a bounded
+element $h\in\A_\Gamma$.
+It is described by an interaction
+\[
+\Phi:X\Subset\Gamma\longmapsto\Phi(X)\in\A_X^{\mathrm{sa}},
+\]
+finite-volume Hamiltonians, and thermodynamic dynamics.
+The formal infinite sum of all $\Phi(X)$ need not converge in the quasi-local
+algebra.
+
+This distinction matters for spectral flattening.
+Continuous functional calculus applies directly to a bounded self-adjoint
+element of a C*-algebra.
+It does not turn an extensive many-body Hamiltonian into a bounded
+quasi-local observable.
+Many-body phase equivalence instead uses a uniform finite-volume or bulk gap,
+quasi-adiabatic continuation, and stabilization by atomic systems.
+
+\begin{warning}[Domain boundary]
+The theorem in \cref{sec:functional-calculus} concerns bounded one-particle
+Hamiltonians or bounded C*-algebra representatives.
+It is not a spectral-flattening theorem for an arbitrary interacting
+infinite-volume Hamiltonian.
+\end{warning}
+
+\subsection{What counts as an effective theory}
+
+The term effective field theory will be used in a restricted way.
+An effective description records fields, symmetries, couplings, and a regime
+of momenta or energies in which its correlation functions approximate those
+of a microscopic model to a stated accuracy.
+A topological field theory is a still coarser target, usually intended to
+retain only long-distance invertible response or defect data.
+
+\begin{definition}[Controlled effective description]
+For a microscopic datum $H$, a controlled effective description consists of
+a scale $\Lambda_{\mathrm{IR}}$, an effective action or Hamiltonian
+$S_{\mathrm{eff}}$, observables $\mathcal O$, and an error statement
+\[
+\left|
+\langle\mathcal O\rangle_H
+-
+\langle\mathcal O\rangle_{S_{\mathrm{eff}}}
+\right|
+\leq \varepsilon(\Lambda_{\mathrm{IR}})
+\]
+for a specified class of observables, with
+$\varepsilon(\Lambda_{\mathrm{IR}})\to0$ in a specified limit.
+\end{definition}
+
+Spectral flattening is not such an approximation.
+It is a homotopy inside the space of gapped bounded operators.
+It preserves a stable topological class while deliberately destroying the
+energy scale.
+
+\subsection{An equivalence audit}
+
+Any claimed comparison must answer more than whether a map can be written.
+We use the following audit throughout.
+
+\begin{longtable}{p{0.22\textwidth}p{0.31\textwidth}p{0.35\textwidth}}
+\toprule
+Question & Required datum & Failure mode \\
+\midrule
+\endfirsthead
+\toprule
+Question & Required datum & Failure mode \\
+\midrule
+\endhead
+Construction & A defined map on a stated domain & Formal analogy with no map \\
+Homotopy invariance & A chosen path topology and gap condition & Gap closes along the path \\
+Faithfulness & Distinct inputs remain distinct & Flattening forgets energy scales \\
+Fullness & Target morphisms lift to microscopic morphisms & EFT deformation has no lattice lift \\
+Essential surjectivity & Every target object has a preimage & Abstract class lacks a local model \\
+Stacking & Direct sum or tensor product is respected & Stabilization conventions disagree \\
+Symmetry & Real, graded, or twisted structure is retained & Forgetting symmetry opens a detour \\
+Boundaries and defects & Boundary conditions enter the category & Bulk class omits boundary choices \\
+Interactions & Domain is closed under allowed interactions & Free classification collapses \\
+Uniform gap & One lower bound controls the family & Pointwise gaps approach zero \\
+\bottomrule
+\end{longtable}
+
+Calling a comparison an equivalence requires affirmative answers in the
+chosen category.
+The controlled free-fermion map below proves construction, gapped-homotopy
+invariance, and stacking compatibility.
+It is intentionally not faithful to microscopic spectra.
+
+\section{Functional calculus and the controlled K-class}
+\label{sec:functional-calculus}
+
+\subsection{A common spectral gap}
+
+Let $S$ be compact Hausdorff and $\A$ a unital complex C*-algebra.
+Write
+\[
+\A_S=C(S,\A).
+\]
+An element $h\in M_N(\A_S)$ is equivalently a norm-continuous family
+$s\mapsto h_s\in M_N(\A)$.
+
+\begin{definition}[Uniform Fermi gap]
+A self-adjoint family $h=h^*\in M_N(\A_S)$ has a uniform Fermi gap
+$\gamma>0$ when
+\[
+\spec(h_s)\cap(-\gamma,\gamma)=\varnothing
+\]
+for every $s\in S$.
+\end{definition}
+
+Because $S$ is compact and $h$ is norm-continuous, pointwise invertibility is
+enough to produce some common positive gap.
+We state the quantitative constant because later parameter objects need not
+be compact, and because estimates depend on it.
+
+\begin{lemma}[Inverse and gap]
+\label{lem:inverse-gap}
+For self-adjoint $a$ in a unital C*-algebra, the following are equivalent:
+\begin{enumerate}[label=(\roman*)]
+  \item $0\notin\spec(a)$;
+  \item $a$ is invertible;
+  \item there is $\gamma>0$ with
+  $\spec(a)\cap(-\gamma,\gamma)=\varnothing$.
+\end{enumerate}
+For an invertible self-adjoint $a$,
+\[
+\dist(0,\spec(a))=\|a^{-1}\|^{-1}.
+\]
+\end{lemma}
+
+\begin{proof}
+The equivalence of the first two statements is the definition of the
+spectrum.
+The spectrum is compact, so exclusion of zero is equivalent to a positive
+distance from zero.
+For a normal element, continuous functional calculus gives
+\[
+\|a^{-1}\|
+=
+\sup_{\lambda\in\spec(a)}|\lambda|^{-1},
+\]
+which proves the last identity.
+\end{proof}
+
+\subsection{Spectral flattening}
+
+Define the sign function on $\R\setminus\{0\}$ by
+\[
+\sgn(x)=
+\begin{cases}
+1,&x>0,\\
+-1,&x<0.
+\end{cases}
+\]
+It is continuous on the spectrum of any invertible self-adjoint element.
+
+\begin{theorem}[Controlled spectral flattening]
+\label{thm:flattening}
+Let $S$ be compact Hausdorff, let $\A$ be a unital complex C*-algebra, and
+let $h=h^*\in M_N(C(S,\A))$ have a uniform Fermi gap.
+Set
+\[
+q=\sgn(h)=h|h|^{-1},
+\qquad
+p=\frac{1-q}{2}.
+\]
+Then:
+\begin{enumerate}[label=(\alph*)]
+  \item $q=q^*$ and $q^2=1$;
+  \item $p=p^*=p^2$;
+  \item evaluation commutes with flattening,
+  $q(s)=\sgn(h_s)$ and $p(s)=\chi_{(-\infty,0)}(h_s)$;
+  \item the path
+  \[
+  h_u=(1-u)h+u\,q,
+  \qquad 0\leq u\leq1,
+  \]
+  remains invertible and preserves the positive and negative spectral
+  subspaces.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Continuous functional calculus in $M_N(C(S,\A))$ defines
+$q=\sgn(h)$.
+The scalar identities
+$\sgn(x)^2=1$ and $\sgn(x)=\overline{\sgn(x)}$ on $\spec(h)$ imply
+$q^2=1$ and $q=q^*$.
+The projection identities for $p$ follow by direct algebra.
+
+Every evaluation map
+\[
+\operatorname{ev}_s:C(S,\A)\longrightarrow\A
+\]
+is a unital star-homomorphism.
+Functoriality of continuous functional calculus gives part (c).
+
+For $\lambda\in\spec(h)$, the scalar homotopy is
+\[
+f_u(\lambda)=(1-u)\lambda+u\,\sgn(\lambda).
+\]
+If $\lambda>0$, then $f_u(\lambda)>0$.
+If $\lambda<0$, then $f_u(\lambda)<0$.
+Thus zero never enters the spectral image.
+Functional calculus identifies $h_u=f_u(h)$ and proves part (d).
+\end{proof}
+
+\begin{remark}
+The theorem is sometimes described as replacing all occupied energies by
+$-1$ and all empty energies by $+1$.
+That description is correct only after the Fermi level and occupied
+convention are fixed.
+\end{remark}
+
+\subsection{Relative operator K-theory}
+
+The projection $p$ determines a class
+\[
+[p]\in K_0(C(S,\A)).
+\]
+Following the difference-group viewpoint emphasized by Thiang
+\cite{Thiang2016}, we compare it with a reference system.
+
+\begin{definition}[Relative difference class]
+Let $h$ and $h_{\mathrm{ref}}$ be uniformly gapped self-adjoint elements of
+matrix algebras over $C(S,\A)$, with all required symmetry data fixed.
+Their relative class is
+\[
+\kappa_S(h,h_{\mathrm{ref}})
+=
+[p_h]-[p_{h_{\mathrm{ref}}}]
+\in K_0(C(S,\A)).
+\]
+\end{definition}
+
+The word relative here refers to a difference from a reference phase.
+It should not be confused with the relative group $K^*(B,U)$ of a topological
+pair, which appears in the transition calculation later.
+
+\begin{proposition}[Gapped-homotopy invariance]
+\label{prop:homotopy-invariance}
+Suppose $t\mapsto h_t$ is a norm-continuous path of self-adjoint elements in
+$M_N(C(S,\A))$ and one $\gamma>0$ satisfies
+\[
+\spec(h_t(s))\cap(-\gamma,\gamma)=\varnothing
+\]
+for every $(t,s)\in[0,1]\times S$.
+Then $t\mapsto p_{h_t}$ is a norm-continuous path of projections and
+\[
+[p_{h_0}]=[p_{h_1}]
+\quad\text{in}\quad K_0(C(S,\A)).
+\]
+Consequently $\kappa_S(h_t,h_{\mathrm{ref}})$ is constant in $t$.
+\end{proposition}
+
+\begin{proof}
+Regard the family as one self-adjoint element
+\[
+H\in M_N(C([0,1]\times S,\A)).
+\]
+The common gap makes $H$ invertible.
+Theorem \ref{thm:flattening} gives a projection
+$P=\chi_{(-\infty,0)}(H)$.
+Evaluation at $t$ yields $p_{h_t}$.
+Thus the endpoints are homotopic projections and define the same K-class.
+\end{proof}
+
+\begin{proposition}[Stacking additivity]
+\label{prop:stacking}
+For two controlled data $h_1,h_2$ and references
+$r_1,r_2$ over the same parameter space,
+\[
+\kappa_S(h_1\oplus h_2,r_1\oplus r_2)
+=
+\kappa_S(h_1,r_1)+\kappa_S(h_2,r_2).
+\]
+\end{proposition}
+
+\begin{proof}
+Functional calculus respects block direct sums, so
+\[
+p_{h_1\oplus h_2}=p_{h_1}\oplus p_{h_2}.
+\]
+Addition in $K_0$ is defined by block direct sum.
+Subtracting the corresponding reference identity gives the formula.
+\end{proof}
+
+\subsection{Chiral symmetry and the odd class}
+
+Suppose a grading
+\[
+\Gamma=
+\begin{pmatrix}
+1&0\\
+0&-1
+\end{pmatrix}
+\]
+satisfies $\Gamma h\Gamma=-h$.
+Functional calculus preserves this oddness:
+$\Gamma q\Gamma=-q$.
+
+\begin{proposition}[Off-diagonal unitary]
+\label{prop:chiral-unitary}
+Assume the two graded summands have equal stabilized size.
+Then the flattened operator has the form
+\[
+q=
+\begin{pmatrix}
+0&u^*\\
+u&0
+\end{pmatrix}
+\]
+for a unitary $u$ over $C(S,\A)$.
+The chiral stable class is $[u]\in K_1(C(S,\A))$, or the relative difference
+$[u]-[u_{\mathrm{ref}}]$ after choosing a reference.
+\end{proposition}
+
+\begin{proof}
+Oddness forces the diagonal blocks of $q$ to vanish.
+Self-adjointness identifies the upper-right block with the adjoint of the
+lower-left block.
+The identity $q^2=1$ then gives
+$u^*u=uu^*=1$.
+The standard unitary picture of $K_1$ supplies the class.
+\end{proof}
+
+Real symmetries and particle-hole structures require the appropriate real or
+graded K-group.
+The complex formula must not be reused after discarding those structures.
+Kitaev's periodic table \cite{Kitaev2009} and the operator-algebraic treatment
+of Thiang \cite{Thiang2016} explain these symmetry-sensitive targets.
+
+\subsection{Naturality in the parameter space}
+
+Let $f:T\to S$ be continuous between compact Hausdorff spaces.
+Pullback gives a star-homomorphism
+\[
+f^*:C(S,\A)\longrightarrow C(T,\A),
+\qquad
+(f^*a)(t)=a(f(t)).
+\]
+
+\begin{proposition}[Parameter naturality]
+\label{prop:naturality}
+Under the assumptions of \cref{thm:flattening},
+\[
+p_{f^*h}=f^*p_h,
+\qquad
+\kappa_T(f^*h,f^*h_{\mathrm{ref}})
+=
+f^*\kappa_S(h,h_{\mathrm{ref}}).
+\]
+\end{proposition}
+
+\begin{proof}
+The first identity is functoriality of continuous functional calculus under
+the star-homomorphism $f^*$.
+The induced map on $K_0$ is additive and sends differences to differences,
+which proves the second identity.
+\end{proof}
+
+This naturality is the reliable part of the condensed interpretation.
+For a representable condensed parameter object $\underline S$, one evaluates
+the family on a compact or profinite test space and pulls back along maps of
+tests.
+Extending the construction to arbitrary condensed anima requires a sheaf or
+stack model of the Hamiltonian domain and is \status{proposed}, not proved by
+the elementary theorem above.
+
+\section{The information-loss contract}
+
+\subsection{What the class retains}
+
+Within the controlled domain, spectral flattening retains the following
+stable data.
+
+\begin{enumerate}[label=(\roman*)]
+  \item It retains the occupied versus empty grading determined by the chosen
+  Fermi level.
+
+  \item It retains the connected component of the gapped self-adjoint
+  operator in the stabilized topology.
+
+  \item It retains symmetry constraints that were built into the real,
+  graded, or twisted target algebra.
+
+  \item It retains the direct-sum law represented by addition in K-theory.
+
+  \item Through pairings with cyclic cocycles or geometric cycles, it may
+  retain quantized response coefficients under the additional hypotheses of
+  those index theorems \cite{Bellissard1994,ProdanSchulzBaldes2016}.
+\end{enumerate}
+
+The last item is not automatic from the abstract K-class alone.
+One must supply the pairing, regularity algebra, trace, and covariance data.
+
+\subsection{What the class forgets}
+
+The same map forgets several physically meaningful quantities.
+
+\begin{center}
+\begin{tabular}{p{0.31\textwidth}p{0.55\textwidth}}
+\toprule
+Discarded datum & Reason \\
+\midrule
+Gap magnitude & Every nonzero eigenvalue is moved to $+1$ or $-1$.\\
+Dispersion & The dependence of energy magnitude on momentum disappears.\\
+Fermi velocity & Positive rescaling and nonlinear deformation leave the sign unchanged.\\
+Correlation length & It is not determined by a stable projection class.\\
+Lieb-Robinson constants & They belong to the microscopic interaction and metric.\\
+Coupling values & Many different couplings flatten to the same involution.\\
+Finite-band unstable data & Stabilization allows addition of trivial bands.\\
+Boundary convention & A bulk K-class alone does not choose an edge termination.\\
+Interaction vertices & They lie outside the quadratic one-particle datum.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{proposition}[Positive rescaling is invisible]
+\label{prop:rescaling}
+Let $h$ be an invertible self-adjoint element of a unital C*-algebra and let
+$c>0$.
+Then
+\[
+\sgn(ch)=\sgn(h),
+\qquad
+p_{ch}=p_h.
+\]
+If $c\neq1$, the gap magnitude is multiplied by $c$.
+Thus spectral flattening is not faithful to microscopic energy scales.
+\end{proposition}
+
+\begin{proof}
+On $\spec(h)$,
+\[
+\sgn(c\lambda)=\sgn(\lambda)
+\]
+because $c$ is positive.
+Functional calculus gives the first two identities.
+The spectrum scales by $c$, so
+\[
+\dist(0,\spec(ch))
+=
+c\,\dist(0,\spec(h)).
+\]
+\end{proof}
+
+This one-line counterexample is enough to rule out any claim that the
+flattened K-class reconstructs the microscopic Hamiltonian.
+
+\begin{example}[Trivial-band stabilization]
+Let $h$ be gapped and let $a>0$.
+Then
+\[
+h
+\quad\text{and}\quad
+h\oplus\diag(-a,a)
+\]
+represent the same reduced stable phase after the added occupied and empty
+atomic bands are included in the reference convention.
+The second system has two more bands and a new energy scale.
+Stable classification is designed to forget that difference.
+\end{example}
+
+\subsection{A contract, not a reconstruction theorem}
+
+We summarize the controlled map as
+\[
+(\A,h,h_{\mathrm{ref}},\mathcal S,\gamma)
+\longmapsto
+\kappa(h,h_{\mathrm{ref}}).
+\]
+Its contract is:
+
+\begin{center}
+\begin{tabular}{p{0.23\textwidth}p{0.63\textwidth}}
+\toprule
+Clause & Content \\
+\midrule
+Domain & Bounded quadratic data in a fixed C*-algebra with a Fermi gap.\\
+Equivalence & Norm-continuous, symmetry-preserving gapped homotopy plus stabilization.\\
+Output & A relative class in the appropriate operator K-group.\\
+Guaranteed & Naturality, homotopy invariance, and stacking additivity.\\
+Not guaranteed & Spectrum, dynamics, locality constants, EFT limit, or interacting completeness.\\
+Inverse & No inverse is supplied.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+This contract matches the formal Lean representation
+\begin{center}
+\texttt{TopologicalPhases.Observables}.
+\end{center}
+That library records an Aoki comparison provider and C*-conditions without
+pretending to prove the analytic theorem inside Lean's standard library.
+
+\section{Low-energy theory is a separate map}
+
+\subsection{Linearization near a crossing}
+
+Suppose a Bloch Hamiltonian depends smoothly on momentum $k$ and a mass
+parameter $m$.
+Near an isolated crossing $(k_0,0)$, one may have
+\[
+h(k_0+p,m)
+=
+\sum_{j=1}^d v_jp_j\Gamma_j
++m\Gamma_0
++O(|p|^2+|m||p|+m^2),
+\]
+where the $\Gamma_j$ satisfy suitable Clifford relations.
+The first-order term is a Dirac Hamiltonian.
+Any scalar term proportional to the identity has already been removed by the
+Fermi-level convention $\mu=0$ before the crossing subspace is expanded.
+
+\begin{proposition}[Controlled local linearization]
+\label{prop:linearization}
+Let $h(k,m)$ be twice continuously differentiable in a neighborhood of
+$(k_0,0)$ and suppose $h(k_0,0)=0$ after restriction to a fixed finite
+crossing subspace.
+Then Taylor's theorem gives
+\[
+h(k_0+p,m)
+=
+D_kh(k_0,0)[p]
++m\,\partial_mh(k_0,0)
++R(p,m),
+\]
+with
+\[
+\|R(p,m)\|
+\leq C(|p|+|m|)^2
+\]
+on a sufficiently small neighborhood.
+\end{proposition}
+
+\begin{proof}
+This is Taylor's theorem for maps from a finite-dimensional parameter space
+to the finite-dimensional normed vector space of matrices.
+The bound follows from a uniform bound on the second derivative on a compact
+neighborhood.
+\end{proof}
+
+The proposition controls a local matrix approximation.
+It does not prove convergence of an interacting lattice theory to a
+relativistic quantum field theory.
+Even in the quadratic setting, the crossing subspace, momentum window,
+symmetry action, and neglected bands must be specified.
+
+\subsection{Scaling limits require more data}
+
+A genuine microscopic-to-EFT theorem would need at least:
+
+\begin{enumerate}[label=(\alph*)]
+  \item a sequence of lattice spacings or energy cutoffs;
+  \item a renormalization prescription for fields and couplings;
+  \item convergence of a stated class of correlation functions or operator
+  algebras;
+  \item control of irrelevant operators in the chosen topology;
+  \item a proof that the microscopic symmetry and anomaly data descend;
+  \item treatment of boundaries and defects if the target theory includes
+  them.
+\end{enumerate}
+
+Condensed mathematics can organize the parameter object on which such data
+vary.
+It does not supply any of these estimates.
+
+\begin{warning}[Flattening is not renormalization]
+The homotopy $h\mapsto\sgn(h)$ acts on all energies in a gapped bounded
+operator.
+Renormalization integrates out or rescales degrees of freedom relative to an
+energy or length scale.
+The two maps can lead to related topological data, but they are not the same
+construction.
+\end{warning}
+
+\subsection{Many-to-one behavior of effective descriptions}
+
+Two lattice Hamiltonians can share the same linear Dirac term while differing
+in quadratic dispersion, remote bands, and short-distance interactions.
+For example, adding
+\[
+\delta h(p)=a|p|^2\Gamma_0
+\]
+does not change the first-order Dirac operator but changes the ultraviolet
+spectrum.
+Likewise, adding a high-energy atomic band changes the microscopic Hilbert
+space without changing the low-energy crossing.
+
+Thus $L$ is generally many-to-one even before applying $I$.
+This is expected behavior for an effective theory.
+It blocks reconstruction unless extra ultraviolet data are retained.
+
+\subsection{From EFT data to stable classes}
+
+Kitaev's free-fermion table \cite{Kitaev2009} and related tenfold-way
+constructions \cite{Schnyder2008,Ryu2010} extract stable classes after fixing
+dimension and symmetry.
+Teo and Kane extend the controlled free classification to defect families
+$H(k,r)$ \cite{TeoKane2010}.
+These are strong results in their stated free-fermion domains.
+
+Freed and Hopkins classify deformation classes of reflection-positive
+invertible extended field theories using stable homotopy and bordism data
+\cite{FreedHopkins2021}.
+Their application to lattice phases assumes the existence and validity of
+low-energy effective-field-theory approximations.
+The bordism calculation is not, by itself, a theorem producing a local
+lattice Hamiltonian.
+
+\begin{remark}[Dimension convention]
+Spatial lattice dimension is denoted $d$.
+Spacetime dimension is $n=d+1$.
+Bordism classifications are usually indexed by $n$, while Bloch Hamiltonians
+are indexed by $d$.
+The two indices must not be silently identified.
+\end{remark}
+
+\section{Disorder and the covariant observable algebra}
+
+\subsection{A profinite disorder hull}
+
+Let $D$ be a finite set of local labels and set
+\[
+\Omega=D^{\Z^d}.
+\]
+With the product topology, $\Omega$ is compact, Hausdorff, and profinite.
+The translation action
+\[
+\alpha:\Z^d\curvearrowright\Omega
+\]
+shifts a configuration.
+
+The covariant bulk algebra is
+\[
+\A_{\Omega}
+=
+C(\Omega)\rtimes_{\alpha}\Z^d.
+\]
+Because $\Z^d$ is amenable, full and reduced crossed products agree.
+A magnetic field may require a twisted crossed product.
+This noncommutative Brillouin-zone viewpoint underlies rigorous treatments of
+disordered topological phases and the quantum Hall effect
+\cite{Bellissard1994,ProdanSchulzBaldes2016}.
+
+\subsection{Finite-range covariant Hamiltonians}
+
+A finite-range covariant one-particle Hamiltonian can be written
+schematically as
+\[
+h
+=
+\sum_{|x|\leq R} h_xu_x,
+\qquad
+h_x\in M_N(C(\Omega)),
+\]
+where the $u_x$ implement translations.
+The coefficients satisfy the adjoint relations that make $h=h^*$.
+The finite sum is an element of $M_N(\A_\Omega)$.
+
+\begin{theorem}[Disordered Fermi projection]
+\label{thm:disorder-projection}
+Let $h=h^*\in M_N(\A_\Omega)$ and suppose
+\[
+0\notin\spec_{M_N(\A_\Omega)}(h).
+\]
+Then
+\[
+p=\chi_{(-\infty,0)}(h)
+\]
+belongs to $M_N(\A_\Omega)$ and defines
+$[p]\in K_0(\A_\Omega)$.
+Norm-continuous paths that remain invertible preserve this class.
+\end{theorem}
+
+\begin{proof}
+Apply continuous functional calculus in the crossed-product C*-algebra.
+The homotopy statement is \cref{prop:homotopy-invariance} with a one-point
+parameter space.
+\end{proof}
+
+This result justifies the disorder algebra where a genuine spectral gap is
+present.
+It does not claim that every configuration has a gap merely because
+$\Omega$ is compact.
+The gap is a spectral property of the crossed-product element.
+
+\subsection{Mobility gaps are not spectral gaps}
+
+Disordered topological phases can remain quantized when the Fermi energy lies
+in a localized regime even though it belongs to the spectrum.
+That situation requires mobility-gap hypotheses, Sobolev or localization
+algebras, trace estimates, and index pairings.
+The discontinuous characteristic function is then handled in a more refined
+regularity framework.
+
+\begin{warning}
+Theorem \ref{thm:disorder-projection} assumes a C*-spectral gap.
+It must not be cited as a mobility-gap theorem.
+The latter theory is deeper and has different hypotheses
+\cite{Bellissard1994,ProdanSchulzBaldes2016}.
+\end{warning}
+
+\subsection{What profinite approximation does and does not prove}
+
+Locally constant functions that factor through finite clopen quotients are
+sup-norm dense in $C(\Omega)$.
+This gives finite-resolution approximations to coefficient functions.
+It does not imply that every K-class, spectral gap, or response coefficient
+is determined by one finite quotient.
+
+The safe condensed statement is functorial:
+the profinite space $\Omega$ is a legitimate test object, covariant families
+pull back along maps of disorder spaces, and their K-classes are natural when
+the analytic hypotheses survive pullback.
+The sheaf condition does not manufacture the crossed-product spectrum or its
+gap.
+
+\section{The SSH model as a complete controlled example}
+\label{sec:ssh}
+
+\subsection{Bloch Hamiltonian and spectrum}
+
+The spinless SSH Bloch Hamiltonian is
+\[
+h(k;t_1,t_2)
+=
+(t_1+t_2\cos k)\sigma_x
++t_2\sin k\,\sigma_y.
+\]
+It anticommutes with the chiral operator $\Gamma=\sigma_z$.
+Writing
+\[
+q(k)=t_1+t_2e^{ik},
+\]
+the energies are
+\[
+E_{\pm}(k)=\pm|q(k)|.
+\]
+The model descends from the dimerized chain introduced by Su, Schrieffer, and
+Heeger \cite{SSH1979}.
+
+\begin{proposition}[SSH gap]
+\label{prop:ssh-gap}
+For real $t_1,t_2$, the distance from zero to the spectrum is
+\[
+\gamma_{1/2}
+=
+\bigl||t_1|-|t_2|\bigr|.
+\]
+The separation between the occupied and empty bands is
+\[
+\gamma_{\mathrm{band}}
+=
+2\bigl||t_1|-|t_2|\bigr|.
+\]
+The gap closes exactly when $|t_1|=|t_2|$.
+\end{proposition}
+
+\begin{proof}
+The squared positive energy is
+\[
+|q(k)|^2
+=
+t_1^2+t_2^2+2t_1t_2\cos k.
+\]
+Its minimum over $k$ is
+\[
+t_1^2+t_2^2-2|t_1t_2|
+=
+(|t_1|-|t_2|)^2.
+\]
+Taking square roots gives the half-gap.
+The two bands lie symmetrically about zero, so their separation is twice that
+number.
+\end{proof}
+
+\subsection{Flattening and winding}
+
+When the model is gapped, define
+\[
+u(k)=\frac{q(k)}{|q(k)|}\in U(1).
+\]
+The flattened Hamiltonian is
+\[
+Q(k)
+=
+\begin{pmatrix}
+0&\overline{u(k)}\\
+u(k)&0
+\end{pmatrix}.
+\]
+
+\begin{proposition}[SSH winding]
+\label{prop:ssh-winding}
+Assume $t_2\neq0$ and $|t_1|\neq|t_2|$.
+With the convention $q(k)=t_1+t_2e^{ik}$,
+\[
+\nu(t_1,t_2)
+=
+\frac{1}{2\pi i}
+\int_0^{2\pi}u(k)^{-1}\partial_ku(k)\,dk
+=
+\begin{cases}
+1,&|t_1|<|t_2|,\\
+0,&|t_1|>|t_2|.
+\end{cases}
+\]
+\end{proposition}
+
+\begin{proof}
+The curve $q(k)$ is a circle of radius $|t_2|$ centered at the real number
+$t_1$.
+Multiplication by a nonzero real $t_2$ rotates the parametrized circle by
+zero or $\pi$ but does not reverse its orientation.
+The circle winds once counterclockwise around zero precisely when its center
+lies inside its radius.
+Otherwise it has winding zero.
+\end{proof}
+
+Choose a trivial reference with $|t_1|>|t_2|$.
+Then the relative AIII class of a topological sample is one.
+This is a concrete instance of the relative $K_1$ construction in
+\cref{prop:chiral-unitary}.
+
+\subsection{The gapless discriminant}
+
+The global coupling discriminant is
+\[
+\Sigma
+=
+\{(t_1,t_2):|t_1|=|t_2|\}.
+\]
+Near the branch $t_1=t_2>0$ and momentum $k=\pi$, write
+\[
+m=t_1-t_2,
+\qquad
+k=\pi+p.
+\]
+Then
+\[
+q(\pi+p)
+=
+m-it_2p+O(p^2).
+\]
+The combined momentum-mass plane is essential.
+Looking only at the coupling line misses the linking circle around the
+isolated degeneracy in $(p,m)$.
+
+\begin{proposition}[Local SSH transition charge]
+\label{prop:ssh-charge}
+Fix $t_2>0$ and orient the small linking circle by
+\[
+m=r\cos\theta,
+\qquad
+t_2p=r\sin\theta,
+\qquad
+0\leq\theta\leq2\pi.
+\]
+To leading order,
+\[
+\frac{q}{|q|}=e^{-i\theta}.
+\]
+Its degree is $-1$.
+Reversing the circle orientation changes the sign.
+The absolute charge is one and equals the magnitude of the winding jump.
+\end{proposition}
+
+\begin{proof}
+Substitution gives
+\[
+q=m-it_2p
+=
+r(\cos\theta-i\sin\theta)
+=
+re^{-i\theta}.
+\]
+Normalization removes $r$.
+The map $\theta\mapsto e^{-i\theta}$ has degree $-1$.
+The higher-order term is uniformly smaller than $r$ on a sufficiently small
+circle, so it can be removed by a homotopy that avoids zero.
+\end{proof}
+
+Topologically, the normalized map defines a class in
+\[
+H^1(S^1;\Z)\cong\Z.
+\]
+The connecting morphism for the pair $(D^2,S^1)$ sends it to
+\[
+\partial\nu
+\in
+H^2(D^2,S^1;\Z).
+\]
+This is the elementary model for a relative transition charge.
+Teo and Kane's free-fermion defect theory gives the broader controlled
+precedent \cite{TeoKane2010}.
+
+\subsection{A symmetry-breaking detour}
+
+Add a staggered sublattice potential
+\[
+\Delta\sigma_z.
+\]
+The Hamiltonian becomes
+\[
+h_{\Delta}(k)
+=
+(t_1+t_2\cos k)\sigma_x
++t_2\sin k\,\sigma_y
++\Delta\sigma_z.
+\]
+For $\Delta\neq0$, it no longer anticommutes with $\sigma_z$.
+
+\begin{theorem}[Gapped detour after forgetting chiral symmetry]
+\label{thm:ssh-detour}
+Fix $t_2>0$ and $0<r<t_2$.
+For $0\leq\theta\leq\pi$, set
+\[
+t_1(\theta)=t_2+r\cos\theta,
+\qquad
+\Delta(\theta)=r\sin\theta.
+\]
+The endpoint at $\theta=0$ is the chiral trivial phase and the endpoint at
+$\theta=\pi$ is the chiral topological phase.
+Along the full path, the occupied-empty band separation is exactly $2r$.
+The interior breaks chiral symmetry.
+\end{theorem}
+
+\begin{proof}
+Since $0<r<t_2$, both $t_1(\theta)$ and $t_2$ are positive.
+The minimum positive energy is
+\[
+\begin{aligned}
+\min_k E_+(k,\theta)
+&=
+\sqrt{(t_1(\theta)-t_2)^2+\Delta(\theta)^2}
+\\
+&=
+\sqrt{r^2\cos^2\theta+r^2\sin^2\theta}
+\\
+&=r.
+\end{aligned}
+\]
+Thus the full band separation is $2r$.
+At the endpoints $\Delta=0$.
+For $0<\theta<\pi$, $\Delta>0$ and the chiral anticommutation relation
+fails.
+\end{proof}
+
+The theorem shows that the SSH charge is relative to the AIII symmetry
+problem.
+If the symmetry is removed from the category, the two endpoints are
+gapped-homotopic.
+This is not a failure of the AIII invariant.
+It is a reminder that symmetry is part of its domain.
+
+\subsection{Executable finite checks}
+
+The accompanying Haskell program implements the exact two-band formulas.
+Its checks include:
+
+\begin{center}
+\begin{tabular}{p{0.42\textwidth}p{0.44\textwidth}}
+\toprule
+Check & Scope \\
+\midrule
+SSH spectrum and analytic gap & Finite $2\times2$ Bloch matrices \\
+Normalized flattened vector & Sampled momenta away from the discriminant \\
+Analytic and numerical winding & AIII two-band family \\
+Relative winding difference & Chosen trivial reference \\
+Local linking degree & The circle $q=m-ip$ \\
+Symmetry-breaking detour & A sampled semicircle with exact gap formula \\
+Information-loss contract & Nonempty, pairwise-disjoint information categories \\
+Three-arrow audit & Distinct typed statuses \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The code compiles with strict warnings and exits nonzero if a check fails.
+It is not evidence for a general thermodynamic limit.
+
+\section{Interactions: the BDI boundary}
+
+\subsection{The free integer invariant}
+
+Class BDI describes one-dimensional free fermions with particle-hole symmetry,
+time-reversal symmetry squaring to $+1$, and their product chiral symmetry.
+In the stable free classification, the phase index is an integer.
+Stacking adds the integers.
+
+This statement is different from the complex AIII SSH invariant, even though
+both use winding in simple matrix representatives.
+The real symmetry structure changes the classification problem.
+
+\subsection{Fidkowski-Kitaev reduction}
+
+Fidkowski and Kitaev constructed a symmetry-preserving interacting path that
+connects free BDI phases whose integer labels differ by eight
+\cite{FidkowskiKitaev2009}.
+They later proved that the eight residue classes are distinct and exhaustive
+for the specified one-dimensional interacting fermionic problem
+\cite{FidkowskiKitaev2011}.
+
+\begin{theorem}[BDI interaction reduction, cited]
+\label{thm:bdi-reduction}
+Within the one-dimensional BDI setting of
+\cite{FidkowskiKitaev2009,FidkowskiKitaev2011}, the stable free index
+\[
+\nu_{\mathrm{free}}\in\Z
+\]
+descends under symmetry-preserving interactions to
+\[
+\nu_{\mathrm{int}}\in\Z/8.
+\]
+In particular, eight copies of the generating free chain admit a gapped
+interacting deformation to the trivial phase.
+\end{theorem}
+
+\begin{proof}[Source-based proof sketch]
+Fidkowski and Kitaev identify the boundary Majorana degrees of freedom and
+construct quartic interactions that gap eight modes without breaking the BDI
+symmetry.
+Their explicit interacting path avoids the free critical locus while
+remaining gapped.
+The matrix-product-state and central-extension analysis distinguishes the
+eight remaining classes and proves exhaustion.
+The full proof is contained in the cited papers; it is not reproduced here.
+\end{proof}
+
+\subsection{What the reduction proves}
+
+The reduction proves that the free classification is not a complete invariant
+of the larger interacting category.
+It does not invalidate the free functional-calculus theorem.
+That theorem remains correct on its quadratic domain.
+
+The categorical picture is a quotient-like comparison
+\[
+\Z
+\longrightarrow
+\Z/8
+\]
+after the class of allowed paths is enlarged to include interactions.
+The kernel is not visible within free gapped homotopy.
+
+\begin{corollary}[No unchanged universal extension]
+There is no classification of all interacting one-dimensional BDI phases by
+the free integer invariant that simultaneously agrees with free stacking and
+identifies phases connected by the Fidkowski-Kitaev interacting paths.
+\end{corollary}
+
+\begin{proof}
+The free invariant assigns different integers to phases whose labels differ by
+eight.
+The cited interacting path declares those phases equivalent.
+Any invariant of interacting phase equivalence must take equal values on the
+two endpoints.
+Therefore the free integer cannot descend unchanged.
+\end{proof}
+
+This gives a direct counterexample to the identification of
+microscopic phases with free K-theory.
+
+\section{Realization is not the inverse map}
+
+\subsection{Stable free representatives}
+
+In controlled free-fermion problems, Bott periodicity and Clifford-module
+constructions often provide representatives for stable K-classes
+\cite{Kitaev2009,Thiang2016}.
+Lattice Dirac models can realize many table entries after fixing a symmetry
+class and allowing stabilization.
+
+Even there, one must distinguish:
+
+\begin{enumerate}[label=(\alph*)]
+  \item a continuous family of finite matrices on a Brillouin torus;
+  \item a finite-range or rapidly decaying real-space Hamiltonian;
+  \item a chosen boundary termination;
+  \item a material realization with fixed orbital constraints.
+\end{enumerate}
+
+A homotopy class of maps may have a continuous representative whose Fourier
+coefficients decay but are not finite range.
+Approximation can often recover finite range while preserving a positive gap,
+but the approximation theorem and symmetry constraints must be stated.
+
+\subsection{Interacting and bordism classes}
+
+For an abstract invertible field-theory or bordism class, a microscopic
+realization needs more:
+
+\begin{enumerate}[label=(\roman*)]
+  \item local degrees of freedom and an on-site or spatial symmetry action;
+  \item a uniformly local or almost-local interaction;
+  \item a ground-state and boundary convention;
+  \item a gap uniform in system size;
+  \item a computation identifying the low-energy or response class;
+  \item an inverse under stacking if invertibility is claimed.
+\end{enumerate}
+
+The bordism group does not package these witnesses.
+It classifies field-theoretic deformation data under its own axioms.
+Freed and Hopkins explicitly frame the lattice application through an EFT
+assumption \cite{FreedHopkins2021}.
+
+\begin{definition}[Realization status]
+For a candidate class $c$, assign one of the following statuses:
+\begin{itemize}
+  \item \status{realized}: an explicit local interaction, symmetry, uniform
+  gap theorem, and comparison computation are known;
+  \item \status{candidate}: a model exists, but one of those checks is
+  incomplete;
+  \item \status{open}: no realization or obstruction theorem is known;
+  \item \status{obstructed}: a theorem rules out realization under the stated
+  microscopic rules.
+\end{itemize}
+\end{definition}
+
+Absence of a known model means \status{open}, not \status{obstructed}.
+
+\subsection{Why surjectivity is hard}
+
+Essential surjectivity of a realization map would require every abstract
+class to admit a microscopic witness.
+Three independent obstructions can intervene.
+
+First, the abstract target may assume relativistic locality or full
+extension to defects that a lattice construction has not supplied.
+Second, anomaly constraints may force a boundary interpretation rather than
+an autonomous lattice bulk in the stated dimension.
+Third, a formal phase label may have no known system-size-independent gap
+proof for its proposed Hamiltonian.
+
+These are mathematical requirements, not matters of terminology.
+
+\subsection{Why injectivity is hard}
+
+Injectivity would say that two microscopic phases with the same abstract
+class are connected by an allowed stabilized gapped path.
+The target class may omit crystalline data, noninvertible excitations,
+boundary conditions, or unstable finite-band information.
+If any omitted datum is retained by the microscopic equivalence, injectivity
+fails.
+
+The BDI reduction shows the opposite possibility as well.
+Enlarging the microscopic path category can identify free classes that were
+distinct before interactions were allowed.
+The answer depends on the domain and its morphisms.
+
+\section{A condensed-mathematics formulation}
+
+\subsection{Representable parameter objects}
+
+For a compactly generated space $S$, write
+\[
+\underline S(T)=\Cont(T,S)
+\]
+on profinite test spaces $T$.
+The precise full-faithfulness statement uses the compact-generation and
+cardinal conventions of condensed mathematics
+\cite{Scholze2026}.
+
+A compact parameter family of controlled Hamiltonians is an element
+\[
+h\in M_N(C(S,\A))_{\mathrm{sa}}.
+\]
+The uniformly gapped locus consists of those $h$ for which one lower bound
+works on all of $S$.
+Theorem \ref{thm:flattening} gives a natural map
+\[
+\operatorname{Flat}_S:
+\Ham^{\mathrm{free,gap}}(S)
+\longrightarrow
+\operatorname{Proj}(M_\infty(C(S,\A))).
+\]
+
+\begin{proposition}[Descent at the C*-algebra level]
+Let $S_i\to S$ be a finite jointly surjective family of profinite spaces.
+Then
+\[
+C(S,\A)
+\longrightarrow
+\operatorname{Eq}
+\left(
+\prod_iC(S_i,\A)
+\rightrightarrows
+\prod_{i,j}C(S_i\times_SS_j,\A)
+\right)
+\]
+is an isomorphism of C*-algebras.
+Compatible flattened projections glue uniquely.
+\end{proposition}
+
+\begin{proof}
+Continuous functions glue uniquely across a finite jointly surjective compact
+Hausdorff cover because the induced disjoint-union map is a quotient map.
+Operations, involution, and the sup norm are pointwise.
+The projection equation is also pointwise, so compatible local projections
+glue to a projection.
+\end{proof}
+
+This is an exact statement about representable profinite tests.
+It does not prove that the spectral gap itself descends from arbitrary local
+gap constants unless the constants have a common positive lower bound.
+
+\subsection{The proposed comparison diagram}
+
+The controlled map and the broader comparison program are displayed as two
+separate chains:
+\[
+\begin{tikzcd}[column sep=huge]
+\Ham^{\mathrm{free,gap}}
+  \arrow[r,"\operatorname{Flat}","\status{established}"']
+&
+K_{\mathrm{op}}.
+\end{tikzcd}
+\]
+\[
+\begin{tikzcd}[column sep=large]
+\Ham^{\mathrm{micro,gap}}
+  \arrow[r,dashed,"L","\status{open}"']
+&
+\EFT^{\mathrm{invertible}}
+  \arrow[r,"I","\status{established}"']
+&
+\Class^{\mathrm{bord}}
+  \arrow[r,dashed,"R","\status{open}"']
+&
+\Real_{\mathrm{lattice}}.
+\end{tikzcd}
+\]
+
+The first arrow is the theorem proved in the controlled free sector.  In the
+second chain, $I$ is solid only on the specified reflection-positive
+invertible-EFT domain classified by Freed and Hopkins.  The low-energy map
+$L$ and the realization map $R$ require separate comparison and realization
+theorems.  No map $K_{\mathrm{op}}\to\EFT^{\mathrm{invertible}}$ and no
+commutative comparison square are claimed here.
+
+\subsection{Solidification is a K-theory bridge}
+
+Aoki proves that solidification of algebraic K-theory recovers connective
+topological K-theory for real and complex Banach algebras, with the stated
+connective and Bott-periodic qualifications \cite{Aoki2024}.
+This supplies a genuine condensed-to-operator K-theory bridge.
+
+It does not reconstruct the C*-norm, positive cone, state space, or
+microscopic interaction.
+It also does not prove that every operator K-class is a physical phase.
+The bridge is at the level of K-theory after the Banach algebra is already
+given.
+
+\section{Status ledger and formal interfaces}
+
+\subsection{Claim ledger}
+
+\begin{longtable}{p{0.15\textwidth}p{0.42\textwidth}p{0.31\textwidth}}
+\toprule
+Status & Claim & Hypotheses or source \\
+\midrule
+\endfirsthead
+\toprule
+Status & Claim & Hypotheses or source \\
+\midrule
+\endhead
+\status{established} & Continuous functional calculus produces the flattened involution and Fermi projection. & Bounded self-adjoint C*-element with a spectral gap.\\
+\status{established} & Gapped norm-continuous paths preserve the K-class. & Common gap and fixed algebra/symmetry.\\
+\status{established} & The relative class is additive under block direct sum. & Fixed reference and stabilization convention.\\
+\status{established} & The SSH winding is one inside the coupling circle and zero outside. & Gapped chiral two-band model.\\
+\status{established} & The local SSH linking charge has magnitude one. & Fixed orientation near the isolated crossing.\\
+\status{established} & A staggered mass opens a gapped detour. & Chiral symmetry is not required along the path.\\
+\status{established} & BDI interactions reduce the free integer to eight classes. & Fidkowski-Kitaev one-dimensional symmetry setting.\\
+\status{established} & A crossed-product Fermi projection gives a K-class. & Covariant bounded Hamiltonian with C*-spectral gap.\\
+\status{proposed} & These maps assemble into a condensed Hamiltonian-stack comparison. & Representable tests are controlled; general stack construction remains.\\
+\status{open} & General interacting microscopic systems are equivalent to an EFT stack. & No theorem in this scope.\\
+\status{open} & Every abstract invertible bordism class has a local gapped lattice representative. & Requires explicit realization and uniform gap.\\
+\status{obstructed} & Free K-theory classifies all interacting BDI phases without modification. & Counterexample from the eightfold reduction.\\
+\bottomrule
+\end{longtable}
+
+\subsection{Lean representation}
+
+The reviewed Lean foundation intentionally represents theorem interfaces, not
+deep analytic proofs.
+The declarations relevant here include:
+
+\begin{itemize}
+  \item \texttt{ClaimStatus} and \texttt{Provenance} for the status ledger;
+  \item \texttt{FiniteVolumeGapWitness} for an explicit common lower bound;
+  \item \texttt{ObjectwiseInvolution} and
+  \texttt{ObjectwiseCStarNormConditions} for operator-algebraic input;
+  \item \texttt{Stacking} and \texttt{PhaseEquivalence} for the stable phase
+  interface;
+  \item \texttt{AokiConnectiveComparisonInterface} for the imported
+  solidification theorem.
+\end{itemize}
+
+No Lean declaration in that foundation asserts a Lieb-Robinson estimate,
+thermodynamic limit, or Aoki comparison without a provider.
+The library builds without user axioms.
+
+\subsection{Haskell representation}
+
+The Haskell directory
+\texttt{src/microscopic-effective-theories/} contains four modules.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Module & Role \\
+\midrule
+\texttt{Core.hs} & SSH spectrum, gap, flattening, winding, detour, contracts \\
+\texttt{Properties.hs} & Deterministic behavioral properties \\
+\texttt{Proofs.hs} & Finite equational and numerical checks \\
+\texttt{Main.hs} & Demonstrations, checks, and nonzero failure exit \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All top-level bindings have explicit type signatures and each module has an
+explicit export list.
+The strict compiler flags are
+\[
+\texttt{-Wall -Wextra -Werror}.
+\]
+The program uses no claim stronger than its finite computations.
+
+\section{Limitations and open comparison problems}
+
+\subsection{Interacting spectral flattening}
+
+A general interacting infinite-volume system has no bounded one-particle
+Hamiltonian to which this construction can be applied.
+One can flatten finite-volume matrices, but the resulting operator may be
+highly nonlocal and need not converge to a quasi-local thermodynamic object.
+Spectral flow is the more appropriate interacting tool, provided a uniform
+gap and locality estimates have already been proved.
+
+An open comparison problem is to relate interacting spectral-flow classes to
+operator-algebraic or generalized cohomology invariants without discarding
+the relevant higher defects.
+
+\subsection{Noninvertible topological order}
+
+A spectrum of invertible phases cannot classify general noninvertible
+topological order.
+Anyons, fusion, braiding, and higher defect categories require richer targets.
+Two systems can share an invertible response class while having different
+noninvertible excitation data.
+
+The paper therefore restricts its bordism discussion to invertible sectors.
+
+\subsection{Boundaries}
+
+Bulk K-theory can pair with boundary maps and produce bulk-boundary
+correspondences under controlled hypotheses
+\cite{ProdanSchulzBaldes2016,TeoKane2010}.
+A bulk class alone does not specify a boundary Hamiltonian, termination, or
+symmetry-breaking boundary condition.
+Any claimed microscopic/EFT equivalence with boundaries must include those
+objects and their morphisms.
+
+\subsection{Crystalline and spatial symmetries}
+
+Spatial symmetries are not ordinary on-site internal symmetries.
+Their action on momentum, position, disorder, and defects changes the target
+K-theory or equivariant homotopy theory.
+A comparison that forgets the spatial action can merge distinct crystalline
+phases.
+
+The present paper treats symmetry abstractly through a fixed C*-algebraic
+structure and does not claim a complete crystalline classification.
+
+\subsection{Mobility-gap extension}
+
+A mobility-gap extension matters for disordered systems.
+It requires localization estimates that ensure the Fermi projection belongs
+to an algebra on which index pairings remain defined.
+Developing that extension in condensed families would require uniform
+localization control across the parameter object.
+Compactness or profiniteness alone does not provide it.
+
+\subsection{Realization tests}
+
+A useful next step is a machine-readable realization registry.
+Each row would record:
+
+\begin{enumerate}[label=(\roman*)]
+  \item the abstract class and symmetry type;
+  \item an explicit microscopic interaction;
+  \item a locality certificate;
+  \item a uniform gap theorem;
+  \item a class computation;
+  \item the status \status{realized}, \status{candidate}, \status{open}, or
+  \status{obstructed}.
+\end{enumerate}
+
+Such a registry would expose which part of the inverse problem is missing for
+each example.
+
+\section{Discussion}
+
+The controlled theorem starts only after a C*-algebra has been chosen and the
+Hamiltonian is bounded and
+self-adjoint, the Fermi level is uniformly isolated, and the symmetry and
+reference are fixed.
+Under those assumptions, functional calculus gives a stable class with clean
+naturality properties.
+
+The loss is built into stable K-theory, which forgets deformations and added
+trivial bands.
+Describing that quotient as a reconstruction of the microscopic system would
+be incorrect.
+
+The SSH calculation makes both sides visible.
+Within AIII symmetry, the winding jump forces a gap closing and the linking
+circle has charge one in magnitude.
+Once the staggered mass is permitted, the detour keeps a constant gap.
+The category changed, so the classification changed.
+
+The BDI example makes the same point at the interaction boundary.
+Allowing quartic interactions enlarges the path space and identifies every
+eighth free phase.
+No amount of categorical packaging removes that physical fact.
+
+Condensed mathematics enters most cleanly through parameter functoriality and
+the treatment of profinite disorder spaces.
+It places continuous families, inverse limits, and descent in one formal
+setting.
+Its contribution is organizational and homological.
+The analytic inputs remain locality, positivity, spectral control, and the
+existence of comparison maps.
+
+\section{Conclusion}
+
+There is a rigorous bridge from a controlled free-fermion Hamiltonian to a
+relative operator K-class:
+\[
+h
+\longmapsto
+\sgn(h)
+\longmapsto
+p_h
+\longmapsto
+[p_h]-[p_{h_{\mathrm{ref}}}].
+\]
+The bridge is natural in compact parameter spaces, invariant under uniformly
+gapped norm-continuous homotopy, and additive under stacking.
+For chiral systems it has the corresponding odd-unitary form.
+For spectrally gapped covariant disorder models it lives in the K-theory of a
+crossed product.
+
+This bridge is not an equivalence between microscopic lattice systems and
+effective field theories.
+It forgets energy scales and much of the ultraviolet model.
+It does not include general interactions.
+It has no automatic inverse realization map.
+
+The correct research program therefore keeps the three arrows separate.
+One proves a low-energy limit where possible, extracts an invariant under
+fixed hypotheses, and treats microscopic realization as its own theorem or
+open problem.
+The SSH transition and the BDI interaction reduction show why those
+distinctions are physically necessary.
+
+\appendix
+
+\section{Functional-calculus details}
+
+\subsection{Continuity of the sign map on a gapped set}
+
+Fix $\gamma>0$ and $M>\gamma$.
+On the compact set
+\[
+X_{\gamma,M}
+=
+[-M,-\gamma]\cup[\gamma,M],
+\]
+the sign function is continuous.
+By the Stone-Weierstrass theorem, polynomials can approximate it uniformly on
+$X_{\gamma,M}$.
+If $h$ is self-adjoint with
+$\spec(h)\subset X_{\gamma,M}$, then
+$\sgn(h)$ is the norm limit of the same polynomials in $h$.
+
+For a norm-continuous family with a common gap and a common norm bound, the
+polynomial approximants are uniformly continuous in the family parameter.
+Their uniform limit is norm-continuous.
+This gives an elementary route to the continuity assertion in
+\cref{prop:homotopy-invariance}.
+
+\subsection{A resolvent formula}
+
+The negative spectral projection can also be written as a Riesz projection.
+Choose a contour $\mathcal C$ enclosing the negative spectrum and excluding
+the positive spectrum.
+Then
+\[
+p_h
+=
+\frac{1}{2\pi i}
+\int_{\mathcal C}(z-h)^{-1}\,dz.
+\]
+If $h'$ is close enough to $h$, the same contour lies in the resolvent set of
+$h'$.
+The resolvent identity
+\[
+(z-h')^{-1}-(z-h)^{-1}
+=
+(z-h')^{-1}(h'-h)(z-h)^{-1}
+\]
+gives norm continuity of the projection.
+
+This formula also displays the role of the gap.
+As the contour approaches the spectrum, the resolvent norm grows and uniform
+control is lost.
+
+\subsection{Symmetry functoriality}
+
+Suppose an automorphism or anti-automorphism $\alpha$ encodes a symmetry and
+$h$ obeys a relation such as
+\[
+\alpha(h)=h,
+\qquad
+\alpha(h)=-h,
+\qquad\text{or}\qquad
+\alpha(h(k))=h(-k).
+\]
+Functional calculus transports the corresponding relation to $q=\sgn(h)$
+because the sign function is real and odd.
+The target K-group must still remember whether $\alpha$ is linear,
+antilinear, grading-preserving, or grading-reversing.
+
+\section{Difference classes and references}
+
+\subsection{Why a reference is useful}
+
+The Grothendieck group of projections contains formal differences.
+Physically, choosing $h_{\mathrm{ref}}$ identifies which atomic or vacuum
+configuration counts as zero.
+The class
+\[
+[p_h]-[p_{h_{\mathrm{ref}}}]
+\]
+then measures an obstruction between two gapped data rather than assigning an
+absolute label to one Hamiltonian.
+
+Thiang's formulation makes this relative viewpoint explicit
+\cite{Thiang2016}.
+It avoids suggesting that the abstract group element contains a preferred
+microscopic representative.
+
+\subsection{Cocycle law}
+
+For three controlled systems $h_0,h_1,h_2$ in the same target,
+\[
+\kappa(h_0,h_2)
+=
+\kappa(h_0,h_1)+\kappa(h_1,h_2),
+\]
+where
+\[
+\kappa(h_i,h_j)=[p_{h_i}]-[p_{h_j}].
+\]
+The formula is immediate by cancellation in the abelian group.
+It is checked on finite SSH representatives by the Haskell program.
+
+\subsection{Reference changes}
+
+If the reference is changed from $r$ to $r'$, then
+\[
+\kappa(h,r')
+=
+\kappa(h,r)+\kappa(r,r').
+\]
+Thus absolute coordinates change by a constant translation.
+Differences between two physical systems do not depend on that coordinate
+choice.
+
+\section{SSH conventions and numerical checks}
+
+\subsection{Orientation}
+
+With
+\[
+q(k)=t_1+t_2e^{ik},
+\]
+the topological SSH winding is $+1$ for $|t_1|<|t_2|$.
+Near $k=\pi$, the local coordinate is
+\[
+q\simeq m-it_2p.
+\]
+The positively oriented circle $(m,t_2p)=(r\cos\theta,r\sin\theta)$ maps to
+$e^{-i\theta}$ and therefore has degree $-1$.
+There is no contradiction.
+The local charge and the phase jump use different boundary orientations.
+Only the orientation-adjusted equality, or equality in magnitude, is
+canonical.
+
+\subsection{Discrete winding computation}
+
+For nonzero samples $q_j=q(k_j)$ with
+$k_j=2\pi j/N$, the code computes
+\[
+\nu_N
+=
+\operatorname{round}
+\left(
+\frac{1}{2\pi}
+\sum_{j=0}^{N-1}
+\operatorname{Arg}
+\left(\frac{q_{j+1}}{q_j}\right)
+\right).
+\]
+The analytic gap check runs first, so division by zero is excluded.
+Set $g_\chi=||t_1|-|t_2||$ and $h=2\pi/N$.
+Since
+\[
+\left|\frac{d}{dk}\operatorname{Arg}q(k)\right|
+\leq \frac{|t_2|}{|q(k)|}
+\leq \frac{|t_2|}{g_\chi},
+\]
+the code requires $h|t_2|/g_\chi<\pi$ before summing principal phase
+increments.
+This sufficient sampling condition prevents a true increment from crossing
+the branch cut; an explicit runtime check rejects an increment of magnitude
+$\pi$ as well.
+The result then agrees with \cref{prop:ssh-winding}.
+
+The computation is a regression test for the implementation.
+It is not used as the proof of the analytic proposition.
+
+\subsection{Finite gap sampling}
+
+The executable proof check compares the closed formula
+\[
+2\sqrt{(|t_1|-|t_2|)^2+\Delta^2}
+\]
+with the minimum sampled band separation on a mesh that contains $k=\pi$.
+The analytic derivation remains the proof.
+The mesh catches sign, factor-of-two, and convention mistakes in code.
+
+\section{Comparison checklist for later work}
+
+Before a future paper claims a microscopic/EFT equivalence, it should fill in
+the following record.
+
+\begin{longtable}{p{0.25\textwidth}p{0.61\textwidth}}
+\toprule
+Field & Required answer \\
+\midrule
+\endfirsthead
+\toprule
+Field & Required answer \\
+\midrule
+\endhead
+Microscopic objects & Interactions, Hilbert spaces, symmetries, and boundary conventions.\\
+Microscopic morphisms & Exact definition of gapped path, circuit, or quasi-local equivalence.\\
+Effective objects & Fields, tangential structure, anomalies, and defect depth.\\
+Effective morphisms & Deformation, natural equivalence, or bordism convention.\\
+Limit & Scaling parameter and topology of convergence.\\
+Uniformity & Bounds uniform in volume and external parameters.\\
+Construction & Formula or theorem defining the forward map.\\
+Invariance & Proof that microscopic equivalences map to effective equivalences.\\
+Faithfulness & Proof or counterexample.\\
+Fullness & Proof that effective morphisms lift.\\
+Surjectivity & Realization theorem for every target class.\\
+Stacking & Compatibility with direct sum or tensor product.\\
+Symmetry & Preservation of internal, antiunitary, and spatial actions.\\
+Boundary & Treatment of edges, defects, and anomaly inflow.\\
+Lost data & Explicit list of ultraviolet information removed by the map.\\
+Interaction boundary & Statement of which nonquadratic perturbations are admitted.\\
+\bottomrule
+\end{longtable}
+
+Most known general comparisons fill only part of this record.
+That is still mathematically useful.
+The problem arises when a partial invariant-producing map is reported as a
+categorical equivalence.
+
+\begin{thebibliography}{99}
+
+\bibitem{Aoki2024}
+K.~Aoki,
+\emph{(Semi)topological K-theory via solidification},
+arXiv:2409.01462, 2024.
+
+\bibitem{Atiyah1967}
+M.~F.~Atiyah,
+\emph{K-Theory},
+W.~A.~Benjamin, 1967.
+
+\bibitem{Bellissard1994}
+J.~Bellissard, A.~van Elst, and H.~Schulz-Baldes,
+\emph{The non-commutative geometry of the quantum Hall effect},
+Journal of Mathematical Physics \textbf{35} (1994), pages 5373 to 5451,
+\href{https://doi.org/10.1063/1.530758}{doi:10.1063/1.530758}.
+
+\bibitem{Blackadar1998}
+B.~Blackadar,
+\emph{K-Theory for Operator Algebras}, second edition,
+Cambridge University Press, 1998.
+
+\bibitem{Scholze2026}
+P.~Scholze,
+\emph{Lectures on Condensed Mathematics},
+arXiv:2605.03658, 2026.
+
+\bibitem{FidkowskiKitaev2009}
+L.~Fidkowski and A.~Kitaev,
+\emph{The effects of interactions on the topological classification of free
+fermion systems},
+Physical Review B \textbf{81} (2010), 134509,
+\href{https://doi.org/10.1103/PhysRevB.81.134509}{doi:10.1103/PhysRevB.81.134509}.
+
+\bibitem{FidkowskiKitaev2011}
+L.~Fidkowski and A.~Kitaev,
+\emph{Topological phases of fermions in one dimension},
+Physical Review B \textbf{83} (2011), 075103,
+\href{https://doi.org/10.1103/PhysRevB.83.075103}{doi:10.1103/PhysRevB.83.075103}.
+
+\bibitem{FreedHopkins2021}
+D.~S.~Freed and M.~J.~Hopkins,
+\emph{Reflection positivity and invertible topological phases},
+Geometry \& Topology \textbf{25} (2021), pages 1165 to 1330,
+\href{https://doi.org/10.2140/gt.2021.25.1165}{doi:10.2140/gt.2021.25.1165}.
+
+\bibitem{Kitaev2001}
+A.~Kitaev,
+\emph{Unpaired Majorana fermions in quantum wires},
+Physics-Uspekhi \textbf{44} (2001), pages 131 to 136,
+\href{https://doi.org/10.1070/1063-7869/44/10S/S29}{doi:10.1070/1063-7869/44/10S/S29}.
+
+\bibitem{Kitaev2009}
+A.~Kitaev,
+\emph{Periodic table for topological insulators and superconductors},
+AIP Conference Proceedings \textbf{1134} (2009), pages 22 to 30,
+\href{https://doi.org/10.1063/1.3149495}{doi:10.1063/1.3149495}.
+
+\bibitem{ProdanSchulzBaldes2016}
+E.~Prodan and H.~Schulz-Baldes,
+\emph{Bulk and Boundary Invariants for Complex Topological Insulators},
+Springer, 2016,
+\href{https://doi.org/10.1007/978-3-319-29351-6}{doi:10.1007/978-3-319-29351-6}.
+
+\bibitem{Ryu2010}
+S.~Ryu, A.~P.~Schnyder, A.~Furusaki, and A.~W.~W.~Ludwig,
+\emph{Topological insulators and superconductors: tenfold way and
+dimensional hierarchy},
+New Journal of Physics \textbf{12} (2010), 065010,
+\href{https://doi.org/10.1088/1367-2630/12/6/065010}{doi:10.1088/1367-2630/12/6/065010}.
+
+\bibitem{Schnyder2008}
+A.~P.~Schnyder, S.~Ryu, A.~Furusaki, and A.~W.~W.~Ludwig,
+\emph{Classification of topological insulators and superconductors in three
+spatial dimensions},
+Physical Review B \textbf{78} (2008), 195125,
+\href{https://doi.org/10.1103/PhysRevB.78.195125}{doi:10.1103/PhysRevB.78.195125}.
+
+\bibitem{SSH1979}
+W.~P.~Su, J.~R.~Schrieffer, and A.~J.~Heeger,
+\emph{Solitons in polyacetylene},
+Physical Review Letters \textbf{42} (1979), pages 1698 to 1701,
+\href{https://doi.org/10.1103/PhysRevLett.42.1698}{doi:10.1103/PhysRevLett.42.1698}.
+
+\bibitem{TeoKane2010}
+J.~C.~Y.~Teo and C.~L.~Kane,
+\emph{Topological defects and gapless modes in insulators and
+superconductors},
+Physical Review B \textbf{82} (2010), 115120,
+\href{https://doi.org/10.1103/PhysRevB.82.115120}{doi:10.1103/PhysRevB.82.115120}.
+
+\bibitem{Thiang2016}
+G.~C.~Thiang,
+\emph{On the K-theoretic classification of topological phases of matter},
+Annales Henri Poincare \textbf{17} (2016), pages 757 to 794,
+\href{https://doi.org/10.1007/s00023-015-0418-9}{doi:10.1007/s00023-015-0418-9}.
+
+\end{thebibliography}
+
+\end{document}

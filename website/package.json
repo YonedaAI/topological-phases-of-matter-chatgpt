@@ -1,0 +1,39 @@
+{
+  "name": "topological-phases-research-ledger",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "content": "node scripts/build-content.mjs",
+    "sync:corpus": "node scripts/sync-corpus.mjs",
+    "finalize:export": "node scripts/finalize-static-export.mjs",
+    "dev": "npm run content && next dev",
+    "build": "npm run content && npm run verify:content && next build && npm run finalize:export && npm run verify:export",
+    "build:vercel": "npm run sync:corpus && npm run verify:content && next build && npm run finalize:export && npm run verify:export",
+    "start": "npx serve out",
+    "check": "tsc --noEmit",
+    "verify:content": "node scripts/verify-content.mjs",
+    "verify:export": "node scripts/verify-export.mjs"
+  },
+  "dependencies": {
+    "cheerio": "1.1.2",
+    "html-react-parser": "5.2.17",
+    "katex": "0.17.0",
+    "lucide-react": "0.553.0",
+    "next": "16.2.10",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "sanitize-html": "2.17.0"
+  },
+  "devDependencies": {
+    "@types/katex": "0.16.7",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@types/sanitize-html": "2.16.0",
+    "sharp": "0.34.5",
+    "typescript": "5.9.3"
+  },
+  "overrides": {
+    "postcss": "8.5.19"
+  }
+}

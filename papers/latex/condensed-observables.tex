@@ -1,0 +1,1339 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage{everypage}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{setspace}
+
+\setstretch{1.08}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=blue!55!black,
+  urlcolor=blue!65!black
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\C}{\mathbb C}
+\newcommand{\R}{\mathbb R}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\N}{\mathbb N}
+\newcommand{\A}{\mathcal A}
+\newcommand{\B}{\mathcal B}
+\newcommand{\Kalg}{K_{\mathrm{alg}}}
+\newcommand{\Ktop}{K^{\mathrm{top}}}
+\newcommand{\ProFin}{\mathrm{ProFin}}
+\newcommand{\Cont}{\operatorname{Cont}}
+\newcommand{\State}{\operatorname{State}}
+\newcommand{\Spec}{\operatorname{Spec}}
+\newcommand{\Eq}{\operatorname{Eq}}
+\newcommand{\Status}[1]{\textsc{#1}}
+
+\definecolor{grokgray}{RGB}{110,110,110}
+\AddEverypageHook{%
+  \ifnum\value{page}=1
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[
+        rotate=90,
+        anchor=south,
+        font=\Large\sffamily\bfseries\color{grokgray},
+        inner sep=0pt
+      ] at ([xshift=38pt,yshift=0.52\paperheight]current page.south west)
+      {GrokRxiv:2026.07.condensed-observables\quad
+       [\,math.OA\,]\quad
+       14 Jul 2026};
+    \end{tikzpicture}
+  \fi
+}
+
+\title{Condensed Families of Quantum Observables:\\
+Positivity, C*-Norms, and Solid K-Theory}
+\author{Matthew Long \\
+\textit{The YonedaAI Collaboration} \\
+\textit{YonedaAI Research Collective} \\
+Chicago, IL \\
+\texttt{matthew@yonedaai.com} $\cdot$ \url{https://yonedaai.com}}
+\date{14 July 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We isolate the operator algebraic layer needed to place quantum lattice systems in a
+condensed mathematical framework.  For a compact Hausdorff parameter space $S$ and
+a C*-algebra $A$, the section algebra $C(S,A)$ has pointwise multiplication and
+involution, fiberwise positivity, and the supremum C*-norm.  We prove descent for
+finite jointly surjective covers and prove that, for profinite $S$, functions through
+finite clopen quotients are norm dense.  These statements justify a precise
+objectwise C*-enhancement of the represented condensed algebra $\underline A$, but
+they do not manufacture a norm, an order, or a state space from a bare condensed
+ring.  We then connect this construction to quasi-local observable algebras,
+compatible local states, and crossed products for covariant disorder.  We give a
+careful account of Ko Aoki's solidification theorem: connective solidified
+algebraic K-theory recovers connective operator K-theory for Banach algebras, while
+periodic operator K-theory requires inversion of the complex degree-two or real
+degree-eight Bott element.  Counterexamples separate continuous state families
+$C(S,\State(A))$ from states of $C(S,A)$, continuous profinite families from locally
+constant ones, and algebraic data from a chosen C*-completion.  The resulting bridge
+is rigorous at the level of observable algebras and K-theory.  It is not an
+equivalence between microscopic Hamiltonians and effective field theories.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+The operator algebra of observables is where several parts of the proposed
+condensed phase program first meet.  A lattice interaction is local data.  Its
+thermodynamic dynamics acts on a norm-completed quasi-local algebra.  Ground states
+are positive normalized functionals on that algebra.  Free-fermion phase invariants
+are K-theory classes of projections, unitaries, or symmetry-compatible flattened
+Hamiltonians.  Disorder is naturally encoded by a compact configuration space and
+a crossed product.  Condensed mathematics can organize continuous and profinite
+families of all these objects, but only after the analytic structures have been
+specified.
+
+The distinction matters.  A ring does not remember a norm.  A *-algebra may admit
+several inequivalent C*-completions.  A positive cone is not determined by ordinary
+ring operations.  A state on an algebra of sections is not the same as a continuous
+family of states on the fibers.  These are not technical objections around the
+edges of the theory.  They determine which objects have a physical interpretation.
+
+This paper supplies the observable-algebra component of the sequence
+
+\[
+\begin{gathered}
+\text{local interactions}
+\longrightarrow
+\text{condensed Hamiltonian families}
+\longrightarrow
+\text{uniformly gapped families}
+\\
+\longrightarrow
+\text{stable phases}
+\longrightarrow
+\text{invertible phase spectra}.
+\end{gathered}
+\]
+
+Our results are deliberately divided by status.
+
+\begin{itemize}[leftmargin=2em]
+\item \Status{Established}: represented condensed sets, compactly parameterized
+  C*-algebras, C*-descent, quasi-local inductive limits, crossed-product observable
+  algebras, functional calculus, and Aoki's solidification theorem under its stated
+  hypotheses.
+\item \Status{Proposed}: the use of these constructions as the observable component
+  of a condensed moduli stack of Hamiltonians.
+\item \Status{Open}: a comparison theorem identifying the proposed condensed stack
+  with a microscopic classification or with a stack of effective field theories.
+\item \Status{Obstructed}: any formulation in which condensed descent alone selects
+  a C*-norm, positivity, or a physical state space.
+\end{itemize}
+
+The main mathematical contributions are as follows.
+
+\begin{enumerate}[leftmargin=2em]
+\item We formulate and prove an objectwise C*-descent theorem for $S\mapsto C(S,A)$.
+\item We prove the finite-clopen approximation theorem for profinite probes and make
+  clear that it is a norm-density result, not a consequence of the sheaf axiom alone.
+\item We distinguish external parameter families of fiber states from states on a
+  section algebra by an explicit counterexample.
+\item We show that compactly parameterized sections commute with the quantum-spin
+  quasi-local inductive limit.
+\item We state the disordered crossed-product construction and the gapped
+  functional-calculus map to K-theory with exact hypotheses.
+\item We state Aoki's connective and Bott-periodic comparisons separately in the
+  complex and real cases.
+\end{enumerate}
+
+Clausen and Scholze provide the condensed foundations
+\cite{ClausenScholze}.  Barwick and Haine provide a closely related homotopy-coherent
+formalism under the name pyknotic objects \cite{BarwickHaine}.  The quasi-local
+framework follows Nachtergaele, Sims, and Young \cite{NSY}.  The disordered
+crossed-product viewpoint follows Bellissard, van Elst, and Schulz-Baldes
+\cite{Bellissard} and its K-theoretic development in
+\cite{BourneKellendonkRennie,Kellendonk}.  The exact solid K-theory comparison is due
+to Aoki \cite{Aoki}.
+
+\section{Condensed parameter objects}
+
+\subsection{The site and represented objects}
+
+Fix an uncountable strong limit cardinal $\kappa$ as in
+\cite{ClausenScholze}.  We suppress it from notation when no confusion can result.
+
+\begin{definition}[Condensed set]
+A condensed set is a sheaf of sets on the category of $\kappa$-small profinite sets,
+with finite jointly surjective families as covers.
+\end{definition}
+
+Concretely, a presheaf $X:\ProFin^{\mathrm{op}}\to\mathrm{Set}$ is a sheaf if it
+sends the empty set to a point, sends finite disjoint unions to products, and
+satisfies the equalizer condition
+
+\[
+X(S)\longrightarrow
+\Eq\bigl(X(S')\rightrightarrows X(S'\times_S S')\bigr)
+\]
+
+for every surjection $S'\to S$ of profinite sets.
+
+A finite jointly surjective family $\{S_i\to S\}$ gives one surjection
+$\coprod_iS_i\to S$.  Since the disjoint union is compact and $S$ is Hausdorff, this
+map is a quotient map.  Thus the single-cover equalizer above is exactly the Cech
+equalizer for a finite covering family.
+
+\begin{proposition}[Represented topological spaces]
+For a topological space $T$, the assignment
+\[
+\underline T(S)=\Cont(S,T)
+\]
+is a condensed set.  After the cardinal convention is fixed, the functor
+$T\mapsto\underline T$ is fully faithful on $\kappa$-compactly generated spaces.
+\end{proposition}
+
+\begin{proof}
+Finite disjoint unions give products of mapping sets.  If $q:S'\to S$ is a
+surjection, then $q$ is a quotient map because its domain is compact and its
+codomain is Hausdorff.  A continuous map $S'\to T$ that agrees on
+$S'\times_S S'$ therefore descends uniquely to a continuous map $S\to T$.
+Full faithfulness on compactly generated spaces is Proposition 1.7 of
+\cite{ClausenScholze}, with the stated cardinal convention.
+\end{proof}
+
+Every Banach space is metrizable, hence first countable and compactly generated.
+Banach algebras and C*-algebras therefore lie safely in the fully faithful range.
+This observation lets us use represented condensed objects without replacing the
+norm topology by an unspecified topology.
+
+\begin{definition}[Condensed anima]
+A condensed anima is an appropriate hypercomplete anima-valued sheaf on compact
+Hausdorff spaces, equivalently on a suitable profinite or extremally disconnected
+basis.  It is the homotopy-coherent replacement for a condensed set.
+\end{definition}
+
+Condensed anima can retain automorphisms and higher equivalences.  This is relevant
+for moduli of Hamiltonians, where gauge equivalences and phase automorphisms should
+not be collapsed to equality.  Not every condensed anima is represented by a
+topological space.  Representability is a property, not part of the definition.
+
+\subsection{What the sheaf condition says}
+
+The sheaf condition is a gluing statement along covers.  It does not state that a
+functor preserves cofiltered limits, nor that an invariant is determined by all
+finite quotients of a profinite set.  Finite-resolution approximation below will
+come from the supremum norm and clopen partitions.
+
+This distinction prevents a common overstatement.  A profinite set is an inverse
+limit of finite discrete sets, but an arbitrary sheaf need not convert that inverse
+limit into a direct limit.  For $C(S,A)$ there is a dense direct limit, followed by
+completion.  The completion is indispensable.
+
+\section{Compactly parameterized C*-algebras}
+
+\subsection{Definitions and conventions}
+
+\begin{definition}[C*-algebra]
+A complex C*-algebra is a complex Banach *-algebra $A$ whose norm satisfies
+\[
+\|a^*a\|=\|a\|^2
+\]
+for every $a\in A$.
+\end{definition}
+
+For $a=a^*\in A$, the following conditions are equivalent: $a=b^*b$ for some
+$b\in A$, the spectrum of $a$ lies in $[0,\infty)$, and $a$ has a positive square
+root.  We write $A_+$ for the resulting closed convex cone.
+
+\begin{definition}[Section algebra]
+Let $S$ be compact Hausdorff and $A$ a C*-algebra.  Define
+\[
+C(S,A)=\{f:S\to A\mid f\text{ is norm-continuous}\}.
+\]
+Operations and involution are pointwise, and
+\[
+\|f\|_\infty=\sup_{s\in S}\|f(s)\|_A.
+\]
+\end{definition}
+
+\begin{theorem}[Objectwise C*-structure]\label{thm:objectwise}
+Let $S$ be compact Hausdorff and $A$ a complex C*-algebra.  Then $C(S,A)$ is a
+C*-algebra.  It is unital if and only if $A$ is unital.  Its positive cone is
+fiberwise:
+\[
+C(S,A)_+
+=
+\{f\in C(S,A):f(s)\in A_+\text{ for all }s\in S\}.
+\]
+There is a canonical C*-isomorphism
+\[
+C(S,A)\cong C(S)\otimes_{\min}A.
+\]
+\end{theorem}
+
+\begin{proof}
+Compactness makes the supremum norm finite.  Pointwise estimates give
+$\|fg\|_\infty\leq\|f\|_\infty\|g\|_\infty$ and
+$\|f^*\|_\infty=\|f\|_\infty$.  A uniform limit of continuous $A$-valued
+functions is continuous, so the section algebra is complete.  Finally,
+\[
+\|f^*f\|_\infty
+=\sup_s\|f(s)^*f(s)\|
+=\sup_s\|f(s)\|^2
+=\|f\|_\infty^2.
+\]
+This proves the C*-identity.
+
+If $f\geq0$, each evaluation map is a *-homomorphism, hence $f(s)\geq0$.  Conversely,
+suppose every $f(s)$ is positive.  The square-root map on the positive cone is norm
+continuous by continuous functional calculus.  Thus $g(s)=f(s)^{1/2}$ is continuous
+and $f=g^*g$.  The tensor-product identification is the standard map on elementary
+tensors, $h\otimes a\mapsto(s\mapsto h(s)a)$.  Since $C(S)$ is commutative and
+nuclear, its minimal and maximal tensor products agree.  The minimal completion
+therefore gives all continuous $A$-valued functions without a representation-dependent
+choice of tensor norm.
+\end{proof}
+
+\begin{corollary}[Functoriality]
+A continuous map $u:T\to S$ induces a contractive *-homomorphism
+\[
+u^*:C(S,A)\longrightarrow C(T,A),\qquad f\longmapsto f\circ u.
+\]
+It is unital when $A$ is unital, and it is isometric when $u$ is surjective.
+\end{corollary}
+
+\begin{proof}
+All algebraic statements are pointwise.  The norm inequality follows because the
+supremum is taken over a subset of the values of $f$.  Surjectivity makes the two
+sets of values equal.
+\end{proof}
+
+\subsection{C*-descent}
+
+\begin{theorem}[Objectwise C*-descent]\label{thm:descent}
+Let $\{q_i:S_i\to S\}_{i=1}^n$ be a finite jointly surjective family of maps between
+profinite sets.  For every C*-algebra $A$, restriction induces an isometric
+C*-isomorphism
+\[
+C(S,A)
+\cong
+\Eq\left(
+\prod_i C(S_i,A)
+\rightrightarrows
+\prod_{i,j}C(S_i\times_S S_j,A)
+\right),
+\]
+where finite products carry the maximum norm.
+\end{theorem}
+
+\begin{proof}
+Let $q:\coprod_iS_i\to S$ be the jointly surjective map.  It is a quotient map.  A
+compatible tuple $(f_i)$ defines a function on the disjoint union that is constant
+on the fibers of $q$, so it descends uniquely to a continuous function $f:S\to A$.
+This proves the equalizer statement at the level of sets.  Pointwise operations show
+that the map and its inverse are *-homomorphisms.  Joint surjectivity gives
+\[
+\|f\|_\infty=\max_i\|f_i\|_\infty,
+\]
+so the isomorphism is isometric.
+\end{proof}
+
+\begin{corollary}[Locality of order and norm]
+Under the hypotheses of \cref{thm:descent}, a section is positive if and only if all
+of its pullbacks are positive.  Its norm is the maximum of the pullback norms.
+\end{corollary}
+
+This is the exact statement in which positivity and the C*-norm are compatible with
+condensed descent.  The norm and order are inherited from $A$ before descent is
+applied.  Descent does not construct them from a ring.
+
+\subsection{A condensed observable-algebra object}
+
+For a C*-algebra $A$ with its norm topology, define
+\[
+\underline A(S)=C(S,A).
+\]
+By \cref{thm:objectwise,thm:descent}, this is a sheaf whose values are C*-algebras
+and whose restriction maps are contractive *-homomorphisms.  We call it the
+\emph{represented objectwise C*-algebra sheaf}.  This term avoids presupposing a
+universal formal category named condensed C*-algebras.
+
+For the phase program, this construction is sufficient.  It provides compact and
+profinite parameter families, a norm topology for gapped homotopies, fiberwise
+positivity, and functorial pullback.  More elaborate categorical definitions can be
+added later, but the present theorems do not depend on them.
+
+\section{Finite clopen approximation}
+
+\begin{definition}[Finite clopen quotient]
+For a profinite set $S$, a finite clopen partition $P$ determines a finite discrete
+quotient $q_P:S\to P$.  A function $S\to A$ factors through $P$ exactly when it is
+constant on every part of the partition.
+\end{definition}
+
+The finite clopen partitions form a directed set under refinement.  If $A$ is a
+C*-algebra, then $C(P,A)\cong A^P$ with the maximum norm.
+
+\begin{theorem}[Finite-resolution density]\label{thm:clopen}
+Let $S$ be profinite and $A$ a Banach space.  Then
+\[
+C(S,A)
+=
+\overline{
+\bigcup_{P} C(P,A)
+}^{\|\cdot\|_\infty},
+\]
+where the union ranges over finite clopen quotients of $S$.  When $A$ is a
+C*-algebra, this is a dense *-subalgebra and its completion is $C(S,A)$.
+\end{theorem}
+
+\begin{proof}
+Fix $f\in C(S,A)$ and $\varepsilon>0$.  For each $s\in S$, continuity gives a
+neighborhood on which the oscillation of $f$ is smaller than $\varepsilon$.  Since
+$S$ is zero dimensional, the neighborhood can be chosen clopen.  Compactness gives
+a finite clopen cover, and Boolean refinement gives a finite clopen partition $P$
+with oscillation smaller than $\varepsilon$ on every part.  Choose one point $s_U$
+in each $U\in P$ and define $f_P|_U=f(s_U)$.  Then
+$\|f-f_P\|_\infty<\varepsilon$.  Pointwise operations preserve locally constant
+functions, proving the C*-algebra statement.
+\end{proof}
+
+\begin{counterexample}[Continuous does not mean locally constant]\label{ce:cantor}
+Let $S=\{0,1\}^{\N}$ and define
+\[
+f(x)=\sum_{n=1}^{\infty}2^{-n}x_n.
+\]
+The series converges uniformly, so $f:S\to\R$ is continuous.  It does not factor
+through any finite quotient because changing a sufficiently late coordinate changes
+its value.  Its prefix truncations are locally constant and converge uniformly.
+\end{counterexample}
+
+The counterexample identifies the role of completion.  Finite disorder data provide
+approximants.  The completed C*-algebra contains limits that depend on infinitely
+many coordinates.
+
+\begin{remark}[Sheaf descent versus inverse limits]
+The sheaf condition used in \cref{thm:descent} concerns compatible data over a cover.
+\Cref{thm:clopen} concerns approximation by a directed family of finite quotients.
+Neither theorem implies the other.  Their combination is useful because it provides
+both gluing and controlled finite-resolution approximation.
+\end{remark}
+
+\section{Norm and positivity are not algebraic}
+
+\subsection{The missing structure problem}
+
+Suppose one begins with a condensed ring $R$.  Ring operations do not specify a
+topology, a complete norm, an involution, or a positive cone.  Adding an involution
+still does not select a C*-norm.  The next example is elementary and decisive.
+
+\begin{counterexample}[Multiple C*-norms]\label{ce:norms}
+Give $\C[x]$ the involution determined by $x^*=x$.  For each compact infinite
+$K\subset\R$, define
+\[
+\|p\|_K=\sup_{t\in K}|p(t)|.
+\]
+This is a faithful pre-C*-norm.  The norms obtained from $K=[-1,1]$ and
+$K=[-2,2]$ differ, and their completions are $C([-1,1])$ and $C([-2,2])$.
+Their induced orders differ as well: $1-x^2$ is positive in the first completion but
+not in the second.
+\end{counterexample}
+
+\begin{proof}
+A nonzero polynomial cannot vanish on an infinite compact subset of $\R$, so the
+seminorm is faithful.  Pointwise complex conjugation gives
+\[
+\|p^*p\|_K=\sup_{t\in K}|p(t)|^2=\|p\|_K^2.
+\]
+The Stone-Weierstrass theorem identifies the completions.  Finally,
+$1-t^2\geq0$ on $[-1,1]$ but takes negative values on $[-2,2]$.
+\end{proof}
+
+The example remains an obstruction after applying the represented condensed functor.
+The same algebraic *-object can inherit distinct topological and ordered
+enhancements.  Therefore the correct input to the observable construction is a
+chosen C*-algebra, not a ring from which one hopes to recover a physical completion.
+
+\subsection{Faithful representations and physical choice}
+
+A faithful *-representation $\pi:A\to B(\mathcal H)$ of a pre-C*-algebra supplies
+the operator norm $\|a\|=\|\pi(a)\|$.  Different representation classes can lead to
+different universal or reduced completions.  Crossed products provide a familiar
+example when the acting group is not amenable.  In the disorder models below the
+acting group is $\Z^d$, which is amenable, so full and reduced crossed products agree.
+
+The physical choice still includes the algebra of observables and its representation.
+A norm alone does not specify a ground state, a GNS Hamiltonian, or a thermodynamic
+spectral gap.
+
+\section{States and parameter families}
+
+\begin{definition}[State]
+For a unital C*-algebra $A$, a state is a complex linear map
+$\omega:A\to\C$ such that
+\[
+\omega(1)=1,
+\qquad
+\omega(a^*a)\geq0
+\]
+for every $a\in A$.
+\end{definition}
+
+The state space $\State(A)$ carries the weak-* topology.  It is compact and convex.
+For a compact parameter space $S$, there are two natural but different constructions.
+
+\begin{enumerate}[leftmargin=2em]
+\item $C(S,\State(A))$ is the space of weak-* continuous families
+  $s\mapsto\omega_s$ of states on a fixed fiber algebra.
+\item $\State(C(S,A))$ is the state space of the C*-algebra of sections.
+\end{enumerate}
+
+\begin{counterexample}[The two state constructions differ]\label{ce:states}
+Let $A=\C$ and let $S$ contain at least two points.  Then $\State(\C)$ is a point, so
+$C(S,\State(\C))$ is a point.  By the Riesz representation theorem,
+$\State(C(S))$ is the compact convex space of regular Borel probability measures on
+$S$.  It contains every point mass and their nontrivial convex combinations.
+\end{counterexample}
+
+The difference has a physical interpretation.  A continuous family $\omega_s$
+assigns a state at each externally fixed parameter.  A state on $C(S,A)$ may also
+average over the parameter.  Under separability and standard Borel hypotheses, its
+description involves a probability measure and measurable fiber functionals.  That
+extra measure is not part of a continuous family of fiber states.
+
+\begin{proposition}[Evaluation states]
+Let $A$ be unital, $s\in S$, and $\omega\in\State(A)$.  Then
+\[
+\operatorname{ev}_{s,\omega}(f)=\omega(f(s))
+\]
+is a state on $C(S,A)$.
+\end{proposition}
+
+\begin{proof}
+Evaluation at $s$ is a unital *-homomorphism.  Composing a state with a unital
+*-homomorphism gives a state.
+\end{proof}
+
+Evaluation states form only a subclass.  Convex combinations and integrals of them
+already produce many additional states.  Consequently, a moduli problem must say
+whether $S$ is an external parameter, a disorder variable to be averaged, or part of
+the observable algebra.
+
+\section{Quasi-local observable algebras}
+
+\subsection{The local net}
+
+Let $\Gamma$ be a countable set, usually a uniformly locally finite metric lattice.
+At each site $x\in\Gamma$, fix a finite-dimensional Hilbert space $\mathcal H_x$.
+For a finite region $\Lambda\Subset\Gamma$, define
+\[
+\A_\Lambda
+=
+\bigotimes_{x\in\Lambda}B(\mathcal H_x).
+\]
+Finite dimensionality removes tensor-norm ambiguity.  If
+$\Lambda\subset\Lambda'$, define
+\[
+\iota_{\Lambda,\Lambda'}(a)
+=
+a\otimes1_{\Lambda'\setminus\Lambda}.
+\]
+
+\begin{theorem}[Quasi-local inductive limit]\label{thm:quasilocal}
+Each inclusion $\iota_{\Lambda,\Lambda'}$ is unital, multiplicative, and isometric.  The
+algebraic union
+\[
+\A_{\Gamma}^{\mathrm{loc}}
+=
+\bigcup_{\Lambda\Subset\Gamma}\A_\Lambda
+\]
+has a well-defined C*-norm, and its completion
+\[
+\A_\Gamma
+=
+\overline{\A_{\Gamma}^{\mathrm{loc}}}^{\|\cdot\|}
+=
+\varinjlim_{\Lambda\Subset\Gamma}\A_\Lambda
+\]
+is the quasi-local observable algebra.
+\end{theorem}
+
+\begin{proof}
+An injective *-homomorphism between C*-algebras is isometric.  The maps are
+compatible, so the norm on an element of the union is independent of the region in
+which it is represented.  Completing the directed union gives the C*-inductive
+limit.  This is the standard construction used in \cite{NSY}.
+\end{proof}
+
+\begin{proposition}[Local approximation of positivity]\label{prop:positive-local}
+The positive cone of the quasi-local algebra satisfies
+\[
+(\A_\Gamma)_+
+=
+\overline{
+\bigcup_{\Lambda\Subset\Gamma}(\A_\Lambda)_+
+}.
+\]
+\end{proposition}
+
+\begin{proof}
+The right side lies in $(\A_\Gamma)_+$ because *-homomorphisms preserve positivity
+and the positive cone is closed.  Conversely, write $a=b^*b$ with
+$b\in\A_\Gamma$.  Choose local $b_n\to b$.  Then $b_n^*b_n$ are local positive
+elements and converge to $b^*b$.
+\end{proof}
+
+\begin{proposition}[Compatible local states]\label{prop:local-states}
+Suppose states $\omega_\Lambda\in\State(\A_\Lambda)$ satisfy
+\[
+\omega_{\Lambda'}\circ\iota_{\Lambda,\Lambda'}=\omega_\Lambda
+\]
+whenever $\Lambda\subset\Lambda'$.  Then they extend uniquely to a state
+$\omega\in\State(\A_\Gamma)$.  Every state on $\A_\Gamma$ restricts to such a
+compatible family.
+\end{proposition}
+
+\begin{proof}
+Compatibility defines a linear functional of norm one on the algebraic union.
+Positivity holds because each element of the local union belongs to some finite
+algebra.  The functional extends uniquely by continuity to the norm completion.
+The converse follows by restriction.
+\end{proof}
+
+\subsection{Compact parameter spaces commute with completion}
+
+\begin{theorem}[Parameterized quasi-local limit]\label{thm:param-limit}
+Let $S$ be compact Hausdorff.  Then
+\[
+C(S,\A_\Gamma)
+\cong
+\overline{
+\bigcup_{\Lambda\Subset\Gamma}C(S,\A_\Lambda)
+}^{\|\cdot\|_\infty}.
+\]
+The isomorphism preserves involution, positivity, and the C*-norm.
+\end{theorem}
+
+\begin{proof}
+By \cref{thm:objectwise},
+\[
+C(S,\A_\Gamma)\cong C(S)\otimes_{\min}\A_\Gamma.
+\]
+The commutative algebra $C(S)$ is nuclear.  Minimal tensoring by it commutes with
+injective C*-inductive limits.  Applying this to \cref{thm:quasilocal} proves the
+density statement.  The structural claims follow from the isometric
+*-isomorphism.
+\end{proof}
+
+For profinite $S$, one can see the theorem without tensor-product machinery.  A
+continuous section has compact image.  Approximate finitely many values by elements
+of a common local algebra, then use a sufficiently fine clopen partition to form a
+locally constant local-algebra-valued approximation.
+
+\subsection{Interactions are not global bounded Hamiltonians}
+
+An interaction is a map
+\[
+\Phi:\{X\Subset\Gamma\}\longrightarrow\A_X^{\mathrm{sa}}.
+\]
+The finite-volume Hamiltonian is
+\[
+H_\Lambda=\sum_{X\subseteq\Lambda}\Phi(X).
+\]
+Even when the interaction has rapid decay, the sum over the infinite lattice need
+not converge in $\A_\Gamma$.  Under the locality hypotheses of \cite{NSY}, the
+thermodynamic object is a strongly continuous automorphism group
+$\tau_t:\A_\Gamma\to\A_\Gamma$ or its generator on a dense domain.
+
+This observation is important for any Hamiltonian moduli stack.  Infinite-volume
+interactions, finite-volume Hamiltonians, dynamics, ground-state representations,
+and bounded observables are related but distinct objects.
+
+\section{Disorder and crossed products}
+
+\subsection{Profinite configuration spaces}
+
+Let $D$ be a finite discrete set and define
+\[
+\Omega=D^{\Z^d}.
+\]
+With the product topology, $\Omega$ is compact, totally disconnected, and metrizable,
+hence profinite.  The translation action
+\[
+\alpha:\Z^d\curvearrowright\Omega
+\]
+is continuous.  Cylinder functions, which depend on finitely many coordinates, are
+locally constant and dense in $C(\Omega)$ by \cref{thm:clopen}.
+
+\subsection{The covariant bulk algebra}
+
+\begin{definition}[Crossed-product observable algebra]
+For a compact space $\Omega$ with a continuous $\Z^d$ action $\alpha$, define
+\[
+\B=C(\Omega)\rtimes_\alpha\Z^d.
+\]
+In the presence of magnetic translations with cocycle $\theta$, define the twisted
+crossed product
+\[
+\B_\theta=C(\Omega)\rtimes_{\alpha,\theta}\Z^d.
+\]
+\end{definition}
+
+The algebra is generated by coefficient functions and translation unitaries with
+the covariance relation
+\[
+U_a f U_a^*=\alpha_a(f).
+\]
+Since $\Z^d$ is amenable, its full and reduced crossed products agree.  This removes
+a completion ambiguity that would be present for a general nonamenable group.
+
+\begin{proposition}[Finite-range covariant families]
+A bounded, finite-range, covariant one-particle Hamiltonian with $N$ internal orbitals
+defines a self-adjoint element of
+\[
+M_N\bigl(C(\Omega)\rtimes_{\alpha,\theta}\Z^d\bigr).
+\]
+Conversely, the finite-support algebraic crossed product describes such finite-range
+covariant operators, and its C*-completion includes norm limits of them.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Write the hopping operator as a finite sum
+\[
+h=\sum_{a\in F}h_aU_a,
+\]
+where $F\subset\Z^d$ is finite and $h_a\in M_N(C(\Omega))$.  Covariance is encoded by
+the crossed-product relation, while self-adjointness gives the corresponding relation
+between $h_a$ and $h_{-a}$.  Such finite sums form the algebraic crossed product,
+which is dense by definition in the C*-crossed product.  Magnetic phases modify the
+multiplication by $\theta$.  This is the framework used in
+\cite{Bellissard,BourneKellendonkRennie}.
+\end{proof}
+
+The crossed product directly models covariant one-particle systems.  It does not
+replace the quasi-local algebra for a general interacting spin system.  An
+interacting disordered model needs a disorder action on interactions, a quasi-local
+dynamics, and a specified state or representation.
+
+\section{Gapped functional calculus and K-theory}
+
+\subsection{From a Hamiltonian to a projection}
+
+\begin{theorem}[Uniformly gapped functional calculus]\label{thm:gapped-k}
+Let $B$ be a unital C*-algebra.  Let
+\[
+t\longmapsto h_t\in M_n(B)_{\mathrm{sa}}
+\]
+be norm-continuous for $t\in[0,1]$.  Suppose there is $\delta>0$ such that
+\[
+\Spec(h_t)\cap(-\delta,\delta)=\varnothing
+\]
+for every $t$.  Then
+\[
+p_t=\chi_{(-\infty,0)}(h_t)
+\]
+is a norm-continuous path of projections in $M_n(B)$.  Consequently,
+$[p_t]\in K_0(B)$ is independent of $t$.
+\end{theorem}
+
+\begin{proof}
+Choose a continuous function $g:\R\to[0,1]$ that equals $1$ on
+$(-\infty,-\delta]$ and $0$ on $[\delta,\infty)$.  Since the spectrum avoids the
+interpolation interval, continuous functional calculus gives
+$g(h_t)=\chi_{(-\infty,0)}(h_t)$.  Functional calculus is continuous for
+norm-continuous self-adjoint families, so $p_t$ is norm-continuous.  Homotopic
+projections represent the same $K_0$ class.
+\end{proof}
+
+The theorem gives a controlled map
+\[
+h\longmapsto p_h\longmapsto[p_h]\in K_0(B).
+\]
+For a chiral system, spectral flattening gives an off-diagonal unitary and an odd
+K-class.  Anti-linear symmetries require real, graded, or equivariant variants.
+Kellendonk develops the role of graded real structures in this classification
+\cite{Kellendonk}.  Bourne, Kellendonk, and Rennie relate the resulting classes to
+crossed-product K-homology and bulk-edge pairings
+\cite{BourneKellendonkRennie}.
+
+\subsection{What a K-class forgets}
+
+The class $[p_h]$ is stable under matrix stabilization and norm-continuous gapped
+homotopy.  It does not retain the eigenvalue magnitudes removed by flattening.  It
+does not retain a preferred interaction decomposition, Lieb-Robinson velocity,
+correlation length, state, boundary condition, or response coefficient.  Response
+coefficients arise only after pairing a K-class with a trace, cyclic cocycle,
+K-homology class, or Kasparov class.
+
+Equality of K-classes can be weaker than the microscopic equivalence relation.  A
+classification theorem must specify the algebra, symmetry class, stabilization, and
+allowed homotopies.  Outside a controlled free-fermion sector, no universal
+identification is asserted here.
+
+\section{Solidification and operator K-theory}
+
+\subsection{The condensed algebraic K-theory object}
+
+Let $A$ be a real or complex Banach algebra.  Regard it as a represented condensed
+algebra by
+\[
+\underline A(S)=C(S,A).
+\]
+Applying algebraic K-theory produces a condensed spectrum whose value is
+schematically
+\[
+S\longmapsto\Kalg(C(S,A)).
+\]
+Solidification is a completion operation on condensed spectra introduced in the
+Clausen-Scholze program.  Aoki proves that it recovers established topological
+K-theories in this setting \cite{Aoki}.
+
+\begin{theorem}[Aoki, complex connective comparison]\label{thm:aoki-complex}
+Let $A$ be a complex Banach algebra.  The solidification of its connective algebraic
+K-theory is discrete and canonically equivalent to the connective part of operator
+K-theory:
+\[
+\bigl(K^{\mathrm{cn}}(\underline A)\bigr)^{\mathrm{sol}}
+\simeq
+\bigl(\tau_{\geq0}\Ktop(A)\bigr)^{\mathrm{disc}}.
+\]
+\end{theorem}
+
+\begin{proof}[Source and proof architecture]
+This is Theorem A of \cite{Aoki}.  Aoki first proves discreteness under openness of
+the general linear groups, a condition satisfied by Banach algebras.  The connective
+comparison is characterized by agreement on $K_0$, homotopy invariance under
+$A\mapsto C([0,1],A)$, and excision for the specified Banach-algebra pullback
+squares.  These properties identify the solidified connective theory with
+$\tau_{\geq0}\Ktop$.
+\end{proof}
+
+\begin{theorem}[Aoki, complex Bott inversion]\label{thm:aoki-bott}
+Let $A$ be a complex Banach algebra and let
+\[
+\beta_{\C}\in K^{\mathrm{top}}_2(\C)\cong\Z
+\]
+be a Bott generator.  Then
+\[
+\Kalg(\underline A)^{\mathrm{sol}}[\beta_{\C}^{-1}]
+\simeq
+\Ktop(A)^{\mathrm{disc}}.
+\]
+\end{theorem}
+
+\begin{proof}
+This is the periodic part of Theorem A in \cite{Aoki}.  The connective comparison
+provides the nonnegative homotopy groups.  Inverting the degree-two complex Bott
+class imposes complex Bott periodicity and yields the periodic operator K-theory
+spectrum.
+\end{proof}
+
+\begin{theorem}[Aoki, real comparison]\label{thm:aoki-real}
+For a real Banach algebra $A$, solidified connective algebraic K-theory identifies
+with connective real operator K-theory.  If
+$\beta_{\R}$ is the real Bott class in degree $8$, then
+\[
+\Kalg(\underline A)^{\mathrm{sol}}[\beta_{\R}^{-1}]
+\simeq
+\Ktop(A)^{\mathrm{disc}}.
+\]
+\end{theorem}
+
+\begin{proof}[Source and qualification]
+Aoki proves the real version in the comparison section of \cite{Aoki}.  The real
+period is eight, not two.  The theorem uses the real Banach-algebra category and the
+real Bott element.  Complexification does not justify silently replacing this class
+by the complex degree-two generator.
+\end{proof}
+
+The localization at $\beta_{\R}$ is defined through the module-spectrum structure
+over $\Kalg(\underline{\R})^{\mathrm{sol}}$.  Bott inversion is therefore a
+localization in spectra, not an informal operation on homotopy groups.
+
+\subsection{The semitopological comparison}
+
+Aoki also proves that if $A$ is a complex associative algebra equipped with the
+condensed structure induced by the ordinary topology on $\C$, then
+solidification of its algebraic K-theory recovers semitopological K-theory.  This is
+separate from the Banach-algebra operator K-theory statement.  The hypotheses and
+target should not be interchanged.
+
+\subsection{Exact nonclaims}
+
+The notation
+\[
+\Kalg(\underline A)^{\mathrm{sol}}
+\simeq
+\Ktop(A)
+\]
+without further qualification is generally too strong.  The exact statement needs
+either connective truncation or Bott inversion.  Even after the exact equivalence is
+applied, it compares K-theory spectra.  It does not reconstruct
+
+\begin{itemize}[leftmargin=2em]
+\item the C*-norm on $A$,
+\item the positive cone $A_+$,
+\item the state space $\State(A)$,
+\item the observable algebra from its K-theory,
+\item a local interaction that generates the dynamics,
+\item or an effective field theory.
+\end{itemize}
+
+This is still a substantial bridge.  It shows that a central invariant of operator
+algebraic phase theory arises through an intrinsic condensed completion of algebraic
+K-theory.  The bridge is invariant-level, exact, and narrower than an equivalence of
+physical models.
+
+\section{A proposed observable component of the phase stack}
+
+\subsection{Input data}
+
+We now state the new organizational proposal.  It is not needed for the proofs above.
+Fix a lattice $\Gamma$, finite-dimensional on-site Hilbert spaces, a symmetry type,
+and a class of interactions with specified locality estimates.  For a profinite test
+object $S$, an observable-family datum consists of
+
+\begin{enumerate}[leftmargin=2em]
+\item a continuous family of interactions with the required uniform locality bound,
+\item the fixed quasi-local C*-algebra $\A_\Gamma$,
+\item the objectwise section algebra $C(S,\A_\Gamma)$,
+\item optional weak-* continuous fiber states $S\to\State(\A_\Gamma)$,
+\item and symmetry actions by continuous *-automorphisms.
+\end{enumerate}
+
+If disorder changes the covariant observable algebra, the datum may instead use an
+appropriate crossed product.  The choice must be part of the object.  It cannot be
+inferred from the condensed parameter set.
+
+\begin{definition}[Proposed observable functor]
+Let $\mathfrak{Obs}_{\Gamma}$ assign to a profinite $S$ the groupoid of the above
+observable-family data and structure-preserving equivalences.  Pullback along
+$T\to S$ is defined by restriction of the parameter family.
+\end{definition}
+
+\Status{Proposed}: after the interaction and morphism categories are specified,
+$\mathfrak{Obs}_{\Gamma}$ should be enhanced to a condensed anima or stack.
+\Cref{thm:descent} proves the descent statement for its fixed section-algebra
+component.  It does not prove descent for gaps, ground states, dynamics, or phase
+equivalences.  Those require separate analytic theorems.
+
+\subsection{Morphisms}
+
+The morphism class determines the moduli problem.  Possible morphisms include
+star isomorphisms, covariant star homomorphisms, Morita equivalences, quasi-local
+automorphisms, and stable gapped homotopies.  They are not interchangeable.
+
+For the present paper, we use contractive star homomorphisms for section-algebra
+functoriality and isometric star isomorphisms for equivalence.  A later phase stack may
+invert a larger class after proving that the relevant physical data are preserved.
+
+\subsection{Dependency boundaries}
+
+The observable layer receives locality and dynamics from the locality paper.  It
+supplies the norm, order, functional calculus, state language, and K-theory target to
+the gap and microscopic-to-effective papers.  It does not prove any of the following:
+
+\begin{itemize}[leftmargin=2em]
+\item a uniform thermodynamic gap,
+\item stability of that gap under perturbations,
+\item equivalence of a lattice system and an effective field theory,
+\item or microscopic realization of an abstract bordism class.
+\end{itemize}
+
+\section{Examples and counterexamples}
+
+\subsection{A finite parameter set}
+
+Let $S=\{0,1\}$ and $A=M_n(\C)$.  Then
+\[
+C(S,A)\cong A\oplus A,
+\qquad
+\|(a_0,a_1)\|=\max\{\|a_0\|,\|a_1\|\}.
+\]
+The positive cone is $A_+\oplus A_+$.  A continuous family of states is simply a
+pair $(\omega_0,\omega_1)$.  A state on $A\oplus A$ also chooses a convex weight:
+\[
+\varphi(a_0,a_1)
+=
+\lambda\omega_0(a_0)+(1-\lambda)\omega_1(a_1),
+\qquad 0\leq\lambda\leq1.
+\]
+This finite example already displays the distinction in \cref{ce:states}.
+The coefficients $\lambda$ and $1-\lambda$ are the classical probability measure on
+$S$.  That measure is absent from the bare parameter family $S\to\State(A)$.
+
+\subsection{A profinite spin family}
+
+Let $S=\{0,1\}^{\N}$ and let $A=M_2(\C)$.  A norm-continuous family of one-site
+observables is a function $f:S\to M_2(\C)$.  It can depend on infinitely many bits,
+but \cref{thm:clopen} approximates it uniformly by functions of finitely many bits.
+Positivity is checked matrix by matrix in every fiber.  The approximation theorem
+preserves positivity after applying the continuous positive-part map or square root.
+
+This is a useful finite-resolution model for disorder.  It is not a proof that a
+thermodynamic invariant computed on finite cylinders converges.  Such convergence
+requires continuity of the invariant in the chosen topology.
+
+\subsection{A spin-chain algebra}
+
+For $\Gamma=\Z$ and $\mathcal H_x=\C^2$, each local algebra is a matrix algebra
+$M_{2^{|\Lambda|}}(\C)$.  The quasi-local algebra is the norm completion of their
+directed union.  Local density matrices give compatible states when their partial
+traces agree.  A translation-invariant product state is obtained from a single
+one-site density matrix.
+
+No infinite sum of identical on-site Hamiltonians belongs to the unital quasi-local
+algebra in norm.  Its finite-volume sums generate compatible local dynamics, and the
+thermodynamic automorphism group is obtained under the standard locality hypotheses.
+
+\subsection{A disordered covariant model}
+
+For binary disorder $D=\{0,1\}$ on $\Z^d$, the coefficient algebra $C(\Omega)$ is
+the completion of cylinder functions.  A nearest-neighbor covariant Hamiltonian is a
+finite sum in $M_N(C(\Omega))\rtimes\Z^d$.  If the Fermi energy lies in a uniform
+spectral gap, \cref{thm:gapped-k} gives a projection in the matrix crossed product
+and hence a K-class.
+
+If only a mobility gap is present, the spectral projection may belong to a smoother
+Sobolev-type algebra rather than the C*-algebra in the same way.  Mobility-gap
+invariants require extra localization hypotheses and are outside the theorem stated
+here.
+
+\section{Computational and formal interfaces}
+
+\subsection{Finite Haskell demonstrations}
+
+The companion program implements exact finite contracts for the following tasks:
+
+\begin{enumerate}[leftmargin=2em]
+\item adjoint involution on $2\times2$ complex matrices,
+\item the principal-minor positivity criterion for Hermitian $2\times2$ matrices,
+\item state evaluation $\operatorname{Tr}(\rho a)$,
+\item the supremum of Hermitian spectral norms over a finite parameter set,
+\item and the error bound for finite-prefix clopen approximation on
+  $\{0,1\}^{\N}$.
+\end{enumerate}
+
+The program is compiled with \texttt{-Wall -Wextra -Werror}.  It provides executable
+regression checks for definitions.  Floating-point tests do not prove positivity in
+an abstract C*-algebra, and finite prefix tests do not prove the sheaf or completion
+theorems.
+
+\subsection{Lean representation boundary}
+
+A Lean library can directly represent finite-dimensional *-algebras, positive
+matrices, continuous functions into normed algebras, and finite clopen partitions.
+It can state the quasi-local inductive system and Aoki comparison as interfaces with
+provenance.  It should not introduce axioms labeled as proofs of Aoki's theorem or of
+thermodynamic dynamics.  Every imported analytic theorem must retain its hypotheses.
+
+The most useful formal dependency chain is
+
+\[
+\begin{tikzcd}[column sep=small,cells={font=\small}]
+\text{local matrix algebras}
+  \arrow[r]
+& \text{C*-inductive limit}
+  \arrow[r]
+& C(S,\A_\Gamma)
+  \arrow[r]
+& \Ktop(C(S,\A_\Gamma)).
+\end{tikzcd}
+\]
+
+The solidification theorem supplies a comparison to the last object only after the
+connective or Bott-periodic qualification has been selected.
+
+\section{Claim ledger and limitations}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.17\textwidth}
+                  >{\raggedright\arraybackslash}p{0.49\textwidth}
+                  >{\raggedright\arraybackslash}p{0.24\textwidth}}
+\toprule
+Status & Claim & Dependency \\
+\midrule
+\endfirsthead
+\toprule
+Status & Claim & Dependency \\
+\midrule
+\endhead
+\Status{Established}
+& $C(S,A)$ is a C*-algebra with fiberwise positivity and supremum norm.
+& Compact Hausdorff $S$, C*-algebra $A$. \\
+\Status{Established}
+& Objectwise C*-descent holds for finite jointly surjective profinite covers.
+& Quotient-map descent. \\
+\Status{Established}
+& Finite clopen quotient functions are dense for profinite $S$.
+& Banach target and compactness. \\
+\Status{Established}
+& Quantum-spin local algebras have a quasi-local C*-inductive limit.
+& Chosen local tensor products and isometric embeddings. \\
+\Status{Established}
+& Covariant one-particle disorder is modeled by a crossed product.
+& Compact hull and continuous action. \\
+\Status{Established}
+& A uniformly gapped norm-continuous path gives a constant K-class.
+& Continuous functional calculus. \\
+\Status{Established}
+& Solidification recovers connective, then Bott-periodic, operator K-theory.
+& Aoki's Banach-algebra hypotheses. \\
+\Status{Proposed}
+& These objects form the observable component of a condensed Hamiltonian stack.
+& A defined moduli category and descent for all added data. \\
+\Status{Open}
+& The resulting stack is equivalent to a microscopic phase or EFT stack.
+& No general comparison theorem. \\
+\Status{Obstructed}
+& A bare condensed ring canonically determines norm, order, and states.
+& \Cref{ce:norms,ce:states}. \\
+\bottomrule
+\end{longtable}
+
+The main limitations are structural.  We restrict the quasi-local construction to
+finite-dimensional on-site Hilbert spaces.  Infinite-dimensional site algebras and
+unbounded on-site terms require domain and topology choices such as those analyzed
+in \cite{NSY}.  We treat true spectral gaps for bounded one-particle Hamiltonians,
+not mobility gaps.  We do not classify noninvertible topological order.  We do not
+derive an effective field theory or a response action from a K-class.  We do not
+claim that all algebraic K-classes have local gapped microscopic representatives.
+
+\section{Discussion}
+
+The observable-algebra layer reveals both the promise and the limit of the condensed
+perspective.  It is promising because ordinary compact parameters, profinite
+disorder, norm completions, and algebraic K-theory can be placed in a common
+functorial setting.  The object $S\mapsto C(S,A)$ is not a metaphor.  It satisfies
+descent as a C*-algebra-valued construction, and for profinite $S$ it has a concrete
+finite-resolution approximation.
+
+The limit is equally clear.  Condensed mathematics organizes topology already
+present in $A$.  It does not decide which representation gives the physical norm,
+which cone is positive, which states are admissible, or whether a dynamics has a
+thermodynamic gap.  These are analytic inputs.  The framework becomes useful when it
+keeps them visible instead of absorbing them into a slogan.
+
+Aoki's theorem sharpens the bridge.  Operator K-theory can be obtained from
+solidified algebraic K-theory of the represented Banach algebra.  The result explains
+why condensed methods can recover a central phase invariant.  It also marks a clean
+boundary.  K-theory is much less information than the C*-algebra with its order,
+states, locality, and dynamics.
+
+For the wider research program, the next step is to combine the observable functor
+with a uniformly local interaction functor and a uniformly gapped subfunctor.  The
+descent of $C(S,A)$ is already established here.  Descent of uniform gaps and
+quasi-adiabatic equivalences is a separate problem.  Any synthesis should retain
+that separation.
+
+\section{Conclusion}
+
+We have proved the operator algebraic statements needed for a rigorous condensed
+formulation of parameterized observables.  Compact families form C*-algebras of
+sections.  Their norms and positive cones are fiberwise.  They satisfy descent over
+profinite covers.  Profinite families admit norm-controlled finite-clopen
+approximations.  Quantum-spin observables arise as C*-inductive limits, and compact
+families commute with that completion.  Covariant disorder leads to crossed
+products, while a uniform spectral gap gives a stable K-class by functional
+calculus.
+
+The strongest condensed-to-operator bridge is Aoki's solidification theorem, with
+connective truncation before periodicity and Bott inversion for the periodic theory.
+The complex Bott class has degree two and the real Bott class degree eight.  These
+qualifications are part of the theorem.
+
+The resulting picture is concise:
+\[
+\begin{gathered}
+\text{chosen C*-observable algebra}
+\longmapsto
+\text{condensed family of section algebras}
+\\
+\longmapsto
+\text{solidified algebraic K-theory}
+\longmapsto
+\text{operator K-theory}.
+\end{gathered}
+\]
+It is a proved invariant-level route.  It is not a reconstruction of physical
+positivity from algebra, and it is not a universal microscopic-to-effective
+equivalence.
+
+\appendix
+
+\section{Detailed checks for the section algebra}
+
+This appendix records elementary estimates used implicitly in
+\cref{thm:objectwise}.  They are included to make the analytic assumptions auditable.
+
+\begin{lemma}[Continuity of pointwise operations]
+If $f,g\in C(S,A)$, then $f+g$, $fg$, and $f^*$ are norm-continuous.
+\end{lemma}
+
+\begin{proof}
+Addition and involution are norm-continuous operations on $A$.  For multiplication,
+at a fixed $s_0$ write
+\[
+f(s)g(s)-f(s_0)g(s_0)
+=
+(f(s)-f(s_0))g(s)+f(s_0)(g(s)-g(s_0)).
+\]
+Continuity of $g$ gives a local bound on $\|g(s)\|$, and both terms tend to zero as
+$s\to s_0$.
+\end{proof}
+
+\begin{lemma}[Completeness]
+Every Cauchy sequence in $C(S,A)$ for the supremum norm converges to an element of
+$C(S,A)$.
+\end{lemma}
+
+\begin{proof}
+If $(f_n)$ is Cauchy in the supremum norm, then $(f_n(s))$ is Cauchy in $A$ for every
+$s$.  Completeness of $A$ defines $f(s)=\lim_nf_n(s)$.  The convergence is uniform.
+A uniform limit of continuous maps into a metric space is continuous, so
+$f\in C(S,A)$ and $f_n\to f$ in the supremum norm.
+\end{proof}
+
+\begin{lemma}[Continuity of square roots]
+If $f\in C(S,A)$ is pointwise positive, then $s\mapsto f(s)^{1/2}$ is norm-continuous.
+\end{lemma}
+
+\begin{proof}
+The union of the spectra of $f(s)$ is contained in
+$[0,\|f\|_\infty]$.  Polynomial approximation of the square-root function on this
+compact interval is uniform.  Applying the same polynomials to $f(s)$ shows that the
+square-root map is the uniform limit of continuous $A$-valued functions.
+\end{proof}
+
+\begin{lemma}[Closedness of the positive cone]
+The set $C(S,A)_+$ is norm closed.
+\end{lemma}
+
+\begin{proof}
+If $f_n\geq0$ and $f_n\to f$ uniformly, then $f_n(s)\to f(s)$ in $A$ for every $s$.
+The positive cone $A_+$ is norm closed, so $f(s)\geq0$.  Apply
+\cref{thm:objectwise}.
+\end{proof}
+
+\section{Local states and density matrices}
+
+For a finite-dimensional local algebra $\A_\Lambda=B(\mathcal H_\Lambda)$, every
+state has the form
+\[
+\omega_\Lambda(a)=\operatorname{Tr}(\rho_\Lambda a)
+\]
+for a unique density matrix $\rho_\Lambda\geq0$ with trace one.  If
+$\Lambda\subset\Lambda'$, compatibility of states is equivalent to
+\[
+\rho_\Lambda
+=
+\operatorname{Tr}_{\Lambda'\setminus\Lambda}(\rho_{\Lambda'}).
+\]
+
+\begin{proposition}[Product-state compatibility]
+Fix one-site density matrices $\rho_x$ for $x\in\Gamma$.  The finite-volume density
+matrices
+\[
+\rho_\Lambda=\bigotimes_{x\in\Lambda}\rho_x
+\]
+define a compatible family and therefore a state on $\A_\Gamma$.
+\end{proposition}
+
+\begin{proof}
+The partial trace of a tensor product over the discarded factors multiplies by the
+traces of those factors.  Each trace is one, so the remaining density matrix is
+$\rho_\Lambda$.  Apply \cref{prop:local-states}.
+\end{proof}
+
+This construction gives a state on the observable algebra.  It does not assert that
+the state is a ground state of a specified interaction.  Ground-state conditions
+involve the dynamics or local energy inequalities.
+
+\section{Counterexample audit}
+
+The three principal counterexamples answer distinct possible overclaims.
+
+\begin{enumerate}[leftmargin=2em]
+\item \Cref{ce:norms} shows that algebraic *-data do not choose a C*-completion or
+  order.
+\item \Cref{ce:states} shows that a continuous family of fiber states is not the
+  state space of the section algebra.
+\item \Cref{ce:cantor} shows that a continuous function on a profinite set need not
+  factor through a finite quotient.
+\end{enumerate}
+
+Together they force three completions or choices to remain explicit: the operator
+norm completion, the distinction between parameter and averaging, and the norm
+closure of finite-resolution data.
+
+\begin{thebibliography}{99}
+
+\bibitem{Aoki}
+K. Aoki,
+\emph{(Semi)topological K-theory via solidification},
+arXiv:2409.01462, 2024,
+\url{https://arxiv.org/abs/2409.01462}.
+
+\bibitem{BarwickHaine}
+C. Barwick and P. Haine,
+\emph{Pyknotic objects, I: Basic notions},
+arXiv:1904.09966, 2019,
+\url{https://arxiv.org/abs/1904.09966}.
+
+\bibitem{Bellissard}
+J. Bellissard, A. van Elst, and H. Schulz-Baldes,
+\emph{The non-commutative geometry of the quantum Hall effect},
+Journal of Mathematical Physics 35 (1994), 5373 to 5451,
+\url{https://arxiv.org/abs/cond-mat/9411052}.
+
+\bibitem{BourneKellendonkRennie}
+C. Bourne, J. Kellendonk, and A. Rennie,
+\emph{The K-theoretic bulk-edge correspondence for topological insulators},
+Annales Henri Poincar\'e 18 (2017), 1833 to 1866,
+\url{https://arxiv.org/abs/1604.02337}.
+
+\bibitem{ClausenScholze}
+D. Clausen and P. Scholze,
+\emph{Lectures on Condensed Mathematics},
+University of Bonn lecture notes, 2019,
+\url{https://www.math.uni-bonn.de/people/scholze/Condensed.pdf}.
+
+\bibitem{Kellendonk}
+J. Kellendonk,
+\emph{On the C*-algebraic approach to topological phases for insulators},
+Journal of Physics A: Mathematical and Theoretical 50 (2017), 085202,
+\url{https://arxiv.org/abs/1509.06271}.
+
+\bibitem{NSY}
+B. Nachtergaele, R. Sims, and A. Young,
+\emph{Quasi-locality bounds for quantum lattice systems, Part I: Lieb-Robinson
+bounds, quasi-local maps, and spectral flow automorphisms},
+Journal of Mathematical Physics 60 (2019), 061101,
+\url{https://arxiv.org/abs/1810.02428}.
+
+\end{thebibliography}
+
+\end{document}

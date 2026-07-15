@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "Please cite the individual paper or the synthesis paper relevant to your use."
+title: "Topological Phases of Matter in Condensed Mathematics"
+type: software
+authors:
+  - family-names: Long
+    given-names: Matthew
+date-released: 2026-07-14
+license: MIT
+repository-code: "https://github.com/YonedaAI/topological-phases-of-matter-chatgpt"
+keywords:
+  - topological phases of matter
+  - condensed mathematics
+  - Lieb-Robinson bounds
+  - operator algebras
+  - spectral gaps
+  - bordism
+  - Lean
+  - Haskell
+abstract: >-
+  A six-paper research program that separates established analytic and
+  operator-algebraic bridges from proposed condensed moduli constructions and
+  open microscopic realization problems.

@@ -1,0 +1,1854 @@
+\documentclass[12pt]{article}
+
+% Core mathematics
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+
+% Diagrams
+\usepackage{tikz-cd}
+\usepackage{tikz}
+
+% References
+\usepackage{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+% Tables and layout
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+% GrokRxiv sidebar
+\usepackage{everypage}
+\usepackage{xcolor}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=green!40!black,
+  urlcolor=blue!60!black,
+  pdftitle={The Invertible Condensed Phase Spectrum Program},
+  pdfauthor={Matthew Long and the YonedaAI Collaboration}
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\A}{\mathcal A}
+\newcommand{\B}{\mathcal B}
+\newcommand{\C}{\mathcal C}
+\newcommand{\F}{\mathcal F}
+\newcommand{\Ham}{\mathfrak{Ham}}
+\newcommand{\Gap}{\mathfrak{Gap}}
+\newcommand{\Phase}{\mathfrak{Phase}}
+\newcommand{\Pic}{\operatorname{Pic}}
+\newcommand{\Core}{\operatorname{Core}}
+\newcommand{\Map}{\operatorname{Map}}
+\newcommand{\Spec}{\operatorname{Spec}}
+\newcommand{\State}{\operatorname{State}}
+\newcommand{\Cont}{\operatorname{Cont}}
+\newcommand{\Th}{\operatorname{Th}}
+\newcommand{\im}{\operatorname{im}}
+\newcommand{\IP}{\mathit{IP}}
+\newcommand{\FH}{\mathit{FH}}
+\newcommand{\Cond}{\mathit{Cond}}
+\newcommand{\Kop}{K_{\mathrm{op}}}
+\newcommand{\Kalg}{K_{\mathrm{alg}}}
+\newcommand{\EST}{\textnormal{\textsc{Established}}}
+\newcommand{\PROP}{\textnormal{\textsc{Proposed}}}
+\newcommand{\CONJ}{\textnormal{\textsc{Conjectural}}}
+\newcommand{\OPEN}{\textnormal{\textsc{Open}}}
+\newcommand{\OBST}{\textnormal{\textsc{Obstructed}}}
+
+\definecolor{grokgray}{RGB}{110,110,110}
+\AddEverypageHook{%
+  \ifnum\value{page}=1
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[
+        rotate=90,
+        anchor=south,
+        font=\Large\sffamily\bfseries\color{grokgray},
+        inner sep=0pt
+      ] at ([xshift=38pt,yshift=0.52\paperheight]current page.south west)
+      {GrokRxiv:2026.07.invertible-condensed-phase-spectrum\quad
+       [\,math-ph\,]\quad
+       14 Jul 2026};
+    \end{tikzpicture}
+  \fi
+}
+
+\title{The Invertible Condensed Phase Spectrum Program:\\
+A Conditional Synthesis of Locality, Gaps, Phases, and Realization}
+\author{Matthew Long \\
+\textit{The YonedaAI Collaboration} \\
+\textit{YonedaAI Research Collective} \\
+Chicago, IL \\
+\texttt{matthew@yonedaai.com} $\cdot$ \url{https://yonedaai.com}}
+\date{14 July 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This paper asks whether local quantum interactions can be organized into an
+invertible condensed phase spectrum without erasing the analytic hypotheses
+that make a lattice model physical.  The proposed construction has five
+stages:
+\[
+\boxed{
+\begin{array}{c}
+\text{local quantum interactions}\\
+\downarrow\\
+\text{condensed moduli stack of Hamiltonians}\\
+\downarrow\\
+\text{uniformly gapped propositional substack}\\
+\downarrow\\
+\text{stabilized phase }\infty\text{-groupoid}\\
+\downarrow\\
+\text{invertible condensed phase spectrum}.
+\end{array}}
+\]
+The sequence is a research program, not a chain of established equivalences.
+Its analytic input is solid in several controlled settings.  Common
+interaction norms give Lieb-Robinson bounds.  Family-uniform thermodynamic
+dynamics additionally require a common interaction tail that vanishes at
+large distance.
+Continuous parameter families in a fixed C*-algebra preserve positivity and
+the C*-norm.  Uniform finite-volume or GNS gaps support quasi-adiabatic
+spectral flow and phase stability.  Functional calculus maps controlled free
+families to operator K-theory.  Low-dimensional Kitaev, BDI, and AKLT models
+provide explicit realizability witnesses.
+
+The categorical assembly is less complete.  A quantitative gap witness is
+data, so its projection to Hamiltonians is a fibration and not a subobject.
+The qualitative gapped locus is instead the propositional image of that
+projection.  Localization by controlled gapped paths, stabilization by
+atomic ancillas, stacking, and passage to the invertible sector should then
+produce a grouplike symmetric monoidal condensed anima.  A connective
+spectrum follows if these constructions satisfy descent and the required
+coherences.  Those hypotheses remain proposed or conjectural.
+
+We keep the resulting object distinct from operator K-theory, Kubota's
+microscopic Omega-spectrum, and the Freed-Hopkins bordism-based field-theory
+classification.  No identification is made without a comparison theorem.
+For a family on $B$ with gapless locus $\Sigma$ and
+$U=B\setminus\Sigma$, a class $\nu\in E^q(U)$ has the established relative
+boundary $\partial\nu\in E^{q+1}(B,U)$.  Its interpretation as a physical
+transition charge is conditional on a microscopic comparison map.  Excision
+and an $E$-oriented normal bundle of codimension $c$ identify it with a class
+in $E^{q+1-c}(\Sigma)$; without orientation the target is twisted.
+
+The result is a precise conditional assembly theorem, a claim-status ledger,
+and an executable Haskell validator that rejects the principal false
+inferences.  It does not claim a completed condensed spectrum or a universal
+classification of topological matter.
+\end{abstract}
+
+\tableofcontents
+
+\section{The research question}
+
+Topological phases are commonly described by stable labels.  Depending on
+the problem, the label may be a Chern number, a K-class, a bordism invariant,
+or a homotopy group of a space of gapped systems.  A label is useful because
+it survives a controlled deformation.  It is dangerous when the deformation
+rules and the comparison map that produced it are left implicit.
+
+The condensed-mathematics perspective begins one step earlier
+\cite{Scholze2026}.  It asks for
+a moduli object whose test points are parameterized families of local
+Hamiltonians.  Profinite tests are especially natural for disorder hulls,
+inverse limits, and totally disconnected parameter spaces.  Descent should
+glue compatible local descriptions, while higher morphisms should remember
+paths, homotopies of paths, pumps, and defects.
+
+The program studied here can be stated in one sentence.
+
+\begin{quote}
+Construct a condensed moduli object of uniformly local Hamiltonian families,
+cut out its uniformly gapped qualitative locus, impose the physical phase
+relation and stabilization, and spectrify the stacking-invertible sector.
+\end{quote}
+
+Every verb in that sentence hides a theorem obligation.  ``Construct'' asks
+for a site, objects, morphisms, and descent.  ``Cut out'' asks whether a gap
+condition is stable under restriction and gluing.  ``Impose'' asks for a
+calculus of controlled paths and quasi-local equivalences.  ``Stabilize''
+asks which ancillas count as trivial.  ``Spectrify'' asks for coherent
+symmetric monoidal structure and deloopings.  The paper keeps those
+obligations visible.
+
+\subsection{Five stages, not five equivalences}
+
+Write the proposed sequence as
+\begin{equation}
+\mathsf{Int}^{\mathrm{ub}}_{\F}
+\longrightarrow
+\Ham_{\F}
+\longleftarrow
+\Gap^{\mathrm{prop}}_{\F}
+\longrightarrow
+\Phase^{\mathrm{st}}_{\F}
+\longrightarrow
+\IP^{\mathrm{cond}}_{\F}.
+\label{eq:five-stage-symbolic}
+\end{equation}
+The reverse arrow at the gapped stage is intentional: a gapped subobject,
+if it exists, includes into the Hamiltonian moduli object.  A quantitative
+witness object maps to both.  The prose sequence records a flow of
+construction; the categorical diagram records the variance correctly.
+
+No arrow in \cref{eq:five-stage-symbolic} is declared an equivalence.  The
+first packages analytic data.  The second takes a propositional image.  The
+third localizes and stabilizes.  The fourth passes to stacking-invertible
+objects and then, conditionally, to a spectrum.
+
+\subsection{Spatial and spacetime grading}
+
+We use
+\begin{equation}
+d=\text{spatial dimension},
+\qquad
+n=d+1=\text{spacetime dimension}.
+\label{eq:dimension-convention}
+\end{equation}
+Microscopic interactions and Kubota's construction are graded by $d$.
+Field-theory tangential structures are graded by $n$.  Any comparison must
+display the shift.  Suppressing it can make two formulas look identical even
+when they classify different dimensional objects.
+
+\subsection{Scope}
+
+The target is the invertible sector.  Intrinsic topological order with
+noninvertible excitations needs fusion, braiding, and defect categories that
+cannot be recovered from a spectrum of units.  Crystalline symmetry,
+fermionic grading, and disorder may be included only after their actions are
+specified in the microscopic category.  This paper describes interfaces for
+that work rather than claiming a complete classification.
+
+\section{A status grammar for a mixed theorem program}
+
+The source papers combine imported theorems, finite calculations,
+definitions, and proposed categorical constructions.  A single word such as
+``result'' cannot distinguish them.  We use five statuses.
+
+\begin{definition}[Claim status]
+For a statement made under explicit hypotheses:
+\begin{itemize}[leftmargin=2.1em]
+  \item \EST{} means a theorem or complete calculation is available in the
+  stated setting.
+  \item \PROP{} means a definition or construction is specified, but its
+  full existence, functoriality, or usefulness has not been proved.
+  \item \CONJ{} means a mathematically definite statement is expected to be
+  true and lacks a proof.
+  \item \OPEN{} means the paper asserts neither a construction nor a
+  resolution.
+  \item \OBST{} means the stated implication is false or is ruled out under
+  the stated rules.
+\end{itemize}
+\end{definition}
+
+The difference between \OPEN{} and \OBST{} matters.  A missing lattice model
+is not an obstruction.  An anomaly theorem or an explicit interacting
+counterexample may be one.  The difference between \PROP{} and \CONJ{} also
+matters.  The notation $\IP^{\mathrm{cond}}$ is a proposed target.  A claim
+that it agrees with another spectrum on a specified overlap is conjectural
+only after a comparison map and its expected domain have been stated.
+
+\subsection{An evidence order}
+
+Statuses do not form a simple scale from weak to strong.  An obstructed
+implication can be known more firmly than a proposed construction.  For
+validation purposes it is better to record provenance separately:
+\begin{equation}
+\text{claim}\quad+\quad\text{status}\quad+\quad
+\text{hypotheses}\quad+\quad\text{provider}.
+\label{eq:claim-record}
+\end{equation}
+A provider may be a theorem, an explicit calculation, a cited construction,
+or a named open comparison problem.  The Haskell code mirrors
+\cref{eq:claim-record}; it never tries to infer truth from a status label.
+
+\subsection{Nonclaims fixed at the outset}
+
+The following statements are excluded.
+\begin{enumerate}[leftmargin=2.2em]
+  \item A profinite parameter space does not imply a uniform locality bound.
+  \item Pointwise finite-volume gaps do not imply a thermodynamic gap.
+  \item A ring with involution is not automatically a C*-algebra.
+  \item A K-class does not reconstruct a Hamiltonian.
+  \item A low-energy field theory is not automatically equivalent to its
+  microscopic lattice model.
+  \item Isomorphic homotopy groups do not identify spectra.
+  \item An abstract bordism class does not provide a microscopic realization.
+  \item A relative cohomology class is not automatically a measurable
+  transition charge.
+\end{enumerate}
+
+These exclusions are not philosophical caution.  Each one corresponds to a
+missing hypothesis or a known loss of information.
+
+\section{Stage one: local quantum interactions}
+
+Let $\Gamma$ be a countable metric lattice of bounded geometry.  At each site
+$x$ choose a finite-dimensional Hilbert space $\mathcal H_x$, or a finite
+dimensional graded local algebra for fermions.  The quasi-local algebra
+$\A_\Gamma$ is the norm completion of the directed union of finite-region
+matrix algebras.
+
+An interaction is a map
+\begin{equation}
+\Phi:\{X\Subset\Gamma\}\longrightarrow(\A_X)_{\mathrm{sa}}.
+\end{equation}
+Choose a decay function $F:[0,\infty)\to(0,\infty)$ with the summability and
+convolution properties used in Lieb-Robinson theory.  One standard norm has
+the form
+\begin{equation}
+\|\Phi\|_F
+=
+\sup_{x,y\in\Gamma}
+\frac{1}{F(d(x,y))}
+\sum_{X\ni x,y}\|\Phi(X)\|.
+\label{eq:f-norm}
+\end{equation}
+Other weighted norms are possible.  What matters in a family is that one
+norm convention and one bound work for every parameter.
+
+\begin{definition}[Uniformly bounded local family]
+For a compact or profinite parameter object $S$, a family
+$\Phi=(\Phi_s)_{s\in S}$ is uniformly $F$-local when
+\begin{equation}
+\sup_{s\in S}\|\Phi_s\|_F<\infty
+\label{eq:uniform-family-locality}
+\end{equation}
+and its local coefficients $s\mapsto\Phi_s(X)$ are norm-continuous for every
+finite $X$.  When infinite tails are admitted, the family also carries an
+explicit tail bound uniform in $s$.
+\end{definition}
+
+Local coefficient continuity and \cref{eq:uniform-family-locality} are
+independent conditions.  A family can vary continuously on every finite
+region while its interaction range escapes to infinity.  Conversely, a
+uniformly finite-range assignment can jump discontinuously in its
+coefficients.
+
+\subsection{Established locality output}
+
+\begin{theorem}[Uniform Lieb-Robinson control]
+\label{thm:uniform-lr}
+\EST{}  Suppose a family of interactions has a common finite $F$-norm on a
+bounded-geometry lattice.  Then the
+finite-volume dynamics satisfy a Lieb-Robinson estimate with constants that
+can be chosen uniformly over the family.  For local observables $A$ and $B$
+with separated supports, one obtains a bound of the form
+\begin{equation}
+\|[\tau^{\Lambda,s}_t(A),B]\|
+\le
+C\|A\|\|B\|
+\bigl(e^{v|t|}-1\bigr)
+\sum_{x\in\operatorname{supp}A}
+\sum_{y\in\operatorname{supp}B}F(d(x,y)),
+\label{eq:lr-bound}
+\end{equation}
+where $C$ and $v$ do not depend on $s$ or on the finite volume $\Lambda$
+\cite{LiebRobinson1972,NachtergaeleSims2010}.  For the thermodynamic limit of
+the full family, require separately a common tail function $T_F(R)$ with
+$T_F(R)\to0$ as $R\to\infty$.  Finite-region $F$-norm continuity does not
+imply this uniform tail condition.
+\end{theorem}
+
+This theorem is analytic input, not a consequence of condensed descent.  A
+test object organizes the parameter dependence; it does not manufacture the
+common constant in \cref{eq:uniform-family-locality}.
+
+\subsection{Restriction and finite descent}
+
+For a map $f:T\to S$, restriction sends $\Phi$ to $f^*\Phi$.  The same
+uniform locality bound remains valid.  For a finite jointly surjective cover
+$S_i\to S$ of profinite spaces, compatible local coefficient functions glue
+because the disjoint union map is a quotient map.  A common numerical bound
+also glues if it has been supplied on the entire finite cover, for example by
+taking the maximum of finitely many bounds.
+
+This gives a controlled set-valued sheaf of interaction objects on the
+chosen finite-cover site.  It does not yet give the higher moduli stack used
+later.  Morphisms, automorphisms, and higher coherences still have to be
+defined.
+
+\begin{counterexample}[Moving weak defect]
+Let $S=\mathbb N\cup\{\infty\}$ be the one-point compactification.  A family
+may place a weak local perturbation farther from the origin as the parameter
+approaches $\infty$.  Every fixed local coefficient then converges, and the
+interactions may share a locality norm.  A low-energy mode tied to the moving
+defect can nevertheless make the spectral gap tend to zero.  Local
+continuity and uniform locality therefore do not imply a uniform gap.
+\end{counterexample}
+
+\section{Stage two: a condensed Hamiltonian moduli object}
+
+The interaction sheaf records objects.  A moduli stack must also record
+isomorphisms and higher families.  Its definition depends on which changes
+of microscopic presentation count as equivalences.
+
+\subsection{Objectwise C*-algebraic control}
+
+For a compact Hausdorff parameter space $S$ and a C*-algebra $\A$, the
+continuous family algebra
+\begin{equation}
+C(S,\A)
+\end{equation}
+is a C*-algebra with pointwise operations, involution, and norm
+\begin{equation}
+\|a\|=\sup_{s\in S}\|a(s)\|_{\A}.
+\end{equation}
+Positivity is fiberwise:
+\begin{equation}
+a\ge0
+\quad\Longleftrightarrow\quad
+a(s)\ge0\text{ for every }s\in S.
+\label{eq:fiberwise-positive}
+\end{equation}
+The C*-identity follows exactly:
+\begin{equation}
+\|a^*a\|
+=
+\sup_s\|a(s)^*a(s)\|
+=
+\sup_s\|a(s)\|^2
+=
+\|a\|^2.
+\label{eq:family-cstar}
+\end{equation}
+
+These statements solve the positivity and norm problem once the fixed
+C*-algebra $\A$ has been chosen.  They do not construct that norm from bare
+algebraic multiplication and involution.
+
+\begin{counterexample}[A star algebra can have several C*-completions]
+A dense involutive convolution algebra associated with a nonamenable group
+can admit distinct full and reduced C*-norms.  Its multiplication and star
+operation do not select one completion.  Any Hamiltonian moduli problem that
+uses spectra, positivity, or states must carry the completion as part of its
+input.
+\end{counterexample}
+
+\subsection{Finite-cover C*-descent}
+
+If $S_i\to S$ is a finite jointly surjective family of profinite spaces, then
+\begin{equation}
+C(S,\A)
+\cong
+\operatorname{Eq}\left(
+\prod_i C(S_i,\A)
+\rightrightarrows
+\prod_{i,j}C(S_i\times_S S_j,\A)
+\right)
+\label{eq:cstar-descent}
+\end{equation}
+as C*-algebras.  The norm on a glued section is forced by the fiberwise
+supremum.  Positivity and self-adjointness descend because they are tested
+fiberwise.
+
+Finite clopen partitions give dense finite approximations to continuous
+functions on a profinite space.  They do not imply that every continuous
+family factors exactly through a finite quotient.  That stronger assertion
+would discard genuine continuous variation.
+
+\subsection{States are not pointwise state-valued maps}
+
+A state on $C(S,\A)$ contains a probability measure on $S$ together with
+conditional state data.  In general,
+\begin{equation}
+\State(C(S,\A))
+\ne
+C(S,\State(\A)).
+\label{eq:state-warning}
+\end{equation}
+The right side chooses one normalized state at every point.  The left side
+can average over the parameter space.  This distinction is relevant when a
+ground-state sector is part of a gap witness.
+
+\subsection{The proposed moduli stack}
+
+Let $\mathsf{CondTest}$ be a chosen site of condensed test objects.  Its
+precise size, topology, and hypercompletion convention must be fixed.  For
+each $S$, define a tentative category $\C_{\Ham}(S)$ whose objects include:
+\begin{enumerate}[leftmargin=2.2em]
+  \item a lattice or relaxed-lattice datum of spatial dimension $d$;
+  \item a continuous field of local finite-dimensional algebras;
+  \item a uniformly $F$-local self-adjoint interaction;
+  \item symmetry and grading data;
+  \item boundary and ground-state conventions when required.
+\end{enumerate}
+Morphisms should record controlled changes of presentation, such as local
+unitary identifications, lattice refinements, or paths of interactions.  The
+choice determines the eventual phase relation.
+
+\begin{definition}[Condensed Hamiltonian moduli, proposed]
+\PROP{}  The object $\Ham_{d,\F}^G$ is the hypercomplete sheafification of
+the anima-valued presheaf
+\begin{equation}
+S\longmapsto\Core(\C_{\Ham}(S)),
+\label{eq:ham-stack-proposed}
+\end{equation}
+provided restriction preserves the analytic bounds and the chosen
+morphisms satisfy descent.
+\end{definition}
+
+The word ``provided'' carries real content.  Objectwise finite-cover descent
+does not automatically prove descent for path spaces, automorphism groups,
+spectral-flow providers, or variable lattices.  The existence of
+\cref{eq:ham-stack-proposed} with all desired structures is \PROP{}.
+
+\section{Stage three: the uniformly gapped propositional substack}
+
+A thermodynamic gap is quantitative.  A gapped locus is qualitative.  The
+two are related by a projection, but they are not the same object.
+
+\subsection{Finite-volume and GNS witnesses}
+
+Fix a family of finite volumes $\Lambda_L$ and a prescribed low-energy
+sector of dimension $m_L$.  A uniform finite-volume witness contains a
+number $\gamma>0$ and a threshold $L_0$ such that
+\begin{equation}
+E_{m_L+1}(H_{\Lambda_L,s})-E_{m_L}(H_{\Lambda_L,s})
+\ge\gamma
+\label{eq:finite-volume-family-gap}
+\end{equation}
+for every $L\ge L_0$ and every parameter $s$.
+
+An infinite-volume GNS witness instead chooses a ground state $\omega_s$,
+its GNS representation, and a positive generator $K_s$ of the implemented
+dynamics such that
+\begin{equation}
+\Spec(K_s)\cap(0,\gamma)=\varnothing
+\label{eq:gns-gap}
+\end{equation}
+uniformly in $s$.  Relating the two notions requires hypotheses on boundary
+conditions, ground-state sectors, and the thermodynamic limit.  The paper
+does not treat them as definitionally equal.
+
+\subsection{Witnesses form a fibration of data}
+
+Let $W(S)$ denote the type of accepted gap witnesses over an $S$-family.
+Define
+\begin{equation}
+\Gap^{\mathrm{wit}}_{\F}(S)
+=
+\{(H,w): H\in\Ham_{\F}(S),\ w\in W_S(H)\}.
+\label{eq:witness-gap-object}
+\end{equation}
+Forgetting the numerical and ground-state data gives
+\begin{equation}
+p_S:\Gap^{\mathrm{wit}}_{\F}(S)\longrightarrow\Ham_{\F}(S).
+\label{eq:witness-projection}
+\end{equation}
+
+\begin{proposition}[Witness projection is not a subobject]
+\label{prop:witness-not-subobject}
+Even when all restriction maps are defined, $p_S$ need not be a
+monomorphism.  One Hamiltonian family can admit many gap lower bounds,
+thresholds, ground-state presentations, and equivalent proofs.  Thus
+$\Gap^{\mathrm{wit}}$ is a fibration of quantitative data over the
+Hamiltonian moduli object, not the qualitative gapped substack.
+\end{proposition}
+
+This is more than a set-theoretic nuisance.  Loops in the space of witnesses
+can contain information about choices that should disappear from a phase
+label.  Treating \cref{eq:witness-projection} as an inclusion would retain
+that information by mistake.
+
+\subsection{The propositional image}
+
+The qualitative predicate is obtained by truncating the existence of a
+witness:
+\begin{equation}
+\Gap^{\mathrm{prop}}_{\F}(S)
+=
+\{H\in\Ham_{\F}(S):\|\exists w\in W_S(H)\|\}.
+\label{eq:propositional-gap}
+\end{equation}
+Here the vertical bars denote propositional truncation.  Equivalently,
+$\Gap^{\mathrm{prop}}$ is the image of $p$ when the chosen category of
+condensed anima has pullback-stable image factorizations.
+
+\begin{definition}[Uniformly gapped propositional substack, proposed]
+\PROP{}  If gap witnesses restrict functorially, compatible witnesses glue
+over the chosen covers with a common positive lower bound, and the image
+factorization in \cref{eq:propositional-gap} commutes with pullback, then
+$\Gap^{\mathrm{prop}}_{\F}\hookrightarrow\Ham_{\F}$ is the uniformly gapped
+propositional substack.
+\end{definition}
+
+Descent can combine witnesses that already exist.  It cannot infer a common
+positive lower bound from unrelated local or pointwise gaps.  For a finite
+cover, finitely many compatible lower bounds have a positive minimum.  For
+an infinite cover, the infimum can be zero.
+
+\subsection{Gap stability}
+
+\begin{theorem}[Controlled stability, schematic]
+\label{thm:controlled-gap-stability}
+\EST{} in its cited operator-algebraic settings.  Let
+$r\mapsto\Phi_r$ be a path of interactions with common locality bounds and a
+uniform thermodynamic gap.  Under the standard differentiability and decay
+hypotheses, quasi-adiabatic spectral flow gives quasi-local automorphisms
+that transport the ground-state sectors along the path.  Phase invariants
+defined through this transport remain constant
+\cite{BMNS2012,BachmannNachtergaele2014}.
+\end{theorem}
+
+The theorem begins with a uniform gap.  It does not prove that a proposed
+path is gapped.  Establishing the gap is often the hardest analytic task in
+a phase classification.
+
+\section{Stage four: the stabilized phase infinity-groupoid}
+
+The qualitative gapped locus still contains every microscopic
+presentation.  A phase object should identify systems connected by the
+allowed physical moves.
+
+\subsection{The path category}
+
+For a test object $S$, let $\C_{\mathrm{gap}}(S)$ be the proposed category
+whose objects are $S$-families in $\Gap^{\mathrm{prop}}(S)$ and whose
+morphisms are controlled uniformly gapped interpolations, quasi-local
+automorphisms supplied by spectral flow, and specified changes of local
+presentation.  Every morphism carries a provider showing that locality and
+the gap remain uniform over both $S$ and the interpolation parameter.
+
+Let $W(S)$ be the class of morphisms declared to be phase equivalences.  A
+calculus of fractions is not assumed automatically.  The infinity-categorical
+localization
+\begin{equation}
+\C_{\mathrm{gap}}(S)[W(S)^{-1}]
+\label{eq:phase-localization}
+\end{equation}
+exists abstractly in a sufficiently large ambient category, but size,
+descent, and compatibility with stacking must still be checked.
+
+\subsection{Stabilization}
+
+Choose a class $\mathsf{At}$ of atomic product-state systems.  Stacking with
+an atomic ancilla gives transition functors
+\begin{equation}
+H\longmapsto H\boxtimes A,
+\qquad A\in\mathsf{At}.
+\end{equation}
+The stabilized category is a filtered colimit only after maps between ancilla
+choices and their coherences have been specified.  Formally, write
+\begin{equation}
+\C_{\mathrm{gap}}^{\mathrm{st}}(S)
+=
+\operatorname*{colim}_{A\in\mathsf{At}}
+\C_{\mathrm{gap}}(S)[W(S)^{-1}].
+\label{eq:stabilized-category}
+\end{equation}
+
+\begin{definition}[Stabilized phase infinity-groupoid, proposed]
+\PROP{}  Under the existence and descent hypotheses above, set
+\begin{equation}
+\Phase^{\mathrm{st}}_{d,\F,G}(S)
+=
+\Core\bigl(\C_{\mathrm{gap}}^{\mathrm{st}}(S)\bigr).
+\label{eq:phase-groupoid}
+\end{equation}
+The result is intended to be an anima-valued condensed sheaf.
+\end{definition}
+
+Taking the core discards noninvertible categorical morphisms but retains all
+equivalences and their higher homotopies.  It does not make every object
+invertible under stacking.  That is a separate operation.
+
+\subsection{Why stabilization changes the question}
+
+Two finite-band Hamiltonians may be inequivalent before adding trivial
+bands and equivalent afterward.  Two spin chains may become equivalent
+after stacking with a product state that changes the on-site Hilbert space.
+Stabilization is therefore a quotient choice, not a harmless notational
+convenience.
+
+The BDI example goes further.  Allowing symmetry-preserving interactions
+enlarges the path category and reduces the free integer classification to
+$\mathbb Z/8$ \cite{FidkowskiKitaev2010}.  A stable free K-class does not survive unchanged when the
+microscopic morphisms are changed.
+
+\section{Stage five: the invertible condensed phase spectrum}
+
+Stacking supplies a symmetric monoidal product on microscopic systems.  If
+it descends through the gap condition, localization, and stabilization, it
+makes $\Phase^{\mathrm{st}}$ an $E_\infty$ object in condensed anima.
+
+\subsection{The invertible sector}
+
+An object $x$ is stacking-invertible when there is an object $y$ and an
+equivalence
+\begin{equation}
+x\boxtimes y\simeq\mathbf 1
+\end{equation}
+in the stabilized phase infinity-groupoid.  The full subobject of such
+objects is
+\begin{equation}
+\Pic(\Phase^{\mathrm{st}}).
+\label{eq:picard-phase}
+\end{equation}
+It is grouplike if the monoidal coherences and descent are in place.
+
+\begin{remark}[Group completion and units]
+One may group-complete the entire stacking monoid and then study its units,
+or take the already invertible full subobject.  These operations need not
+encode the same physical question if formal inverses exist without
+microscopic witnesses.  The program here uses the Picard subobject: an
+inverse must be represented by a phase.
+\end{remark}
+
+\subsection{Spectrification}
+
+Grouplike $E_\infty$ spaces are equivalent to connective spectra.  In a
+suitable infinity-topos, the same recognition principle can be applied
+internally, subject to presentability and descent hypotheses.  This motivates
+the definition
+\begin{equation}
+\IP^{\mathrm{cond}}_{d,\F,G}
+=
+\operatorname{sp}
+\Pic(\Phase^{\mathrm{st}}_{d,\F,G}).
+\label{eq:condensed-spectrum}
+\end{equation}
+
+\begin{definition}[Invertible condensed phase spectrum, proposed]
+\PROP{}  Equation \cref{eq:condensed-spectrum} denotes the connective
+condensed spectrum obtained from the stacking-invertible stabilized phase
+object, provided the latter exists as a grouplike $E_\infty$ condensed anima
+and the internal recognition theorem applies in the chosen category.
+\end{definition}
+
+This definition does not prove that the spectrum exists for the full class
+of interacting lattice systems.  It also does not identify its spatial
+degree $d$ pieces with the levels of an Omega-spectrum.  A spatial suspension
+or lattice-direction delooping theorem is still required.
+
+\subsection{A conditional assembly theorem}
+
+The logical content of the program can be packaged as follows.
+
+\begin{theorem}[Conditional assembly]
+\label{thm:conditional-assembly}
+Assume:
+\begin{enumerate}[label=(A\arabic*),leftmargin=2.7em]
+  \item the uniformly $F$-local interaction presheaf has functorial
+  restrictions and hyperdescent;
+  \item Hamiltonian objects, controlled morphisms, and higher equivalences
+  form an anima-valued condensed stack;
+  \item quantitative finite-volume or GNS gap witnesses restrict and descend
+  with a common positive lower bound;
+  \item the witness projection admits a pullback-stable propositional image;
+  \item controlled gapped paths and quasi-local equivalences admit a
+  localization compatible with descent;
+  \item stabilization by the declared atomic systems exists and commutes with
+  restriction;
+  \item stacking is coherently symmetric monoidal throughout the
+  construction and preserves all declared equivalences;
+  \item the Picard subobject is a grouplike $E_\infty$ condensed anima to
+  which internal connective spectrification applies.
+\end{enumerate}
+Then the five stages define a connective invertible condensed phase spectrum
+$\IP^{\mathrm{cond}}_{d,\F,G}$.  Its zeroth homotopy sheaf is the sheaf of
+stacking-invertible stabilized phases represented in the construction.
+\end{theorem}
+
+\begin{proof}
+Assumptions (A1) and (A2) give the condensed Hamiltonian moduli object.
+Assumptions (A3) and (A4) give a propositional gapped subobject without
+retaining choices of gap proof.  Assumptions (A5) and (A6) produce the
+stabilized phase infinity-groupoid.  Assumption (A7) equips it with a
+coherent $E_\infty$ stacking product.  Assumption (A8) identifies the Picard
+subobject with the zeroth space of a connective spectrum internal to the
+chosen condensed setting.  The description of the zeroth homotopy sheaf is
+the definition of connected components in that Picard object.
+\end{proof}
+
+The theorem is formally valid but conditional.  Its conclusion should not
+be cited without the assumptions.  Current work establishes parts of (A1),
+(A3), and (A5) in controlled settings.  The full stack-level assembly is
+\PROP{}, and broad comparison or spatial delooping statements are \OPEN{} or
+\CONJ{}.
+
+\section{Homotopy groups, pumps, and defects}
+
+The slogan
+\begin{align}
+\pi_0&=\text{phases},\notag\\
+\pi_1&=\text{adiabatic pumps and phase automorphisms},\notag\\
+\pi_k&=\text{higher families and higher defects}
+\label{eq:homotopy-slogan}
+\end{align}
+is useful only after the basepoint and the kind of homotopy group have been
+specified.
+
+\subsection{Homotopy sheaves and global shapes}
+
+For a based condensed anima $X$, one can form homotopy sheaves
+$\underline\pi_k(X)$ on test objects.  One can also take global sections or
+a shape and then form ordinary homotopy groups.  These operations need not
+agree.  In the proposed spectrum, the least ambiguous object is the homotopy
+sheaf
+\begin{equation}
+\underline\pi_k\bigl(\IP^{\mathrm{cond}}_{d,\F,G}\bigr).
+\end{equation}
+Its value at a test object $S$ records $S$-parameterized classes, subject to
+the success of the assembly theorem.
+
+\subsection{Zeroth homotopy}
+
+At a point test object,
+\begin{equation}
+\pi_0\Omega^\infty\IP^{\mathrm{cond}}
+\end{equation}
+would be the abelian group of stacking-invertible stabilized phases.  It is
+not the set of all topological phases, since noninvertible phases have been
+removed.  It also depends on symmetry, allowed interactions, boundary
+conventions, and the selected stabilization.
+
+\subsection{First homotopy}
+
+A based loop in the phase infinity-groupoid is a one-parameter family that
+returns to its starting phase up to the declared equivalence.  With a
+uniform gap and a quasi-adiabatic transport provider, such a loop can define
+an adiabatic pump or an automorphism of the phase.  Without that analytic
+provider it is only a loop in the proposed moduli object.
+
+Thus the identification of $\pi_1$ with pumps has two layers:
+\begin{enumerate}[leftmargin=2.2em]
+  \item categorical loop data in the stabilized phase object;
+  \item an analytic transport theorem that assigns a physical pumped
+  quantity or boundary action.
+\end{enumerate}
+The first is part of the proposed organization.  The second is established
+in important model classes and remains open in full generality.
+
+\subsection{Higher families}
+
+A class in $\pi_k$ can be represented by a based $k$-parameter family.  Its
+interpretation as a codimension-$(k+1)$ defect requires a separate
+family-to-defect construction, usually involving suspension, boundary
+conditions, or a clutching map.  Higher homotopy does not turn into a defect
+merely by changing terminology.
+
+\begin{proposition}[Qualified higher-defect interpretation]
+Suppose a family-to-defect map is defined on controlled uniformly gapped
+families, respects homotopy and stacking, and is compatible with the chosen
+spatial suspension.  Then a class in the relevant $\pi_k$ determines a
+stable defect class.  Without this map, $\pi_k$ records a higher family but
+not yet a physical defect.
+\end{proposition}
+
+\section{The gapless locus and relative transition charge}
+
+Let $B$ be a parameter space and let
+\begin{equation}
+f:B\longrightarrow\Ham_{\F}
+\label{eq:parameter-map}
+\end{equation}
+be a Hamiltonian family.  Pull back the propositional gapped subobject:
+\begin{equation}
+U_f
+=
+B\times_{\Ham_{\F}}\Gap^{\mathrm{prop}}_{\F}.
+\label{eq:gapped-pullback}
+\end{equation}
+When $U_f$ is represented by an open subspace of $B$, define
+\begin{equation}
+\Sigma_f=B\setminus U_f.
+\label{eq:gapless-locus}
+\end{equation}
+The symbol $\Sigma$ therefore denotes a qualitative failure locus.  The
+witness fibration also pulls back to $U_f$, but it cannot be subtracted from
+$B$ because it is not a subobject.  If openness, closedness of $\Sigma$, or a
+good-pair replacement is unavailable, the relative group used below is not
+assigned automatically to the proposed gapless locus.
+
+\subsection{Why openness is an analytic theorem}
+
+For bounded self-adjoint elements, a spectral gap is stable under sufficiently
+small norm perturbations.  For thermodynamic interacting systems, openness
+requires a topology on interactions and a stability theorem uniform in
+volume.  The statement ``the gapped locus is open'' is therefore established
+only in a declared controlled setting.  Condensed sheafification alone does
+not prove it.
+
+\subsection{The exact relative class}
+
+Let $E$ be a generalized cohomology theory represented by a spectrum.  Put
+$U=B\setminus\Sigma$ and assume $(B,U)$ is a good pair for $E$.  The long
+exact sequence contains
+\begin{equation}
+E^q(B)\xrightarrow{j^*}E^q(U)
+\xrightarrow{\partial}E^{q+1}(B,U)
+\longrightarrow E^{q+1}(B).
+\label{eq:relative-les}
+\end{equation}
+For $\nu\in E^q(U)$, define
+\begin{equation}
+Q_\Sigma(\nu)=\partial\nu
+\in E^{q+1}(B,B\setminus\Sigma).
+\label{eq:relative-charge}
+\end{equation}
+
+\begin{proposition}[Extension obstruction]
+\label{prop:extension-obstruction}
+\EST{}  The class $Q_\Sigma(\nu)$ vanishes exactly when $\nu$ lies in the
+image of $E^q(B)\to E^q(U)$.
+\end{proposition}
+
+\begin{proof}
+This is exactness of \cref{eq:relative-les} at $E^q(U)$.
+\end{proof}
+
+The proposition concerns extension of a cohomology class.  It does not say
+that the Hamiltonian family extends across $\Sigma$ as a uniformly gapped
+family.
+
+\subsection{Excision and Thom localization}
+
+If excision applies near the closed set $\Sigma$, then
+\begin{equation}
+E^{q+1}(B,B\setminus\Sigma)
+\cong
+E^{q+1}(N,N\setminus\Sigma)
+\label{eq:excision-local}
+\end{equation}
+for a suitable neighborhood $N$.  Suppose further that $B$ is smooth,
+$\Sigma\hookrightarrow B$ is a closed submanifold of codimension $c$, and
+its normal bundle $\mathcal N$ is $E$-oriented.  A tubular neighborhood and
+the Thom isomorphism give
+\begin{equation}
+E^{q+1}(B,B\setminus\Sigma)
+\cong
+\widetilde E^{q+1}(\Th(\mathcal N))
+\cong
+E^{q+1-c}(\Sigma).
+\label{eq:thom-charge}
+\end{equation}
+Without an $E$-orientation, the last group must be replaced by the
+appropriate twisted theory.  For singular $\Sigma$, a stratified normal
+datum or supported-cohomology formulation is needed.
+
+\subsection{When the class is physical}
+
+Suppose a microscopic family $H$ on $U$ has a phase invariant
+$\nu_{\mathrm{mic}}(H)$.  To obtain the $E$-cohomology class used above one
+needs a natural transformation
+\begin{equation}
+c_E:\nu_{\mathrm{mic}}(H)\longmapsto\nu_E(H)\in E^q(U)
+\label{eq:physical-comparison}
+\end{equation}
+that respects restriction, stacking, and controlled gapped homotopy.
+
+\begin{theorem}[Conditional physical transition charge]
+\label{thm:conditional-charge}
+If \cref{eq:physical-comparison} is supplied and has the stated naturality,
+then
+\begin{equation}
+Q_\Sigma(H):=\partial\nu_E(H)
+\end{equation}
+is invariant under the chosen microscopic phase relation on $U$.  It is
+localized near $\Sigma$ by excision and, under the Thom hypotheses, has
+degree $q+1-c$ on the critical locus.
+\end{theorem}
+
+The algebraic-topology part of this theorem is \EST{}.  The general
+microscopic comparison is \PROP{} or \OPEN{}, depending on the model class.
+For a controlled free-fermion family, functional calculus can provide it.
+For arbitrary interacting systems, no universal map is asserted.
+
+\subsection{A local SSH test}
+
+For the chiral two-band SSH Hamiltonian, the off-diagonal function
+\begin{equation}
+q(k)=t_1+t_2e^{ik}
+\end{equation}
+has winding one when $|t_1|<|t_2|$ and winding zero when
+$|t_1|>|t_2|$.  At the isolated crossing $t_1=t_2$, $k=\pi$, a small linking
+circle in the combined momentum and mass coordinates has degree of magnitude
+one.  This is a controlled example of \cref{eq:relative-charge}.  A loop in
+the tuning parameter alone would miss the momentum coordinate and need not
+link the degeneracy \cite{TeoKane2010,Thiang2016}.
+
+\section{Microscopic systems and effective field theories}
+
+The phrase ``microscopic to effective'' covers three separate operations.
+They should be drawn as three arrows:
+\begin{equation}
+\begin{tikzcd}[column sep=huge,row sep=large]
+\Ham^{\mathrm{micro,gap}}
+  \arrow[r,dashed,"L"]
+& \mathsf{EFT}^{\mathrm{inv}}
+  \arrow[r,"I","\text{established on a stated EFT domain}"']
+& \mathsf{Class}^{\mathrm{stable}}
+  \arrow[dll,dashed,"R"] \\
+\mathsf{Real}_{\mathrm{lattice}}
+  \arrow[u,"\text{forget witnesses}"']
+&&
+\end{tikzcd}
+\label{eq:three-comparisons}
+\end{equation}
+Here $L$ is a low-energy limit, $I$ extracts a stable invariant on a specified
+effective-theory domain, and $R$ is a
+realization problem whose target contains explicit stabilized microscopic
+witnesses.  The final vertical map forgets those witnesses and retains the
+underlying microscopic Hamiltonian.  None is automatically inverse to
+another.  The solid $I$ does not assert an invariant map on every object
+called an EFT; its established use here is restricted to declared targets,
+including the Freed-Hopkins domain described below.
+
+\subsection{Controlled free functional calculus}
+
+Let $h\in M_N(C(S,\A))_{\mathrm{sa}}$ and suppose
+\begin{equation}
+\Spec(h_s)\cap(-\gamma,\gamma)=\varnothing
+\end{equation}
+for a common $\gamma>0$.  Continuous functional calculus gives
+\begin{equation}
+q_h=\operatorname{sgn}(h),
+\qquad
+p_h=\frac{1-q_h}{2}.
+\label{eq:flattening}
+\end{equation}
+The projection $p_h$ varies continuously with $s$.  Relative to a reference
+$h_{\mathrm{ref}}$, the difference
+\begin{equation}
+\kappa(h,h_{\mathrm{ref}})
+=[p_h]-[p_{h_{\mathrm{ref}}}]
+\label{eq:k-class}
+\end{equation}
+is invariant under norm-continuous paths with a common gap and is additive
+under block sum.  Throughout this paper the first argument is the target and
+the second is the reference, so $\kappa(\text{target},\text{reference})$ means
+target minus reference.
+
+This is an \EST{} map in the controlled free sector.  It loses the gap
+magnitude, dispersion, Fermi velocity, correlation length, Lieb-Robinson
+constants, coupling values, boundary termination, and much of the band
+presentation.  Flattening is not a renormalization-group construction.
+
+\subsection{Interacting systems}
+
+A general interacting many-body Hamiltonian does not have a bounded
+one-particle matrix to which \cref{eq:flattening} applies.  Flattening a
+finite-volume matrix can produce a highly nonlocal operator and may not have
+a quasi-local thermodynamic limit.  Quasi-adiabatic spectral flow is the
+right comparison tool for paths of interacting systems, but it starts from
+uniform locality and a uniform gap.
+
+The Fidkowski-Kitaev reduction is a decisive warning.  One-dimensional BDI
+free phases have an integer index.  Symmetry-preserving interactions reduce
+the classification to $\mathbb Z/8$ \cite{FidkowskiKitaev2010}.  Therefore no universal equivalence can
+identify free operator K-theory with the interacting microscopic phase
+object.
+
+\subsection{Disorder}
+
+For a covariant disordered free Hamiltonian with a genuine C*-spectral gap,
+the Fermi projection lies in an appropriate crossed-product algebra and
+defines a K-class.  A mobility-gap extension needs localization estimates
+strong enough to place the projection and its commutators in the relevant
+algebra.  A profinite disorder hull does not supply those estimates.
+
+\section{Three stable-homotopy targets that remain distinct}
+
+The proposed condensed spectrum is not the only spectrum in the subject.
+Two established constructions have different domains.
+
+\subsection{Freed-Hopkins field-theory classes}
+
+Fix a spacetime symmetry type $(H_n,\rho_n)$ and its Madsen-Tillmann spectrum
+$MTH$.  In the discrete topological sector, Freed and Hopkins compute
+deformation classes of reflection-positive invertible extended topological
+field theories by a torsion subgroup of
+\begin{equation}
+[MTH,\Sigma^{n+1}I\mathbb Z(1)].
+\label{eq:fh-target}
+\end{equation}
+This is an \EST{} field-theory theorem under its hypotheses
+\cite{FreedHopkins2021}.  Application to
+lattice phases uses an effective-field-theory assumption.  The theorem does
+not assert that every class in \cref{eq:fh-target} has a finite-range lattice
+representative with a thermodynamic gap.
+
+\subsection{Kubota's microscopic Omega-spectrum}
+
+Kubota constructs an \EST{} Omega-spectrum $\IP_*$ from invertible gapped
+quantum spin systems on Euclidean spaces.  Its ingredients include
+operator-algebraic interactions, uniformly almost-local control, relaxed
+lattices, stabilization by atomic systems, nondegenerate gapped GNS ground
+states, and sheaves of smooth parameter families \cite{Kubota2025}.  This is a genuine
+microscopic stable-homotopy object.
+
+It is not definitionally the condensed spectrum in
+\cref{eq:condensed-spectrum}.  The parameter sites, gap witnesses, lattice
+conventions, and descent conditions differ.  A comparison should first be
+defined on their common smooth, uniformly controlled domain.
+
+\subsection{Aoki's K-theory bridge}
+
+Aoki proves, with connective and Bott-periodic qualifications, that
+solidification of algebraic K-theory of real or complex Banach algebras
+recovers the corresponding connective topological K-theory, followed by
+inversion of the degree-two complex or degree-eight real Bott element for
+the periodic theory.  This is an \EST{} invariant-level bridge
+\cite{Aoki2024}.
+
+The input Banach or C*-algebra is already present.  Solidification does not
+recover its norm, positive cone, state space, or microscopic interaction.
+It also does not say that every K-class is a physical phase.
+
+\subsection{Comparison diagram}
+
+The honest current diagram is
+\begin{equation}
+\begin{tikzcd}[column sep=large,row sep=large]
+& \IP_*^{\mathrm{Kubota}}
+  \arrow[dl,dotted,"C_{\mathrm{cond}}"']
+  \arrow[dr,dotted,"C_{\mathrm{EFT}}"] & \\
+\IP^{\mathrm{cond}}
+  \arrow[rr,dotted,"C_{\mathrm{bord}}"']
+&& \Map(MTH,\Sigma^{*+1}I\mathbb Z(1)) \\
+& \Kop
+  \arrow[ul,dotted,"C_K"]
+  \arrow[ur,dotted,"C_{K,\mathrm{EFT}}"'] &
+\end{tikzcd}
+\label{eq:comparison-web}
+\end{equation}
+Every dotted arrow needs a domain, a formula, naturality, stacking
+compatibility, and homotopy invariance.  An equivalence claim also needs
+full faithfulness and essential surjectivity, or their spectral analogues.
+No such global equivalence is asserted here.
+
+\section{Physical realizability}
+
+An abstract class becomes physical only through a witness.  For a
+microscopic system in spatial dimension $d$, a realization record contains:
+\begin{enumerate}[leftmargin=2.2em]
+  \item local degrees of freedom and a lattice;
+  \item an explicit uniformly local interaction;
+  \item symmetry, grading, and boundary conventions;
+  \item a thermodynamic gap witness;
+  \item a microscopic invariant;
+  \item an explicit comparison to the abstract class;
+  \item a stacking inverse if invertibility is claimed.
+\end{enumerate}
+An element of a bordism group supplies none of the microscopic fields by
+itself.
+
+\subsection{Three realized low-dimensional rows}
+
+The companion realizability analysis establishes three concrete rows.
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.20\textwidth}
+                  >{\raggedright\arraybackslash}p{0.23\textwidth}
+                  >{\raggedright\arraybackslash}p{0.30\textwidth}}
+\toprule
+System & Gap witness & Microscopic invariant & Abstract comparison status \\
+\midrule
+\endfirsthead
+\toprule
+System & Gap witness & Microscopic invariant & Abstract comparison status \\
+\midrule
+\endhead
+Class-D Kitaev chain
+& Exact flat periodic bulk spectrum at the solvable point
+& Pfaffian parity and one Majorana at each open end
+& Agreement with the nontrivial spin or Arf $\mathbb Z/2$ class under the low-energy interpretation \cite{Kitaev2001,FreedHopkins2021} \\
+
+BDI stack
+& Exact free gap plus the Fidkowski-Kitaev gapped interaction for eight copies
+& Free integer, reduced to residue modulo eight with interactions
+& Agreement with the two-dimensional $\mathrm{Pin}^-$ Arf-Brown-Kervaire $\mathbb Z/8$ sector \cite{FidkowskiKitaev2010,FreedHopkins2021} \\
+
+Spin-one AKLT chain
+& Rigorous AKLT bulk-gap theorem
+& Nontrivial projective $SO(3)$ boundary representation
+& Agreement with the nontrivial $H^2(SO(3),U(1))$ sector \cite{AKLT1987,BachmannNachtergaele2014} \\
+\bottomrule
+\end{longtable}
+
+Each row is microscopically realized in the stated one-dimensional setting.
+The last column records a limited comparison, not a spectrum equivalence.
+
+\subsection{Surjectivity and injectivity}
+
+Surjectivity of a realization map would require every abstract class to have
+a local Hamiltonian witness with a uniform gap and the correct response.
+Anomalies, finite-dimensional local Hilbert spaces, spatial symmetry, or
+unknown gap proofs may obstruct or delay such a result.
+
+Injectivity would require two systems with the same abstract class to be
+connected by the chosen stabilized gapped path.  A field-theory target may
+forget crystalline data, noninvertible excitations, boundary termination,
+or unstable finite-band structure.  If the microscopic category retains any
+of these, injectivity can fail.
+
+The BDI example shows that changing the domain can also merge classes.  Once
+interactions are admitted, paths exist that were absent in the free
+category.  Realization and comparison questions are meaningless until the
+domain and its morphisms are fixed.
+
+\section{Arrow-by-arrow theorem obligations}
+
+The five-stage program is best audited one arrow at a time.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.19\textwidth}
+                  >{\raggedright\arraybackslash}p{0.31\textwidth}
+                  >{\raggedright\arraybackslash}p{0.15\textwidth}
+                  >{\raggedright\arraybackslash}p{0.24\textwidth}}
+\toprule
+Arrow & Required theorem & Status & Main missing point \\
+\midrule
+\endfirsthead
+\toprule
+Arrow & Required theorem & Status & Main missing point \\
+\midrule
+\endhead
+Interactions to Hamiltonian moduli
+& Uniform analytic bounds define a stack with controlled morphisms
+& \PROP{}
+& Higher descent and variable microscopic presentations \\
+
+Hamiltonian moduli to gapped locus
+& Witness projection has pullback-stable propositional image
+& \PROP{}
+& Uniform thermodynamic witnesses and image descent \\
+
+Gapped locus to stabilized phases
+& Controlled path localization and atomic stabilization commute with descent
+& \PROP{}
+& Global calculus of equivalences and coherences \\
+
+Stabilized phases to invertible sector
+& Stacking descends as a symmetric monoidal structure and units form a Picard object
+& \PROP{}
+& Physical inverses and sheafwise invertibility \\
+
+Picard object to spectrum
+& Internal grouplike recognition and spatial delooping
+& \PROP{} for connective spectrification, \OPEN{} for spatial Omega-structure
+& Compatibility between spatial suspension and categorical delooping \\
+
+Microscopic spectrum to K-theory
+& Natural invariant map preserving families and stacking
+& \EST{} in controlled free sectors, \OPEN{} generally
+& Interactions and information loss \\
+
+Microscopic spectrum to EFT or bordism
+& Low-energy functor with stabilization and defect compatibility
+& \OPEN{} generally
+& Existence, functoriality, faithfulness, and realization \\
+
+Kubota spectrum to condensed spectrum
+& Comparison on a common smooth and condensed parameter domain
+& \OPEN{}
+& Site change, gap conventions, and descent \\
+\bottomrule
+\end{longtable}
+
+This table prevents progress on one arrow from being reported as completion
+of the sequence.  Aoki's theorem, for example, advances an invariant bridge
+after a Banach algebra is given.  It does not solve the moduli, gap, phase,
+or realization arrows.
+
+\section{Obstructions and failed shortcuts}
+
+Several tempting shortcuts are known to fail.
+
+\begin{counterexample}[Pointwise gaps]
+For every parameter $s$ and every finite volume, suppose the Hamiltonian has
+a positive gap $\gamma_{s,L}$.  The infimum over $s$ and $L$ may still be
+zero.  The data do not define a point of $\Gap^{\mathrm{wit}}$ without one
+positive lower bound and a declared low-energy sector.
+\end{counterexample}
+
+\begin{counterexample}[Qualitative image replaced by witnesses]
+If a Hamiltonian admits two lower bounds $\gamma$ and $\gamma/2$, the witness
+object contains at least two points over the same Hamiltonian.  Its projection
+cannot be the inclusion of a substack.  The qualitative image must truncate
+the choice.
+\end{counterexample}
+
+\begin{counterexample}[Homotopy groups without a map]
+Two connective spectra can have isomorphic individual homotopy groups while
+their Postnikov data or multiplicative structures differ.  A list of group
+agreements does not define an equivalence of spectra.
+\end{counterexample}
+
+\begin{counterexample}[Finite-size numerical gap evidence]
+A computation at lengths $L\le20$ can be consistent with a sequence of gaps
+that later tends to zero.  It is evidence for a conjecture, not a
+thermodynamic witness.
+\end{counterexample}
+
+\begin{counterexample}[Free invariant under interacting paths]
+BDI phases of free indices zero and eight are distinct in the free path
+category and equivalent after the Fidkowski-Kitaev interaction is admitted.
+Thus the free K-class is not a complete invariant of the interacting phase
+category.
+\end{counterexample}
+
+\begin{counterexample}[Bordism generator without lattice data]
+A generator of a bordism or Anderson-dual group specifies an abstract
+field-theory deformation class.  It does not specify local degrees of
+freedom, an interaction, a gap theorem, or a stacking inverse.  Calling the
+class realized before those witnesses are supplied changes the meaning of
+realization.
+\end{counterexample}
+
+\section{A precise research agenda}
+
+The synthesis isolates five theorem packages.  They can be pursued largely
+independently and then joined by explicit interfaces.
+
+\subsection{Package I: analytic family control}
+
+The first package should formulate a category of lattices and interactions
+on which a common locality norm implies family-uniform Lieb-Robinson bounds,
+thermodynamic dynamics, and restriction stability.  It should include
+moving defects, disorder hulls, and variable local Hilbert spaces without
+confusing local continuity with uniform decay.
+
+The main target is a base-change theorem: pullback of a controlled family
+preserves every constant used by the dynamics.  A second target is finite
+descent for quantitative locality certificates.  Infinite descent will
+need a bornological or boundedness condition that prevents constants from
+escaping.
+
+\subsection{Package II: gap certificates and openness}
+
+The second package should compare finite-volume and GNS witnesses under
+explicit boundary and sector hypotheses.  Its output should be a stack of
+witnesses over the Hamiltonian moduli object, together with a theorem that
+the propositional image is pullback-stable.
+
+A useful certificate has fields for the lower bound, volume threshold,
+ground-state sector, boundary convention, and theorem provider.  This makes
+the gap claim transportable without pretending that the provider is unique.
+
+\subsection{Package III: phase localization}
+
+The third package should define controlled gapped paths, quasi-local
+automorphisms, finite-depth circuits, lattice changes, and stabilization in
+one infinity-categorical model.  Comparison functors between these notions
+should be theorems, not definitional equalities.
+
+The practical question is whether local phase equivalences glue.  On an
+overlap, two spectral-flow providers may differ by a phase automorphism.
+That difference belongs in the higher groupoid and cannot be erased during
+descent.
+
+\subsection{Package IV: stacking and spectrification}
+
+The fourth package should prove that stacking preserves locality and gap
+witnesses with controlled constants, descends through localization, and is
+coherently symmetric monoidal.  It should then distinguish actual physical
+inverses from formal Grothendieck inverses.
+
+Connective spectrification is only part of the job.  To compare spatial
+dimensions, one needs a theorem that adding a lattice direction implements
+the loop or suspension maps of an Omega-spectrum.  Kubota's construction is
+the clearest established benchmark for this step.
+
+\subsection{Package V: comparison and realization}
+
+The fifth package should build natural transformations on carefully chosen
+overlaps:
+\begin{enumerate}[leftmargin=2.2em]
+  \item from free condensed Hamiltonian families to operator K-theory;
+  \item from Kubota's smooth microscopic families to condensed tests;
+  \item from controlled microscopic invertible phases to reflection-positive
+  effective field theories;
+  \item from a generalized cohomology invariant to relative transition
+  classes;
+  \item from abstract classes back to explicit microscopic witnesses where
+  possible.
+\end{enumerate}
+Each map should list the information it forgets.  A realization theorem
+should state its locality, symmetry, dimensional, and boundary restrictions.
+
+\section{Formal and executable representations}
+
+The repository contains a Lean interface library for the shared vocabulary
+of the project.  It records claim statuses, providers, locality and gap
+witness interfaces, objectwise C*-conditions, stacking, phase equivalence,
+and comparison records.  It does not assert the deep analytic theorems as
+axioms.  This synthesis does not modify that library.
+
+The Haskell program accompanying this paper has a narrower purpose.  It
+checks the architecture of a proposed synthesis record.  Its data types
+distinguish the witness fibration from the propositional image and distinguish
+an invariant map from an equivalence theorem.  Its tests reject:
+\begin{enumerate}[leftmargin=2.2em]
+  \item a phase sequence that skips a stage or reverses its order;
+  \item a qualitative gapped locus represented by witness data;
+  \item an equivalence claim without a named comparison theorem;
+  \item a physical relative charge without a microscopic comparison;
+  \item an untwisted Thom target without an orientation;
+  \item a spacetime degree that fails $n=d+1$.
+\end{enumerate}
+
+The executable is not a proof assistant.  It verifies a finite status and
+dependency contract.  Analytic results remain cited theorem providers.
+
+\section{Claim ledger}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.15\textwidth}
+                  >{\raggedright\arraybackslash}p{0.52\textwidth}}
+\toprule
+Statement & Status & Basis and boundary \\
+\midrule
+\endfirsthead
+\toprule
+Statement & Status & Basis and boundary \\
+\midrule
+\endhead
+Uniform Lieb-Robinson bounds and thermodynamic dynamics
+& \EST{}
+& Common interaction norm, bounded geometry, and uniform tail hypotheses \\
+
+C*-norm and positivity for $C(S,\A)$
+& \EST{}
+& A fixed C*-algebra $\A$ and compact Hausdorff parameter space \\
+
+Finite-cover C*-descent
+& \EST{}
+& Finite jointly surjective profinite cover and continuous gluing \\
+
+Bare algebraic data determine a unique physical C*-norm
+& \OBST{}
+& Distinct C*-completions provide counterexamples \\
+
+Uniform gap stability and spectral flow
+& \EST{}
+& Controlled paths satisfying the established locality, regularity, and uniform-gap hypotheses \\
+
+Pointwise gaps imply a family-uniform thermodynamic gap
+& \OBST{}
+& Positive numbers can have zero infimum; moving defects give physical models \\
+
+Witnessed gap object projects as a fibration
+& \PROP{}
+& Explicit dependent-pair construction with many witnesses per Hamiltonian \\
+
+Propositional gapped substack
+& \PROP{}
+& Requires pullback-stable image factorization and descent of common witnesses \\
+
+Stabilized phase infinity-groupoid
+& \PROP{}
+& Requires controlled localization, ancilla stabilization, and higher descent \\
+
+Invertible condensed phase spectrum
+& \PROP{}
+& Conditional internal spectrification of the Picard phase object \\
+
+Spatial Omega-spectrum structure for the condensed construction
+& \OPEN{}
+& Needs a suspension or lattice-direction delooping theorem \\
+
+Controlled free flattening to operator K-theory
+& \EST{}
+& Bounded self-adjoint family with a common Fermi gap \\
+
+Aoki solidification comparison
+& \EST{}
+& Algebraic to topological K-theory for real or complex Banach algebras, with connective and Bott qualifications \\
+
+Free K-theory classifies all interacting phases
+& \OBST{}
+& BDI interaction reduction supplies a counterexample \\
+
+Kubota microscopic Omega-spectrum
+& \EST{}
+& Invertible gapped spin systems with the hypotheses of Kubota's construction \\
+
+Freed-Hopkins field-theory classification
+& \EST{}
+& Reflection-positive invertible field theories under the stated tangential and field-theoretic hypotheses \\
+
+Kubota spectrum equals the condensed phase spectrum
+& \OPEN{}
+& No comparison equivalence has been constructed \\
+
+Microscopic spectrum equals the Freed-Hopkins target
+& \OPEN{}
+& Low-energy functor, family compatibility, and realization are missing generally \\
+
+Kitaev, BDI, and AKLT witness rows
+& \EST{}
+& Explicit interactions, symmetries, gap calculations or theorems, and microscopic invariants \\
+
+Every bordism class is physically realizable
+& \OPEN{}
+& No general surjectivity theorem is asserted \\
+
+Relative connecting class $\partial\nu$
+& \EST{}
+& Long exact sequence of the pair $(B,B\setminus\Sigma)$ \\
+
+Thom localization to $E^{q+1-c}(\Sigma)$
+& \EST{}
+& Excision, smooth closed locus, and $E$-oriented rank-$c$ normal bundle \\
+
+Every relative class is a physical transition charge
+& \OBST{}
+& A microscopic invariant and natural comparison map are additional required data \\
+\bottomrule
+\end{longtable}
+
+\section{Discussion}
+
+The condensed perspective earns its keep by forcing parameter dependence to
+be part of the object.  Disorder, inverse limits, and higher families then
+belong to the same moduli problem as ordinary paths.  It also forces descent
+questions into the open.  A family assembled from local pieces needs common
+analytic constants, not just compatible point values.
+
+The separation of witnessed and qualitative gaps is indispensable.  A gap
+proof contains a lower bound, a ground-state convention, and often a
+theorem-specific presentation.  Those choices matter during verification
+and are irrelevant to the yes-or-no gapped locus.  The witness fibration
+retains them; the propositional image forgets them.  Conflating the two
+damages both the mathematics and the software model.
+
+Stable-homotopy objects in this subject also come from different physical
+categories.  Operator K-theory is an invariant of a specified
+operator algebra.  Kubota's spectrum is built from microscopic gapped spin
+systems and smooth parameter families.  Freed-Hopkins classify invertible
+field theories under reflection positivity and tangential hypotheses.  The
+proposed condensed spectrum is intended to organize condensed parameter
+families of microscopic phases.  Similar grading patterns make comparison
+reasonable.  They do not make comparison automatic.
+
+Transition charges expose the same issue in a smaller calculation.  The expression
+$E^{q+1}(B,B\setminus\Sigma)$ is exact algebraic topology.  Its physical
+content begins only after a microscopic phase invariant lands in $E^q(U)$.
+Excision localizes the obstruction, and a Thom isomorphism moves it onto the
+critical locus under an orientation hypothesis.  None of these steps can
+replace the microscopic comparison map.
+
+The program is therefore neither complete nor empty.  Its analytic
+foundations include locality bounds, C*-control, gap stability in established
+settings, functional calculus, and explicit low-dimensional realizations.
+Its categorical assembly is a precise proposal with identifiable theorem
+obligations.  That is enough to support a focused research program without
+claiming a classification that has not been built.
+
+\section{Conclusion}
+
+The five-stage sequence can be made mathematically coherent if every stage
+keeps its hypotheses and every arrow keeps its own proof obligation:
+\[
+\boxed{
+\begin{array}{c}
+\text{local quantum interactions}\\
+\downarrow\\
+\text{condensed moduli stack of Hamiltonians}\\
+\downarrow\\
+\text{uniformly gapped propositional substack}\\
+\downarrow\\
+\text{stabilized phase }\infty\text{-groupoid}\\
+\downarrow\\
+\text{invertible condensed phase spectrum}.
+\end{array}}
+\]
+Locality comes from uniform interaction estimates.  Positivity and norms
+come from a declared C*-algebraic setting.  A thermodynamic gap comes from a
+quantitative witness.  The qualitative gapped substack is the propositional
+image of the witness fibration.  Phases arise only after controlled path
+localization and stabilization.  The spectrum arises only after coherent
+stacking, restriction to physical units, and internal spectrification.
+
+Under these conditions, $\pi_0$ records invertible stabilized phases,
+$\pi_1$ records loops that become pumps when analytic transport is supplied,
+and higher homotopy records higher families that become defects only through
+a family-to-defect theorem.  The gapless locus is pulled back from the
+propositional gapped subobject.  A relative class
+$\partial\nu\in E^{q+1}(B,B\setminus\Sigma)$ measures failure of an invariant
+to extend, while a physical charge also needs a microscopic comparison.
+
+The proposed spectrum must remain distinct from operator K-theory, Kubota's
+microscopic Omega-spectrum, and the Freed-Hopkins field-theory target until
+comparison theorems say otherwise.  Explicit models can test those maps.
+They cannot be replaced by matching tables of groups.  The next advances
+should therefore prove arrows, not rename their endpoints.
+
+\appendix
+
+\section{The five stage data contract}
+
+This appendix records a compact contract suitable for formalization.
+
+\subsection{Local interaction record}
+
+A local interaction family record contains
+\begin{equation}
+(\Gamma,d,\A_{\mathrm{loc}},\Phi,F,C_F,T_F,G,\alpha),
+\end{equation}
+where $C_F$ is a common interaction-norm bound and $T_F$ is a common tail
+certificate.  Restriction may change the parameter object but may not weaken
+the declared bound silently.
+
+\subsection{Hamiltonian moduli record}
+
+A Hamiltonian moduli record adds a test site, object and morphism categories,
+restriction functors, descent data, and size conventions.  The object record
+alone defines a sheaf of data at best.  Higher moduli require mapping anima
+and coherent descent.
+
+\subsection{Gap record}
+
+A gap witness contains
+\begin{equation}
+(\gamma,L_0,\text{sector},\text{boundary},\text{provider})
+\end{equation}
+or its GNS analogue.  The qualitative flag is the truncation of the existence
+of such a record.  The flag never substitutes for the provider during an
+analytic proof.
+
+\subsection{Phase record}
+
+A phase record lists its allowed paths, local circuits, quasi-local
+automorphisms, lattice changes, ancillas, and symmetry rules.  Two papers
+that use different records may obtain different phase sets without
+contradiction.
+
+\subsection{Spectrum record}
+
+A spectrum record lists the symmetric monoidal operation, unit, physical
+inverse witness, $E_\infty$ coherences, test-object descent, and spatial
+suspension maps.  A sequence of abelian groups is not a substitute for this
+record.
+
+\section{Comparison theorem checklist}
+
+Before identifying two phase constructions, a comparison should answer all
+of the following questions.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.25\textwidth}
+                  >{\raggedright\arraybackslash}p{0.65\textwidth}}
+\toprule
+Field & Required answer \\
+\midrule
+\endfirsthead
+\toprule
+Field & Required answer \\
+\midrule
+\endhead
+Source objects & Local interactions, fields, algebras, or phase objects in the source \\
+Source morphisms & Gapped paths, quasi-local maps, field-theory deformations, or stable maps \\
+Target objects & Exact target category or spectrum, including grading conventions \\
+Parameter site & Smooth manifolds, compact spaces, profinite sets, or condensed objects \\
+Analytic domain & Locality norm, gap, regularity, symmetry, and boundary hypotheses \\
+Formula & Construction of the map on objects and parameter families \\
+Naturality & Compatibility with pullback and restriction \\
+Homotopy invariance & Proof that source equivalences map to target equivalences \\
+Stacking & Symmetric monoidal compatibility and behavior of units \\
+Suspension & Compatibility with dimension shifts and spectrum structure \\
+Defects & Treatment of boundaries, higher morphisms, and anomaly inflow \\
+Faithfulness & Which distinct microscopic phases can the target merge? \\
+Fullness & Which target morphisms lift to microscopic morphisms? \\
+Surjectivity & Which target objects have explicit microscopic realizations? \\
+Lost data & Energy scales, dispersion, correlation lengths, boundaries, or interactions forgotten by the map \\
+Inverse & Explicit construction and proof, if an equivalence is claimed \\
+\bottomrule
+\end{longtable}
+
+\section{Relative charge bookkeeping}
+
+Let $j:U\hookrightarrow B$.  The relevant part of the exact sequence is
+\begin{equation}
+\begin{tikzcd}[column sep=large]
+E^q(B) \arrow[r,"j^*"]
+& E^q(U) \arrow[r,"\partial"]
+& E^{q+1}(B,U) \arrow[r]
+& E^{q+1}(B).
+\end{tikzcd}
+\end{equation}
+The checks are:
+\begin{enumerate}[leftmargin=2.2em]
+  \item the connecting map raises degree by one;
+  \item exactness gives $\partial j^*=0$;
+  \item excision moves the pair to a neighborhood of $\Sigma$;
+  \item a rank-$c$ $E$-orientation shifts the localized degree down by $c$;
+  \item no orientation means a twisted Thom target;
+  \item a physical name requires a microscopic comparison map.
+\end{enumerate}
+
+For a codimension-one transition locus, the Thom shift returns degree $q$.
+For an isolated codimension-three degeneracy, it gives degree $q-2$ on the
+point, equivalently a linking class on an $S^2$ in the normal coordinates.
+
+\section{Status-sensitive glossary}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.23\textwidth}
+                  >{\raggedright\arraybackslash}p{0.68\textwidth}}
+\toprule
+Term & Meaning in this paper \\
+\midrule
+\endfirsthead
+\toprule
+Term & Meaning in this paper \\
+\midrule
+\endhead
+Local family & Parameter family with continuous local coefficients and common decay bounds \\
+Condensed moduli stack & Proposed anima-valued sheaf of Hamiltonian objects and controlled equivalences \\
+Gap witness & Quantitative finite-volume or GNS certificate with a positive common lower bound \\
+Witness fibration & Dependent object of Hamiltonians together with chosen certificates \\
+Propositional image & Qualitative subobject asserting only that some witness exists \\
+Thermodynamic gap & Positive bulk-gap lower bound uniform in the volume convention \\
+Phase & Equivalence class in the chosen localized and stabilized microscopic category \\
+Invertible phase & Phase with a represented stacking inverse \\
+Condensed spectrum & Proposed internal connective spectrum built from the Picard phase object \\
+Operator K-class & Stable invariant of a specified operator algebra, not a microscopic reconstruction \\
+Kubota spectrum & Established microscopic Omega-spectrum in Kubota's smooth almost-local setting \\
+Freed-Hopkins target & Stable-homotopy classification of reflection-positive invertible field theories under its hypotheses \\
+Gapless locus & Complement of the pulled-back propositional gapped locus when that complement is represented \\
+Relative class & Connecting image $\partial\nu$ in the cohomology of a pair \\
+Physical transition charge & Relative class equipped with a microscopic invariant and natural comparison map \\
+Realized class & Abstract label with a complete microscopic witness in the stated rules \\
+\bottomrule
+\end{longtable}
+
+\section{Source papers and division of labor}
+
+The five companion papers supply separate theorem packages.
+\begin{enumerate}[leftmargin=2.2em]
+  \item \emph{Locality and Lieb-Robinson Bounds for Condensed Families}
+  isolates uniform interaction norms, family continuity, thermodynamic
+  dynamics, and the moving-defect counterexample.
+  \item \emph{Condensed Observable Algebras} treats C*-norms, positivity,
+  finite descent, state spaces, crossed products, and Aoki's solidification
+  bridge.
+  \item \emph{Uniform Thermodynamic Spectral Gaps in Condensed Families}
+  separates finite-volume and GNS witnesses and distinguishes the witness
+  fibration from its propositional image.
+  \item \emph{From Microscopic Lattice Hamiltonians to Effective Field
+  Theories} proves the controlled free functional-calculus map, works out the
+  SSH transition, and documents information loss and the BDI reduction.
+  \item \emph{Physical Realizability of Invertible Phase Classes} compares
+  the Freed-Hopkins, Kubota, and proposed condensed targets, verifies three
+  low-dimensional witnesses, and states the exact relative-charge
+  hypotheses.
+\end{enumerate}
+
+The synthesis uses their accepted claims without promoting any companion
+proposal to an established theorem.
+
+\begin{thebibliography}{99}
+
+\bibitem{Aoki2024}
+K.~Aoki,
+\emph{(Semi)topological K-theory via solidification},
+arXiv:2409.01462, 2024.
+
+\bibitem{AKLT1987}
+I.~Affleck, T.~Kennedy, E.~H.~Lieb, and H.~Tasaki,
+\emph{Rigorous results on valence-bond ground states in antiferromagnets},
+Physical Review Letters \textbf{59} (1987), 799 to 802,
+\url{https://doi.org/10.1103/PhysRevLett.59.799}.
+
+\bibitem{BachmannNachtergaele2014}
+S.~Bachmann and B.~Nachtergaele,
+\emph{On gapped phases with a continuous symmetry and boundary operators},
+Journal of Statistical Physics \textbf{154} (2014), 91 to 112,
+\url{https://arxiv.org/abs/1307.0716}.
+
+\bibitem{BMNS2012}
+S.~Bachmann, S.~Michalakis, B.~Nachtergaele, and R.~Sims,
+\emph{Automorphic equivalence within gapped phases of quantum lattice systems},
+Communications in Mathematical Physics \textbf{309} (2012), 835 to 871,
+\url{https://arxiv.org/abs/1102.0842}.
+
+\bibitem{Blackadar1998}
+B.~Blackadar,
+\emph{K-Theory for Operator Algebras}, second edition,
+Cambridge University Press, 1998.
+
+\bibitem{Scholze2026}
+P.~Scholze,
+\emph{Lectures on Condensed Mathematics},
+arXiv:2605.03658, 2026.
+
+\bibitem{FidkowskiKitaev2010}
+L.~Fidkowski and A.~Kitaev,
+\emph{The effects of interactions on the topological classification of free
+fermion systems},
+Physical Review B \textbf{81} (2010), 134509,
+\url{https://doi.org/10.1103/PhysRevB.81.134509}.
+
+\bibitem{FreedHopkins2021}
+D.~S.~Freed and M.~J.~Hopkins,
+\emph{Reflection positivity and invertible topological phases},
+Geometry and Topology \textbf{25} (2021), 1165 to 1330,
+\url{https://doi.org/10.2140/gt.2021.25.1165}.
+
+\bibitem{HastingsKoma2006}
+M.~B.~Hastings and T.~Koma,
+\emph{Spectral gap and exponential decay of correlations},
+Communications in Mathematical Physics \textbf{265} (2006), 781 to 804,
+\url{https://doi.org/10.1007/s00220-006-0030-4}.
+
+\bibitem{Kitaev2001}
+A.~Y.~Kitaev,
+\emph{Unpaired Majorana fermions in quantum wires},
+Physics-Uspekhi \textbf{44} (2001), 131 to 136,
+\url{https://arxiv.org/abs/cond-mat/0010440}.
+
+\bibitem{Kubota2025}
+Y.~Kubota,
+\emph{Stable homotopy theory of invertible gapped quantum spin systems I:
+Kitaev's Omega-spectrum},
+arXiv:2503.12618, 2025.
+
+\bibitem{LiebRobinson1972}
+E.~H.~Lieb and D.~W.~Robinson,
+\emph{The finite group velocity of quantum spin systems},
+Communications in Mathematical Physics \textbf{28} (1972), 251 to 257.
+
+\bibitem{NachtergaeleSims2010}
+B.~Nachtergaele and R.~Sims,
+\emph{Lieb-Robinson bounds in quantum many-body physics},
+Contemporary Mathematics \textbf{529} (2010), 141 to 176,
+\url{https://arxiv.org/abs/1004.2086}.
+
+\bibitem{ProdanSchulzBaldes2016}
+E.~Prodan and H.~Schulz-Baldes,
+\emph{Bulk and Boundary Invariants for Complex Topological Insulators},
+Springer, 2016.
+
+\bibitem{TeoKane2010}
+J.~C.~Y.~Teo and C.~L.~Kane,
+\emph{Topological defects and gapless modes in insulators and superconductors},
+Physical Review B \textbf{82} (2010), 115120,
+\url{https://doi.org/10.1103/PhysRevB.82.115120}.
+
+\bibitem{Thiang2016}
+G.~C.~Thiang,
+\emph{On the K-theoretic classification of topological phases of matter},
+Annales Henri Poincare \textbf{17} (2016), 757 to 794,
+\url{https://doi.org/10.1007/s00023-015-0418-9}.
+
+\end{thebibliography}
+
+\end{document}

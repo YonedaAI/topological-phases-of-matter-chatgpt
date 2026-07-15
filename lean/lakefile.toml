@@ -1,0 +1,10 @@
+name = "topological-phases"
+version = "0.1.0"
+defaultTargets = ["TopologicalPhases"]
+
+[[lean_lib]]
+name = "TopologicalPhases"
+
+[[lean_exe]]
+name = "topological-phases-test"
+root = "TopologicalPhasesTest"

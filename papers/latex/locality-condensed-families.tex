@@ -1,0 +1,1538 @@
+\documentclass[12pt]{article}
+
+% Core math
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+
+% Diagrams
+\usepackage{tikz-cd}
+\usepackage{tikz}
+
+% References
+\usepackage{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+% Graphics and tables
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+
+% Page layout
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+% GrokRxiv sidebar
+\usepackage{everypage}
+\usepackage{xcolor}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=green!40!black,
+  urlcolor=blue!60!black,
+  pdftitle={Uniform Locality for Condensed Families of Quantum Lattice Interactions},
+  pdfauthor={Matthew Long and the YonedaAI Collaboration}
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{counterexample}[theorem]{Counterexample}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Alg}{\mathcal A}
+\newcommand{\Int}{\mathcal I}
+\newcommand{\Fin}{\mathcal P_0}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\dist}{\operatorname{dist}}
+\newcommand{\Cont}{\operatorname{Cont}}
+\newcommand{\Ham}{\mathfrak{Ham}}
+\newcommand{\Gap}{\mathfrak{Gap}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\EST}{\textsc{Established}}
+\newcommand{\PROP}{\textsc{Proposed}}
+\newcommand{\OBS}{\textsc{Obstructed}}
+\newcommand{\OPEN}{\textsc{Open}}
+
+\definecolor{grokgray}{RGB}{110,110,110}
+\AddEverypageHook{%
+  \ifnum\value{page}=1
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[
+        rotate=90,
+        anchor=south,
+        font=\Large\sffamily\bfseries\color{grokgray},
+        inner sep=0pt
+      ] at ([xshift=38pt,yshift=0.52\paperheight]current page.south west)
+      {GrokRxiv:2026.07.locality-condensed-families\quad
+       [\,math-ph\,]\quad
+       14 Jul 2026};
+    \end{tikzpicture}
+  \fi
+}
+
+\title{Uniform Locality for Condensed Families of Quantum Lattice Interactions}
+\author{Matthew Long \\
+\textit{The YonedaAI Collaboration} \\
+\textit{YonedaAI Research Collective} \\
+Chicago, IL \\
+\texttt{matthew@yonedaai.com} $\cdot$ \url{https://yonedaai.com}}
+\date{14 July 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We isolate the analytic input needed to place parameterized quantum lattice
+interactions in a condensed mathematical setting.  The decisive condition is
+not profiniteness of the parameter object.  It is a bound on an interaction
+$F$-norm that is uniform in the parameter.  Under the usual summability and
+convolution conditions on $F$, such a bound gives finite-volume
+Lieb-Robinson estimates with constants independent of both the parameter and
+the volume.  It also gives thermodynamic dynamics, uniformly on compact time
+intervals.  A separate local $F$-continuity condition yields point-norm
+continuity of the infinite-volume dynamics on local observables.  We package
+these hypotheses into a functor on profinite sets and prove its elementary
+finite-cover descent property.  This packaging is categorical.  It supplies
+none of the propagation estimates by itself.
+
+Two counterexamples mark the boundary of the result.  First, compact
+parameterization and pointwise locality do not imply a uniform interaction
+bound.  Second, even local parameter continuity together with a uniform
+locality bound and a positive gap in every fiber does not imply a gap uniform
+in the family.  The latter failure is exhibited by an on-site defect whose
+strength tends to zero while its position escapes to infinity.  We state all
+results with exact hypotheses, distinguish established analytic theorems from
+the proposed condensed organization, and include finite executable checks in
+Haskell.  The outcome is a precise first arrow in the program from local
+quantum interactions to a condensed moduli stack of Hamiltonians.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+Topological phases are usually organized by paths of gapped Hamiltonians,
+stable equivalence, operator algebras, or effective field theories.  Each of
+these viewpoints begins with a more elementary question.  Which families of
+lattice interactions define controlled dynamics in the first place?  A
+classification of phases cannot be more reliable than its locality
+hypotheses.
+
+Condensed mathematics suggests testing a moduli object on profinite sets.  If
+$S$ is profinite, an $S$-point should describe an $S$-parameterized family of
+interactions.  This is attractive for disorder spaces such as
+$D^{\mathbb Z^d}$ with $D$ finite.  It is also potentially misleading.  The
+sheaf condition glues compatible data over a finite cover.  It does not bound
+an infinite sum of interaction terms, prove a convolution estimate, or
+construct thermodynamic time evolution.
+
+The purpose of this paper is to separate these jobs.  The analytic layer is
+provided by interaction Banach spaces and Lieb-Robinson theory.  The
+parameter layer records local continuity and a common norm bound.  The
+condensed layer records functoriality in a profinite test object and descent
+for finite jointly surjective covers.
+
+Our main theorem is a uniform-family corollary of the standard
+Lieb-Robinson and thermodynamic-limit theorems.  Let $(\Gamma,d)$ be a
+countable metric space, let $F$ satisfy uniform summability and a convolution
+condition, and let $(\Phi_s)_{s\in S}$ be a family of interactions such that
+
+\begin{equation}
+  \sup_{s\in S}\|\Phi_s\|_F\le M<\infty.
+  \label{eq:intro-uniform}
+\end{equation}
+
+Then the propagation constants depend on $F$ and $M$, not on $s$ or the
+finite volume.  The corresponding thermodynamic dynamics exist with uniform
+finite-volume convergence on compact time intervals.  If the family is
+locally continuous in the sense defined below, then
+$s\mapsto\tau_t^s(A)$ is norm-continuous for each local observable $A$.
+
+The compactness of $S$ is useful only after a topology has been specified.
+For example, continuity of $S\to\mathcal B_F$ implies
+\cref{eq:intro-uniform} when $S$ is compact.  Product-topology disorder
+families are generally not continuous in this global Banach norm.  They may
+still satisfy the common bound directly and may be continuous on every local
+restriction.  Keeping these two requirements separate is essential.
+
+The paper uses four claim labels.
+
+\begin{itemize}[leftmargin=2.3em]
+\item \EST{} marks a cited theorem or a direct corollary with proof.
+\item \PROP{} marks the categorical organization introduced here.
+\item \OBS{} marks a statement ruled out by a counterexample.
+\item \OPEN{} marks a comparison or extension not proved here.
+\end{itemize}
+
+The central claim of this paper is \EST{}.  The condensed moduli functor is
+\PROP{}.  The assertion that profiniteness by itself produces uniform
+locality is \OBS{}.
+
+\subsection{Main contributions}
+
+The contributions are deliberately narrow.
+
+\begin{enumerate}[leftmargin=2.3em]
+\item We fix a single interaction norm and state the corresponding
+Lieb-Robinson estimate with its constants.
+\item We prove a uniform-family theorem for finite-volume propagation and
+thermodynamic dynamics.
+\item We formulate a local $F$-topology suitable for product-type disorder
+families and prove parameter continuity of dynamics under a common tail
+bound.
+\item We define a profinite functor of uniformly local interactions and prove
+finite-cover descent.
+\item We give counterexamples separating pointwise locality, uniform
+locality, local continuity, and uniform gappedness.
+\item We provide a finite Haskell companion that computes $F$-function
+diagnostics, Lieb-Robinson envelopes, and finite witnesses for the logical
+difference between pointwise and uniform conditions.
+\end{enumerate}
+
+We do not prove a spectral gap, construct a phase spectrum, or identify a
+microscopic lattice category with an effective field theory.  Those problems
+begin after the analytic foundation established here.
+
+\subsection{Relation to the literature}
+
+The norm and propagation estimates follow the framework developed by
+Nachtergaele and Sims and its detailed treatment by Nachtergaele, Sims, and
+Young \cite{NachtergaeleSims2010,NSY2019}.  The thermodynamic-limit argument
+uses a uniform Cauchy estimate on local observables.  Parameter dependence is
+an application of continuity and local $F$-convergence estimates in
+\cite{NSY2019}.  Spectral flow is discussed only to identify which output of
+this paper later phase-classification work needs \cite{BMNS2012}.  No theorem
+from condensed mathematics is used to prove an analytic estimate.
+
+\section{Quantum lattice systems and interaction norms}
+
+\subsection{The quasi-local algebra}
+
+\begin{definition}[Quantum lattice system]
+Let $(\Gamma,d)$ be a countable metric space.  To every $x\in\Gamma$ assign a
+finite-dimensional complex Hilbert space $\mathcal H_x$.  For a finite set
+$\Lambda\Subset\Gamma$, define
+
+\begin{equation}
+  \mathcal H_\Lambda=\bigotimes_{x\in\Lambda}\mathcal H_x,
+  \qquad
+  \Alg_\Lambda=\mathcal B(\mathcal H_\Lambda).
+\end{equation}
+
+If $\Lambda_0\subseteq\Lambda$, identify $A\in\Alg_{\Lambda_0}$ with
+$A\otimes 1_{\Lambda\setminus\Lambda_0}$.  The local algebra and quasi-local
+algebra are
+
+\begin{equation}
+  \Alg^{\mathrm{loc}}_\Gamma
+  =\bigcup_{\Lambda\Subset\Gamma}\Alg_\Lambda,
+  \qquad
+  \Alg_\Gamma
+  =\overline{\Alg^{\mathrm{loc}}_\Gamma}^{\|\cdot\|}.
+\end{equation}
+\end{definition}
+
+Finite-dimensional on-site spaces keep the presentation focused.  The
+Lieb-Robinson estimate permits certain unbounded on-site Hamiltonians after
+passing to an interaction picture, but unbounded interaction terms require
+additional hypotheses and are outside our scope.
+
+\begin{definition}[Interaction]
+An interaction is a map
+
+\begin{equation}
+  \Phi:\Fin(\Gamma)\longrightarrow\Alg^{\mathrm{loc}}_\Gamma
+\end{equation}
+
+such that $\Phi(Z)=\Phi(Z)^*\in\Alg_Z$ for every finite $Z$.  Its
+finite-volume Hamiltonian is
+
+\begin{equation}
+  H^\Phi_\Lambda=\sum_{Z\subseteq\Lambda}\Phi(Z).
+\end{equation}
+\end{definition}
+
+The associated finite-volume Heisenberg dynamics is
+
+\begin{equation}
+  \tau^{\Lambda,\Phi}_t(A)
+  =e^{itH^\Phi_\Lambda}Ae^{-itH^\Phi_\Lambda}.
+\end{equation}
+
+All finite-volume expressions are well defined.  The substantive issue is to
+control them independently of $\Lambda$.
+
+\subsection{F-functions}
+
+\begin{definition}[F-function]
+A non-increasing function $F:[0,\infty)\to(0,\infty)$ is an $F$-function on
+$(\Gamma,d)$ if
+
+\begin{equation}
+  \|F\|
+  :=\sup_{x\in\Gamma}\sum_{y\in\Gamma}F(d(x,y))<\infty
+  \label{eq:F-sum}
+\end{equation}
+
+and
+
+\begin{equation}
+  C_F
+  :=\sup_{x,y\in\Gamma}
+  \frac{1}{F(d(x,y))}
+  \sum_{z\in\Gamma}F(d(x,z))F(d(z,y))<\infty.
+  \label{eq:F-conv}
+\end{equation}
+\end{definition}
+
+The first condition says that tails are uniformly summable.  The second says
+that one convolution does not degrade the spatial profile beyond a constant.
+Repeated commutator estimates then produce powers of $C_F$ without changing
+the form of the decay function.
+
+\begin{example}[Polynomial and exponential weights]
+On $\mathbb Z^\nu$ with the $\ell^1$ metric, for every $\epsilon>0$,
+
+\begin{equation}
+  F(r)=\frac{1}{(1+r)^{\nu+\epsilon}}
+\end{equation}
+
+is an $F$-function.  If $g$ is non-decreasing and subadditive, then
+$F_g(r)=e^{-g(r)}F(r)$ is again an $F$-function.  In particular,
+
+\begin{equation}
+  F_a(r)=e^{-ar}F(r),\qquad a>0,
+\end{equation}
+
+produces the familiar exponential light-cone form.
+\end{example}
+
+\begin{definition}[Interaction F-norm]
+For an interaction $\Phi$, set
+
+\begin{equation}
+  \|\Phi\|_F
+  =\sup_{x,y\in\Gamma}
+  \frac{1}{F(d(x,y))}
+  \sum_{\substack{Z\Subset\Gamma\\x,y\in Z}}
+  \|\Phi(Z)\|.
+  \label{eq:F-norm}
+\end{equation}
+
+Let $\mathcal B_F$ be the vector space of interactions with finite
+$F$-norm.
+\end{definition}
+
+The $x=y$ part controls the total interaction incident on one site.  The
+$x\ne y$ part controls simultaneous incidence at separated sites.  This is
+stronger than asking each individual term to decay with its diameter.
+
+\begin{lemma}[Pair bound]
+If $\Phi\in\mathcal B_F$, then for all $x,y\in\Gamma$,
+
+\begin{equation}
+  \sum_{Z\ni x,y}\|\Phi(Z)\|
+  \le \|\Phi\|_F F(d(x,y)).
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+This is the defining inequality obtained by multiplying
+\cref{eq:F-norm} by $F(d(x,y))$.
+\end{proof}
+
+\begin{lemma}[Uniform tail]
+Define
+
+\begin{equation}
+  T_F(R)
+  =\sup_{x\in\Gamma}
+  \sum_{\substack{y\in\Gamma\\d(x,y)\ge R}}F(d(x,y)).
+\end{equation}
+
+Then $T_F(R)\to0$ as $R\to\infty$ whenever the uniform summability in
+\cref{eq:F-sum} is accompanied by the usual uniform tail property.  On a
+uniformly locally finite lattice and for the standard polynomial or weighted
+polynomial examples, this property holds.
+\end{lemma}
+
+\begin{proof}
+For the standard lattice examples, compare the sum with the corresponding
+radial series.  More generally, the tail property is recorded separately
+because boundedness of a family of summable functions does not force uniform
+integrability without a geometric hypothesis.  All later uniform convergence
+statements assume $T_F(R)\to0$.
+\end{proof}
+
+\begin{remark}
+This explicit tail assumption is useful in a family theorem.  It prevents a
+silent exchange of a supremum over base points with a limit in the radius.
+For $\mathbb Z^\nu$ and the $F$-functions used in applications, no extra work
+is needed.
+\end{remark}
+
+\section{Parameterized interaction families}
+
+\subsection{Uniform locality and local continuity}
+
+Let $S$ be a compact Hausdorff space.  The intended applications include
+profinite sets, compact coupling spaces, and compact disorder hulls.
+
+\begin{definition}[Uniformly F-local family]
+A family $\Phi=(\Phi_s)_{s\in S}$ is uniformly $F$-local if
+
+\begin{equation}
+  M_F(\Phi):=\sup_{s\in S}\|\Phi_s\|_F<\infty.
+  \label{eq:family-M}
+\end{equation}
+\end{definition}
+
+This is a property of the whole family.  It is not the statement that each
+$\|\Phi_s\|_F$ is finite.
+
+\begin{definition}[Local F-continuity]
+A uniformly $F$-local family is locally $F$-continuous if, for every finite
+$\Lambda\Subset\Gamma$, the map
+
+\begin{equation}
+  S\longrightarrow\mathcal B_F,
+  \qquad
+  s\longmapsto\Phi_s|_\Lambda
+\end{equation}
+
+is continuous, where $\Phi_s|_\Lambda$ retains only terms supported inside
+$\Lambda$.  Equivalently, for every net $s_i\to s$ and finite $\Lambda$,
+
+\begin{equation}
+  \| (\Phi_{s_i}-\Phi_s)|_\Lambda\|_F\longrightarrow0.
+  \label{eq:local-F-cont}
+\end{equation}
+\end{definition}
+
+Since a finite $\Lambda$ has only finitely many subsets, local $F$-continuity
+is equivalent to norm continuity of every coefficient map
+$s\mapsto\Phi_s(Z)$ for finite $Z\Subset\Gamma$.  This coordinate
+description is useful, but the restricted $F$-norm is better suited to the
+estimates below.
+
+Terms crossing the boundary of $\Lambda$ are not ignored analytically.  Their
+effect is controlled uniformly by the $F$-tail after $\Lambda$ is enlarged.
+This is why local continuity must be paired with
+\cref{eq:family-M}.
+
+\begin{proposition}[A sufficient global condition]
+If $S$ is compact and $s\mapsto\Phi_s$ is continuous as a map into the
+Banach space $\mathcal B_F$, then the family is uniformly $F$-local and
+locally $F$-continuous.
+\end{proposition}
+
+\begin{proof}
+The norm is continuous, so its image on the compact set $S$ is bounded.
+Restriction to a finite volume is a continuous contraction in the relevant
+interaction norm.
+\end{proof}
+
+\begin{remark}
+The converse is false and should not be desired.  In a product disorder
+space, two configurations that agree near the origin can disagree at every
+distant scale.  A covariant interaction may therefore be close on every
+fixed local region without being close in a norm that takes a supremum over
+all lattice sites.
+\end{remark}
+
+\subsection{Finite-volume parameter continuity}
+
+\begin{lemma}
+If $\Phi$ is locally $F$-continuous, then for fixed finite $\Lambda$ the map
+
+\begin{equation}
+  (s,t,A)\longmapsto\tau_t^{\Lambda,\Phi_s}(A)
+\end{equation}
+
+is norm-continuous on $S\times\mathbb R\times\Alg_\Lambda$.
+\end{lemma}
+
+\begin{proof}
+The finite sum $H_\Lambda^{\Phi_s}$ is norm-continuous in $s$.  The
+exponential map is norm-continuous on finite-dimensional matrix algebras, and
+conjugation is jointly continuous.
+\end{proof}
+
+This elementary lemma is not enough for the thermodynamic limit.  The number
+of interaction terms grows with the volume.  Uniform locality is what makes
+the finite statement stable as $\Lambda$ tends to $\Gamma$.
+
+\section{Uniform Lieb-Robinson estimates}
+
+\subsection{The finite-volume bound}
+
+For finite $X\subseteq\Gamma$, let $\partial_{\Phi}X$ be the set of sites in
+$X$ belonging to a nonzero interaction term, meaning a set $Z$ with
+$\Phi(Z)\ne0$, that also meets $\Gamma\setminus X$.
+For disjoint finite $X,Y$, define
+
+\begin{equation}
+  D_{F,\Phi}(X,Y)
+  =\min\left\{
+  \sum_{x\in X}\sum_{y\in\partial_\Phi Y}F(d(x,y)),
+  \sum_{x\in\partial_\Phi X}\sum_{y\in Y}F(d(x,y))
+  \right\}.
+\end{equation}
+
+We also use the coarser parameter-independent quantity
+
+\begin{equation}
+  \overline D_F(X,Y)
+  =\sum_{x\in X}\sum_{y\in Y}F(d(x,y)).
+  \label{eq:Dbar}
+\end{equation}
+
+Clearly $D_{F,\Phi}(X,Y)\le\overline D_F(X,Y)$.
+
+\begin{theorem}[Lieb-Robinson bound]
+\label{thm:LR-single}
+Let $\Phi\in\mathcal B_F$.  Let $X,Y\Subset\Gamma$ be disjoint,
+$\Lambda\supseteq X\cup Y$, $A\in\Alg_X$, and $B\in\Alg_Y$.  Then
+
+\begin{equation}
+\begin{split}
+ \|[\tau_t^{\Lambda,\Phi}(A),B]\|
+ \le {}&
+ \frac{2\|A\|\|B\|}{C_F}
+ \left(e^{2C_F\|\Phi\|_F|t|}-1\right)
+ D_{F,\Phi}(X,Y).
+ \label{eq:LR-single}
+\end{split}
+\end{equation}
+
+In particular, the same estimate holds with $D_{F,\Phi}$ replaced by
+$\overline D_F$.
+\end{theorem}
+
+\begin{proof}[Proof sketch with the analytic dependence displayed]
+For $B\in\Alg_Y$, consider the commutator map
+$A\mapsto[\tau_t^{\Lambda,\Phi}(A),B]$.  Differentiate after removing the
+internal dynamics on $X$.  Only interaction terms crossing the current
+support boundary enter the resulting integral inequality.  Iterating that
+inequality produces paths of overlapping interaction supports.  The
+$n$th-order term is bounded by
+
+\begin{equation}
+  2\|A\|\|B\|
+  \frac{(2|t|\|\Phi\|_F)^n}{n!}
+  C_F^{n-1}D_{F,\Phi}(X,Y).
+\end{equation}
+
+Summing over $n\ge1$ gives \cref{eq:LR-single}.  The convolution estimate
+\cref{eq:F-conv} is exactly what turns the sum over intermediate lattice
+sites into $C_F^{n-1}F(d(x,y))$.  A complete proof, including time-dependent
+interactions and unbounded on-site terms, is Theorem 3.1 of
+\cite{NSY2019}.
+\end{proof}
+
+\begin{theorem}[Uniform family Lieb-Robinson estimate]
+\label{thm:family-LR}
+Let $(\Phi_s)_{s\in S}$ be uniformly $F$-local with
+$M=M_F(\Phi)$.  Under the hypotheses of \cref{thm:LR-single},
+
+\begin{equation}
+ \|[\tau_t^{\Lambda,\Phi_s}(A),B]\|
+ \le
+ \frac{2\|A\|\|B\|}{C_F}
+ \left(e^{2C_FM|t|}-1\right)
+ \overline D_F(X,Y)
+ \label{eq:uniform-LR}
+\end{equation}
+
+for every $s\in S$ and every finite $\Lambda\supseteq X\cup Y$.
+\end{theorem}
+
+\begin{proof}
+Apply \cref{thm:LR-single} to each $\Phi_s$, use
+$\|\Phi_s\|_F\le M$, and replace the interaction-dependent boundary factor
+by \cref{eq:Dbar}.  No compactness or topology on $S$ is used.
+\end{proof}
+
+\begin{remark}[Status]
+The single-interaction estimate is \EST{}.  The family statement is a direct
+corollary, also \EST{}.  The uniformity comes from the common norm bound, not
+from the word ``family'' and not from profiniteness.
+\end{remark}
+
+\subsection{Exponential light-cone form}
+
+Suppose $F_a(r)=e^{-ar}F(r)$ and the family is uniformly $F_a$-local.  Define
+
+\begin{equation}
+  v_a=\frac{2C_{F_a}M_{F_a}(\Phi)}{a}.
+\end{equation}
+
+\begin{corollary}
+For disjoint $X,Y$,
+
+\begin{equation}
+\begin{split}
+ \|[\tau_t^{\Lambda,\Phi_s}(A),B]\|
+ \le{}&
+ 2\|A\|\|B\|\|F\|C_{F_a}^{-1}
+ \min\{|X|,|Y|\} \\
+ &\times
+ \exp\bigl(a(v_a|t|-d(X,Y))\bigr),
+ \label{eq:light-cone}
+\end{split}
+\end{equation}
+
+uniformly in $s$ and $\Lambda$.
+\end{corollary}
+
+\begin{proof}
+Subadditivity of distance extracts $e^{-ad(X,Y)}$ from the spatial sum.
+Uniform summability bounds the remaining sum by
+$\|F\|\min\{|X|,|Y|\}$.  Rewriting the time exponential with the definition
+of $v_a$ gives \cref{eq:light-cone}.
+\end{proof}
+
+The number $v_a$ is a velocity bound, not necessarily the optimal physical
+velocity.  The theorem controls a light-cone envelope and makes no assertion
+that a signal saturates it.
+
+\section{Thermodynamic dynamics}
+
+\subsection{Existence and uniform convergence}
+
+Let $(\Lambda_n)_{n\ge1}$ be increasing and exhaustive.  For a fixed local
+observable $A\in\Alg_X$, choose $n_0$ with $X\subseteq\Lambda_{n_0}$.
+
+\begin{theorem}[Uniform thermodynamic dynamics]
+\label{thm:thermo}
+Let $(\Phi_s)_{s\in S}$ be uniformly $F$-local, and assume the uniform
+$F$-tail tends to zero.  For every $s\in S$, $A\in\Alg^{\mathrm{loc}}_\Gamma$,
+and $t\in\mathbb R$, the limit
+
+\begin{equation}
+  \tau_t^s(A)=\lim_{n\to\infty}
+  \tau_t^{\Lambda_n,\Phi_s}(A)
+  \label{eq:thermo-limit}
+\end{equation}
+
+exists in norm.  It is independent of the exhaustion.  Convergence is
+uniform in $s$ and in $t$ on compact intervals.  Each
+$(\tau_t^s)_{t\in\mathbb R}$ extends uniquely to a strongly continuous group
+of $*$-automorphisms of $\Alg_\Gamma$.
+\end{theorem}
+
+\begin{proof}
+For $n\ge m\ge n_0$, the standard comparison estimate for two finite-volume
+dynamics gives
+
+\begin{equation}
+\begin{split}
+ &\|\tau_t^{\Lambda_n,\Phi_s}(A)
+       -\tau_t^{\Lambda_m,\Phi_s}(A)\| \\
+ &\qquad\le
+ \frac{2\|A\|}{C_F}
+ e^{2C_FM|t|}C_FM|t|
+ \sum_{x\in X}
+ \sum_{y\in\Lambda_n\setminus\Lambda_m}F(d(x,y)).
+ \label{eq:Cauchy-tail}
+\end{split}
+\end{equation}
+
+The right side is independent of $s$.  It tends to zero as $m,n\to\infty$,
+uniformly for $t$ in a compact interval.  Thus the finite-volume dynamics
+form a uniform Cauchy net on local observables.  The group, involution, norm,
+and multiplicative properties pass to the limit.  Exhaustion independence
+follows by interlacing two exhaustions.  Strong continuity holds first on the
+dense local algebra using a uniform small-time estimate and then on all of
+$\Alg_\Gamma$ by isometry.  This is the family-uniform version of Theorem
+3.5 in \cite{NSY2019}.
+\end{proof}
+
+\begin{corollary}[Infinite-volume Lieb-Robinson bound]
+The estimate \cref{eq:uniform-LR} holds with
+$\tau_t^{\Lambda,\Phi_s}$ replaced by $\tau_t^s$.
+\end{corollary}
+
+\begin{proof}
+Take the norm limit in the finite-volume commutator.  The bound is independent
+of the volume.
+\end{proof}
+
+\subsection{Continuity in the family parameter}
+
+\begin{theorem}[Point-norm parameter continuity]
+\label{thm:param-cont}
+Assume the hypotheses of \cref{thm:thermo} and local $F$-continuity.  For
+every local $A$ and fixed $t$,
+
+\begin{equation}
+  S\longrightarrow\Alg_\Gamma,
+  \qquad
+  s\longmapsto\tau_t^s(A)
+\end{equation}
+
+is norm-continuous.  Continuity is uniform in $t$ on compact intervals.
+\end{theorem}
+
+\begin{proof}
+Fix $s\in S$, a net $s_i\to s$, a local observable $A\in\Alg_X$, a compact
+time interval $[-T,T]$, and $\epsilon>0$.  By
+\cref{eq:Cauchy-tail}, choose a finite $\Lambda$ containing $X$ such that
+
+\begin{equation}
+  \sup_{r\in S,\,|t|\le T}
+  \|\tau_t^r(A)-\tau_t^{\Lambda,\Phi_r}(A)\|
+  <\epsilon/3.
+\end{equation}
+
+For this fixed $\Lambda$, local $F$-continuity implies
+$H_\Lambda^{\Phi_{s_i}}\to H_\Lambda^{\Phi_s}$ in norm.  Finite-volume
+parameter continuity then gives, eventually and uniformly for $|t|\le T$,
+
+\begin{equation}
+  \|\tau_t^{\Lambda,\Phi_{s_i}}(A)
+       -\tau_t^{\Lambda,\Phi_s}(A)\|<\epsilon/3.
+\end{equation}
+
+The triangle inequality proves the claim.  This is also a specialization of
+the local $F$-convergence theorem in \cite{NSY2019}.
+\end{proof}
+
+\begin{remark}
+Global $\mathcal B_F$-continuity gives a direct quantitative estimate for the
+difference of two dynamics.  The local argument above is weaker and better
+adapted to disorder.  It works because a local observable sees a large but
+finite region up to a uniformly controlled tail.
+\end{remark}
+
+\section{Profinite parameters and condensed organization}
+
+\subsection{Why profinite spaces occur}
+
+Let $D$ be finite.  The product
+
+\begin{equation}
+  \Omega=D^{\mathbb Z^d}
+\end{equation}
+
+is compact, Hausdorff, and totally disconnected, hence profinite.  Its clopen
+cylinder sets record finite patches of a disorder configuration.  A local
+rule assigning interaction terms from finite patches is continuous in the
+product topology.  Uniform boundedness of the allowed coupling values can
+give a common $F$-norm estimate, but this is an additional calculation.
+
+Profinite sets also arise as inverse limits of finite-resolution parameter
+spaces.  The useful fact is that continuous maps out of a profinite set can
+be approximated, in suitable uniform targets, by locally constant maps.  For
+interaction families, however, approximation must respect the uniform
+$F$-bound.  Finite-resolution language does not excuse a missing tail
+estimate.
+
+\subsection{A functor of controlled interactions}
+
+Fix $(\Gamma,d)$, the on-site algebras, and an $F$-function.  For $M>0$ and a
+profinite set $S$, define
+
+\begin{equation}
+  \Ham_F^M(S)
+  =\left\{
+  (\Phi_s)_{s\in S}:
+  \begin{array}{l}
+  \|\Phi_s\|_F\le M\text{ for every }s,\\
+  s\mapsto\Phi_s\text{ is locally }F\text{-continuous}
+  \end{array}
+  \right\}.
+  \label{eq:Ham-functor}
+\end{equation}
+
+For a continuous map $f:T\to S$, define
+
+\begin{equation}
+  f^*:\Ham_F^M(S)\longrightarrow\Ham_F^M(T),
+  \qquad
+  (f^*\Phi)_t=\Phi_{f(t)}.
+\end{equation}
+
+\begin{proposition}[Functoriality]
+The assignment $S\mapsto\Ham_F^M(S)$ is a contravariant functor on profinite
+sets.  The thermodynamic dynamics are natural under pullback:
+
+\begin{equation}
+  \tau_t^{(f^*\Phi)_u}(A)=\tau_t^{\Phi_{f(u)}}(A).
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The norm bound is preserved by precomposition.  Local continuity is preserved
+because a composite of continuous maps is continuous.  The dynamics identity
+holds in every finite volume and therefore in the thermodynamic limit.
+Identity maps and composites act as required.
+\end{proof}
+
+\begin{theorem}[Finite-cover descent]
+\label{thm:descent}
+On a fixed small site of profinite sets with finite jointly surjective covers,
+$\Ham_F^M$ is a sheaf of sets.
+\end{theorem}
+
+\begin{proof}
+Let $(S_i\to S)_{i=1}^k$ be a finite jointly surjective family and suppose
+$\Phi_i\in\Ham_F^M(S_i)$ agree on every fiber product
+$S_i\times_S S_j$.  For $s\in S$, choose a lift $s_i\in S_i$ and define
+$\Phi_s=(\Phi_i)_{s_i}$.  Compatibility makes this independent of the lift.
+
+The disjoint union $\coprod_i S_i\to S$ is a continuous surjection from a
+compact space to a Hausdorff space, hence a quotient map.  Each finite-volume
+coefficient map descends to a continuous map on $S$.  The common bound
+$\|\Phi_s\|_F\le M$ is inherited fiberwise.  Thus the glued family belongs to
+$\Ham_F^M(S)$.  Uniqueness follows from joint surjectivity.
+\end{proof}
+
+\begin{corollary}[Variable bounds]
+Let
+
+\begin{equation}
+  \Ham_F^{\mathrm{ub}}(S)=\bigcup_{M>0}\Ham_F^M(S).
+\end{equation}
+
+Then $\Ham_F^{\mathrm{ub}}$ also satisfies finite-cover descent.
+\end{corollary}
+
+\begin{proof}
+A finite cover supplies finitely many bounds $M_i$.  Their maximum is a global
+bound for the glued family.
+\end{proof}
+
+\begin{remark}[What was proved]
+The sheaf statement is \PROP{} as an organization of a familiar analytic
+class.  Its proof is elementary topology.  The propagation theorem used to
+define the controlled class remains the established analytic input from
+Lieb-Robinson theory.
+\end{remark}
+
+\subsection{From a sheaf of sets to a moduli stack}
+
+Interactions may have symmetries, gauge identifications, and higher
+equivalences.  Replacing \cref{eq:Ham-functor} by a groupoid-valued or
+anima-valued object is natural.  One might form an action groupoid for a
+chosen group of quasi-local automorphisms, then impose descent after specifying
+the topology on morphisms.
+
+That construction is not carried out here.  In particular, the following
+issues remain \OPEN{}:
+
+\begin{itemize}[leftmargin=2.3em]
+\item which automorphisms are morphisms before imposing a spectral gap;
+\item how stabilization by product-state ancillas is represented;
+\item whether a chosen localization preserves the analytic subfunctor;
+\item how higher homotopies interact with a uniform locality witness;
+\item which universe and hypercompletion conventions define the condensed
+anima.
+\end{itemize}
+
+Our result supplies the object space and its dynamics.  It is not yet the full
+condensed moduli stack.
+
+\section{Examples}
+
+\subsection{Uniformly bounded finite-range couplings}
+
+Let $\Gamma=\mathbb Z^d$.  Fix an interaction range $R$ and a finite list of
+shapes $Z_1,\ldots,Z_N$.  Suppose
+
+\begin{equation}
+  \Phi_s(x+Z_j)=J_j(s,x)K_{j,x},
+\end{equation}
+
+where $\|K_{j,x}\|\le1$ and
+
+\begin{equation}
+  \sup_{s,x,j}|J_j(s,x)|\le J_*.
+\end{equation}
+
+Only finitely many translates containing a given pair $x,y$ contribute, and
+none contribute when $d(x,y)$ exceeds the maximal diameter of a shape.
+Consequently,
+
+\begin{equation}
+  \sup_s\|\Phi_s\|_{F_a}
+  \le C(d,R,N,F_a)J_*.
+\end{equation}
+
+If each $J_j(s,x)$ depends continuously on a finite cylinder of $s\in
+D^{\mathbb Z^d}$, the family is locally $F$-continuous.  This gives a direct
+class of profinite points of \cref{eq:Ham-functor}.
+
+\subsection{Covariant disorder}
+
+Let $\Omega=D^{\mathbb Z^d}$ with shift $T_x$.  A covariant local rule has the
+form
+
+\begin{equation}
+  \Phi_\omega(x+Z)=U_x\Phi_{T_{-x}\omega}(Z)U_x^*,
+\end{equation}
+
+where $U_x$ translates observables.  A uniform bound on the finite set of
+local coupling values gives uniform locality.  Product-topology continuity
+gives local continuity.  The global map
+$\omega\mapsto\Phi_\omega$ usually fails to be continuous in
+$\mathcal B_F$, since the norm takes a supremum over all translations.
+
+The family theorem is designed for precisely this situation.  It asks for the
+uniform bound directly and uses local continuity only where continuity is
+needed.
+
+\subsection{Time-dependent interactions}
+
+For completeness, let $u\mapsto\Phi_s(u)$ be strongly continuous in physical
+time and locally bounded in $F$-norm.  On a compact time interval $I$, assume
+
+\begin{equation}
+  \sup_{s\in S}\int_I\|\Phi_s(u)\|_F\,du<\infty.
+\end{equation}
+
+The same proof yields a two-parameter cocycle $\tau^s_{t,r}$.  In the
+time-independent exponent, replace $M|t-r|$ by
+
+\begin{equation}
+  \int_{\min(t,r)}^{\max(t,r)}\|\Phi_s(u)\|_F\,du,
+\end{equation}
+
+Thus $2C_FM|t-r|$ in the exponential becomes
+$2C_F\int_{\min(t,r)}^{\max(t,r)}\|\Phi_s(u)\|_F\,du$.
+
+This extension is \EST{} in \cite{NSY2019}.  We use time-independent
+notation elsewhere to keep the parameter $s$ distinct from physical time.
+
+\section{Counterexamples and sharp distinctions}
+
+\subsection{Pointwise finite norms do not give a common norm}
+
+\begin{counterexample}
+Let $S=\mathbb N\cup\{\infty\}$ be the one-point compactification and let
+$\Psi$ be a nonzero finite-range interaction.  Put
+
+\begin{equation}
+  \Phi_n=n\Psi,
+  \qquad
+  \Phi_\infty=0.
+\end{equation}
+
+Every fiber has finite $F$-norm, but
+$\sup_{s\in S}\|\Phi_s\|_F=\infty$.
+\end{counterexample}
+
+This family is not locally continuous at infinity, so it is intentionally
+simple.  It shows that a pointwise finiteness statement has the wrong
+quantifiers for uniform propagation.
+
+\subsection{Coefficientwise continuity needs a uniform tail condition}
+
+One can arrange interaction mass at increasing distances so that every fixed
+coefficient stabilizes while a global norm diverges.  For example, choose
+pair terms on $\mathbb Z$ supported at $\{0,n\}$ with amplitudes tuned so that
+each interaction has finite norm but the norms grow with $n$.  On the
+one-point compactification, coefficients on each fixed finite support converge
+to zero.  No common Lieb-Robinson velocity follows.
+
+This is the reason our local continuity definition is not presented as a
+substitute for \cref{eq:family-M}.  It is a second condition with a different
+job.
+
+\subsection{The moving weak-defect counterexample}
+
+The next example is central because it satisfies uniform locality and local
+continuity while its gaps collapse.
+
+\begin{counterexample}[Moving weak defect]
+\label{cex:moving-defect}
+Let $\Gamma=\mathbb N$ with one qubit at each site.  Write
+
+\begin{equation}
+  p_x=|1\rangle\langle1|_x.
+\end{equation}
+
+For $n\ge1$, define the on-site interaction
+
+\begin{equation}
+  \Phi_n(\{x\})=
+  \begin{cases}
+  n^{-1}p_n,&x=n,\\
+  p_x,&x\ne n,
+  \end{cases}
+  \qquad
+  \Phi_n(Z)=0\quad\text{if }|Z|\ne1.
+  \label{eq:defect-n}
+\end{equation}
+
+Define the limiting interaction by
+
+\begin{equation}
+  \Phi_\infty(\{x\})=p_x.
+  \label{eq:defect-infty}
+\end{equation}
+
+Let $S=\mathbb N\cup\{\infty\}$.  Then:
+
+\begin{enumerate}[leftmargin=2.3em]
+\item the family is finite-range and uniformly $F$-local;
+\item $\Phi_n\to\Phi_\infty$ locally in $F$-norm;
+\item all fibers have the same unique product ground state;
+\item the GNS gaps are $\gamma_n=1/n$ and $\gamma_\infty=1$;
+\item therefore every fiber is gapped but
+$\inf_{s\in S}\gamma_s=0$.
+\end{enumerate}
+\end{counterexample}
+
+\begin{proof}
+Only on-site terms occur, so the interaction range is zero.  With the usual
+normalization $F(0)>0$,
+
+\begin{equation}
+  \|\Phi_n\|_F
+  =F(0)^{-1}\sup_x\|\Phi_n(\{x\})\|
+  =F(0)^{-1}.
+\end{equation}
+
+Thus the family has a common norm bound.  For a fixed finite
+$\Lambda\subset\mathbb N$, the defect site $n$ eventually lies outside
+$\Lambda$, so $\Phi_n|_\Lambda=\Phi_\infty|_\Lambda$.  This proves local
+$F$-convergence.
+
+The vector with every qubit in $|0\rangle$ is the unique zero-energy product
+ground state.  In the $n$th fiber, flipping the qubit at site $n$ costs
+$1/n$, while every other single flip costs $1$.  All multi-flip energies are
+sums of positive on-site costs.  Hence the GNS gap is $1/n$.  In the limiting
+fiber every single flip costs $1$, so its gap is $1$.
+More explicitly, the GNS Hamiltonian is diagonal on the dense basis of
+finite-spin-flip vectors.  Its positive eigenvalues are finite sums of the
+on-site costs.  Their infimum is therefore the least on-site cost, so no
+infrared sequence produces an additional spectral value below the stated
+gap.
+\end{proof}
+
+\begin{remark}
+The limiting interaction in \cref{eq:defect-infty} does not omit the defect
+term.  Instead, the weak term moves away and the local limit restores unit
+strength at every fixed site.  This choice ensures that the limiting fiber is
+also gapped.  It makes the counterexample stronger than one whose limiting
+fiber is simply gapless.
+\end{remark}
+
+\begin{corollary}
+Uniform Lieb-Robinson estimates, local parameter continuity, and pointwise
+gappedness do not imply a parameter-uniform gap.
+\end{corollary}
+
+\begin{proof}
+The first two properties and failure of the third follow from
+\cref{cex:moving-defect}.
+\end{proof}
+
+\subsection{Compact norm-continuous matrices and changing degeneracy}
+
+There is also a finite-dimensional obstruction.  Let
+
+\begin{equation}
+  S=\{0\}\cup\{1/n:n\ge2\},
+  \qquad
+  H_s=\operatorname{diag}(0,s,1).
+\end{equation}
+
+This is a norm-continuous family on a profinite compact set.  At $s=0$, the
+literal ground space has dimension two and the gap above it is $1$.  At
+$s=1/n$, the ground state is unique and the literal ground-state gap is
+$1/n$.  Every fiber is gapped, but there is no common lower bound.
+
+If the two lowest levels are instead treated as one isolated ground band, the
+gap from that band to the level at $1$ is at least $1/2$.  Thus a later
+definition of a uniformly gapped substack must specify whether it tracks the
+literal ground eigenspace or an isolated low-energy band of constant rank.
+
+\section{Finite approximation and executable diagnostics}
+
+The companion Haskell program performs finite calculations.  It is useful
+for checking constants and quantifiers, but it is not a proof assistant and
+does not establish a thermodynamic theorem.
+
+\subsection{Finite F-function diagnostics}
+
+On a finite line $\{0,\ldots,L-1\}$, the program computes
+
+\begin{equation}
+  \|F\|_L
+  =\max_x\sum_yF(|x-y|)
+\end{equation}
+
+and
+
+\begin{equation}
+  C_{F,L}
+  =\max_{x,y}
+  \frac{\sum_zF(|x-z|)F(|z-y|)}{F(|x-y|)}.
+\end{equation}
+
+For increasing $L$, these values provide finite diagnostics for candidate
+$F$-functions.  Bounded values in a numerical sample do not prove boundedness
+for the infinite lattice.  An analytic estimate remains necessary.
+
+\subsection{Lieb-Robinson envelope}
+
+Given finite estimates $C_{F,L}$, $M$, supports $X,Y$, and time $t$, the code
+evaluates
+
+\begin{equation}
+  \mathcal E_L(t;X,Y)
+  =\frac{2}{C_{F,L}}
+  \left(e^{2C_{F,L}M|t|}-1\right)
+  \sum_{x\in X,y\in Y}F(|x-y|).
+\end{equation}
+
+Norms of $A$ and $B$ are set separately.  This calculation is useful for
+catching missing factors and for seeing how a chosen decay profile affects
+the envelope.
+
+\subsection{Pointwise versus uniform predicates}
+
+For a finite list of positive gaps, both ``every gap is positive'' and
+``there is a positive minimum'' hold.  The distinction appears in a family
+of growing test sets.  For the defect sequence,
+
+\begin{equation}
+  \min_{1\le n\le N}\gamma_n=\frac1N.
+\end{equation}
+
+The program prints this value for increasing $N$.  The analytic formula, not
+the finite run, proves that the infimum over all $n$ is zero.
+
+\section{Interfaces required by later papers}
+
+\subsection{Input to the gap paper}
+
+The thermodynamic gap is defined using the generator of the infinite-volume
+dynamics in a chosen ground-state representation.  Paper 3 therefore needs
+the following outputs from the present paper:
+
+\begin{enumerate}[leftmargin=2.3em]
+\item the quasi-local algebra $\Alg_\Gamma$;
+\item the class of admissible interactions $\mathcal B_F$;
+\item a common locality witness $M_F(\Phi)$ for a family;
+\item the thermodynamic automorphism group $\tau_t^s$;
+\item point-norm parameter continuity on local observables;
+\item the distinction between local and global interaction topologies.
+\end{enumerate}
+
+Paper 3 must add a ground-state convention and a gap witness.  No gap
+predicate is part of \cref{thm:family-LR} or \cref{thm:thermo}.
+
+\subsection{Input to spectral flow}
+
+Quasi-adiabatic continuation assumes a differentiable interaction path, a
+uniform isolated spectral band, and stronger decay control on the interaction
+and its derivative.  Under those hypotheses, Bachmann, Michalakis,
+Nachtergaele, and Sims construct a quasi-local spectral-flow automorphism
+\cite{BMNS2012}.
+
+The present paper supplies the propagation and thermodynamic-limit pattern
+used by that construction.  It does not verify the spectral gap along a path.
+Accordingly, the implication
+
+\begin{equation}
+  \text{uniformly local path}
+  \Longrightarrow
+  \text{spectral-flow equivalence}
+\end{equation}
+
+is \OBS{} without an independent uniform-gap assumption.
+
+\subsection{Input to observable algebras and K-theory}
+
+Paper 2 begins with the same quasi-local algebra and may form
+$C(S,\Alg_\Gamma)$ for a compact parameter space $S$.  The existence of this
+C*-algebra of continuous functions is independent of the existence of a
+Hamiltonian dynamics.  Conversely, the $F$-norm contains interaction data not
+recoverable from the abstract C*-algebra alone.
+
+Thus the arrows
+
+\begin{equation}
+  \Phi_s\longmapsto\Alg_\Gamma
+  \longmapsto C(S,\Alg_\Gamma)
+\end{equation}
+
+forget information.  Any later K-theory invariant should be described as an
+invariant of the chosen observable-algebra construction, not as a complete
+encoding of the interaction.
+
+\section{Status ledger and limitations}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.26\textwidth}
+                  >{\raggedright\arraybackslash}p{0.18\textwidth}
+                  >{\raggedright\arraybackslash}p{0.47\textwidth}}
+\toprule
+Statement & Status & Reason \\
+\midrule
+\endfirsthead
+\toprule
+Statement & Status & Reason \\
+\midrule
+\endhead
+Finite-volume Lieb-Robinson estimate under finite $F$-norm
+& \EST{}
+& Theorem 3.1 of \cite{NSY2019}, with earlier foundations in
+\cite{NachtergaeleSims2010}. \\
+Uniform estimate for an $S$-family with a common $F$-norm bound
+& \EST{}
+& Direct substitution of the common bound into the cited estimate. \\
+Uniform thermodynamic dynamics
+& \EST{}
+& Uniform version of the Cauchy-tail proof in \cite{NSY2019}. \\
+Parameter continuity from local $F$-continuity and a common tail bound
+& \EST{}
+& Finite truncation plus uniform tails, compatible with the local
+$F$-convergence theorem of \cite{NSY2019}. \\
+The functor $\Ham_F^{\mathrm{ub}}$ on profinite sets
+& \PROP{}
+& Definition introduced here to organize the established analytic class. \\
+Finite-cover descent for $\Ham_F^{\mathrm{ub}}$
+& \EST{}
+& Elementary gluing over quotient maps, once the analytic class is fixed. \\
+Canonical condensed anima of all Hamiltonians and equivalences
+& \OPEN{}
+& Morphisms, higher coherences, topology, stabilization, and size
+conventions remain to be specified. \\
+Uniform locality from profiniteness alone
+& \OBS{}
+& Profinite topology does not bound interaction norms. \\
+Uniform gap from uniform locality and pointwise gaps
+& \OBS{}
+& The moving weak-defect family in \cref{cex:moving-defect}. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Analytic limitations}
+
+We work with bounded interaction terms and finite-dimensional on-site spaces.
+Bosonic lattice models, continuum systems, and interactions with unbounded
+terms require different domains, representations, or state-dependent bounds.
+The conclusions should not be transferred to those settings by analogy.
+
+The $F$-norm is sufficient, not necessary.  Some models admit sharper or
+state-dependent propagation estimates even when the norm used here is
+infinite.  Our functor therefore describes a robust controlled subspace of
+interactions, not every physically local model.
+
+The light-cone estimate is an upper bound.  It does not identify the exact
+front velocity, diffusion law, or transport coefficient.  Disorder can
+produce anomalous or zero-velocity bounds that are stronger than the common
+estimate used here.
+
+\subsection{Categorical limitations}
+
+The sheaf in \cref{thm:descent} is set-valued.  It does not encode unitary
+conjugacies, quasi-local automorphisms, defects, or higher families.  Calling
+it a moduli stack without adding those morphisms would overstate the result.
+
+The finite-cover sheaf property does not say that every invariant factors
+through a finite quotient of a profinite parameter.  Locally constant
+families may approximate continuous families in a chosen norm, but an
+invariant must also be continuous in that norm before an approximation
+argument applies.
+
+The associated condensed object depends on the selected topology on the
+interaction class.  The global $F$-norm topology is convenient for analysis
+but too strong for many disorder families.  The local $F$-topology admits
+those families but does not make the norm function locally bounded without a
+separate uniformity condition.  This tradeoff is structural, not cosmetic.
+
+\subsection{Physical limitations}
+
+A Lieb-Robinson bound controls propagation of commutators.  It does not imply
+a ground state, uniqueness, positivity of a gap, topological order, or
+invertibility.  It also does not distinguish a trivial phase from a
+topological one.
+
+The moving defect example shows that even an exceptionally simple family of
+commuting on-site Hamiltonians can violate uniform gappedness.  Any proposed
+gapped substack must therefore carry the uniform gap as data or as a proved
+property with the correct quantifiers.
+
+\section{Discussion}
+
+The condensed perspective is most useful here as bookkeeping with teeth.  It
+forces one to ask what an $S$-family is, which topology controls variation,
+and whether a statement is stable under pullback and finite-cover descent.
+Those questions expose a hidden ambiguity in the slogan ``continuous family
+of local Hamiltonians.''  Continuity and locality are not single predicates.
+
+The global interaction Banach topology makes compactness powerful.  A
+continuous map from a compact $S$ has a bounded image, so uniform propagation
+follows immediately.  The same topology is poorly matched to covariant
+disorder because it monitors every translate at once.  The local topology is
+better matched to physical observables, but compactness no longer supplies a
+global norm bound.  The correct definition records both local continuity and
+uniform locality.
+
+This two-part definition also behaves well under a finite profinite cover.
+Local continuity glues because continuous maps glue across a compact quotient.
+The uniform bound glues because a finite maximum exists.  That is the precise
+sense in which condensed organization helps.  It preserves a carefully
+defined analytic class under the covers used by the site.
+
+The next step of the larger research program is harder.  To define a
+uniformly gapped subfunctor, one must choose between finite-volume and GNS
+gaps, state the boundary conditions, track a ground band, and demand one gap
+constant for the whole parameter object.  The counterexamples here show that
+none of this data can be suppressed.
+
+There is also a useful lesson for formalization.  A proof assistant interface
+should not encode ``local interaction'' as an unstructured label.  It should
+carry an $F$-function, proofs of summability and convolution, an interaction,
+and a numerical norm witness.  A family should carry a common witness rather
+than a function returning a separate witness for every point.  That design
+makes the quantifier distinction visible in the type.
+
+\section{Conclusion}
+
+We have established a controlled first arrow
+
+\begin{equation}
+  \text{local quantum interactions}
+  \longrightarrow
+  \text{parameterized thermodynamic dynamics}.
+\end{equation}
+
+The analytic theorem is simple to state: a common interaction $F$-norm bound
+gives common Lieb-Robinson constants and uniform thermodynamic convergence.
+Local $F$-continuity then gives continuity of the dynamics on local
+observables.  These results are inherited from established Lieb-Robinson
+theory with the family quantifiers made explicit.
+
+We also proposed a profinite functor of controlled interaction families and
+proved finite-cover descent.  This provides an honest object-level input for
+a future condensed moduli stack.  Its categorical form does not produce the
+analytic estimates.  It records the class for which those estimates have
+already been proved.
+
+Finally, the moving weak defect shows why the next arrow cannot be automatic.
+Uniform locality and pointwise gaps coexist with a collapsing family gap.
+The uniformly gapped substack must therefore impose new analytic data.  This
+boundary between organization and analysis is the main conclusion of the
+paper.
+
+\appendix
+
+\section{Detailed comparison estimate}
+
+This appendix records the finite-volume comparison used in
+\cref{thm:thermo}.  Let $\Lambda_m\subseteq\Lambda_n$ and write
+
+\begin{equation}
+  H_{\Lambda_n}=H_{\Lambda_m}+V_{m,n},
+\end{equation}
+
+where $V_{m,n}$ contains terms not wholly supported in $\Lambda_m$.  Duhamel's
+formula gives
+
+\begin{equation}
+\begin{split}
+ &\tau_t^{\Lambda_n}(A)-\tau_t^{\Lambda_m}(A)\\
+ &\quad=
+ i\int_0^t
+ \tau_r^{\Lambda_n}
+ \left([V_{m,n},\tau_{t-r}^{\Lambda_m}(A)]\right)dr.
+ \label{eq:duhamel}
+\end{split}
+\end{equation}
+
+Taking norms and decomposing $V_{m,n}$ into interaction terms yields
+
+\begin{equation}
+ \|\tau_t^{\Lambda_n}(A)-\tau_t^{\Lambda_m}(A)\|
+ \le
+ \sum_{Z\in\mathcal S_{m,n}}
+ \int_0^{|t|}
+ \|[\Phi(Z),\tau_{|t|-r}^{\Lambda_m}(A)]\|dr,
+\end{equation}
+
+where $\mathcal S_{m,n}$ is the set of new terms meeting the complement of
+$\Lambda_m$.  The Lieb-Robinson estimate bounds each commutator by a spatial
+sum from $X$ to $Z$.  Summing over $Z$ and using the interaction norm gives a
+tail from $X$ to $\Lambda_n\setminus\Lambda_m$.  Integrating the time
+exponential gives \cref{eq:Cauchy-tail}, up to the harmless choice between
+$e^{2C_FM|t|}-1$ and its upper bound
+$2C_FM|t|e^{2C_FM|t|}$.
+
+Every constant in this argument is controlled by $F$, $C_F$, $M$, $|X|$,
+and the time interval.  This is the entire reason the thermodynamic limit is
+uniform in the family parameter.
+
+\section{A finite-cover gluing lemma}
+
+\begin{lemma}
+Let $q:K\to S$ be a continuous surjection from a compact space to a Hausdorff
+space.  Let $Y$ be any topological space.  A map $f:S\to Y$ is continuous if
+and only if $f\circ q$ is continuous.
+\end{lemma}
+
+\begin{proof}
+The map $q$ is closed because images of compact sets are compact and compact
+subsets of a Hausdorff space are closed.  A continuous closed surjection is a
+quotient map.  The assertion is the defining property of the quotient
+topology.
+\end{proof}
+
+\begin{remark}
+In \cref{thm:descent}, take $K=\coprod_iS_i$.  The target $Y$ is the
+finite-volume interaction space for each fixed $\Lambda$.  The lemma proves
+continuity of the glued local restrictions.  The analytic norm bound is
+checked separately.
+\end{remark}
+
+\section{Logical form of uniform conditions}
+
+The following formulas summarize the quantifiers that the paper keeps
+separate.
+
+Pointwise locality is
+
+\begin{equation}
+  \forall s\in S\;\exists M_s<\infty:
+  \|\Phi_s\|_F\le M_s.
+\end{equation}
+
+Uniform locality is
+
+\begin{equation}
+  \exists M<\infty\;\forall s\in S:
+  \|\Phi_s\|_F\le M.
+\end{equation}
+
+Pointwise gappedness is
+
+\begin{equation}
+  \forall s\in S\;\exists\gamma_s>0:
+  \operatorname{gap}(H_s)\ge\gamma_s.
+\end{equation}
+
+Uniform gappedness is
+
+\begin{equation}
+  \exists\gamma>0\;\forall s\in S:
+  \operatorname{gap}(H_s)\ge\gamma.
+\end{equation}
+
+Neither exchange of quantifiers is a matter of notation.  Compactness permits
+the exchange only when the relevant bound or gap function has suitable
+continuity properties.  The ground-state gap can fail to be lower
+semicontinuous when ground-state multiplicity changes.  The moving defect
+shows failure even with a fixed unique product ground state if the interaction
+topology is local.
+
+\section{Notation and reproducibility}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.66\textwidth}}
+\toprule
+Symbol & Meaning \\
+\midrule
+\endfirsthead
+\toprule
+Symbol & Meaning \\
+\midrule
+\endhead
+$\Gamma$ & Countable metric lattice or graph. \\
+$\Alg_\Lambda$ & Matrix algebra of observables in finite volume $\Lambda$. \\
+$\Alg_\Gamma$ & Norm-completed quasi-local C*-algebra. \\
+$\Phi$ & Bounded self-adjoint interaction. \\
+$F$ & Uniformly summable decay function with a convolution bound. \\
+$C_F$ & Convolution constant of $F$. \\
+$\|\Phi\|_F$ & Interaction norm in \cref{eq:F-norm}. \\
+$S$ & Compact parameter space, often profinite. \\
+$M_F(\Phi)$ & Uniform interaction-norm bound over $S$. \\
+$\tau_t^{\Lambda,\Phi_s}$ & Finite-volume dynamics in fiber $s$. \\
+$\tau_t^s$ & Thermodynamic dynamics in fiber $s$. \\
+$\Ham_F^M$ & Proposed sheaf of locally continuous families with common bound $M$. \\
+\bottomrule
+\end{longtable}
+
+The Haskell sources accompanying this article are in the repository directory
+
+\begin{center}
+\path{src/locality-condensed-families/}.
+\end{center}
+
+They compile with GHC using
+\texttt{-Wall}, \texttt{-Wextra}, and \texttt{-Werror}.  All exported functions have explicit type
+signatures.  The computations are deterministic and require no external
+packages beyond \texttt{base}.
+
+\begin{thebibliography}{99}
+
+\bibitem{LiebRobinson1972}
+E. H. Lieb and D. W. Robinson,
+The finite group velocity of quantum spin systems,
+\emph{Communications in Mathematical Physics} \textbf{28} (1972), 251 to 257.
+\href{https://doi.org/10.1007/BF01645779}{doi:10.1007/BF01645779}.
+
+\bibitem{NachtergaeleSims2006}
+B. Nachtergaele and R. Sims,
+Lieb-Robinson bounds and the exponential clustering theorem,
+\emph{Communications in Mathematical Physics} \textbf{265} (2006), 119 to 130.
+\href{https://arxiv.org/abs/math-ph/0506030}{arXiv:math-ph/0506030}.
+
+\bibitem{NachtergaeleOgataSims2006}
+B. Nachtergaele, Y. Ogata, and R. Sims,
+Propagation of correlations in quantum lattice systems,
+\emph{Journal of Statistical Physics} \textbf{124} (2006), 1 to 13.
+\href{https://arxiv.org/abs/math-ph/0603064}{arXiv:math-ph/0603064}.
+
+\bibitem{NachtergaeleSims2010}
+B. Nachtergaele and R. Sims,
+Lieb-Robinson bounds in quantum many-body physics,
+in \emph{Entropy and the Quantum}, Contemporary Mathematics \textbf{529}
+(2010), 141 to 176.
+\href{https://arxiv.org/abs/1004.2086}{arXiv:1004.2086}.
+
+\bibitem{NVZ2011}
+B. Nachtergaele, A. Vershynina, and V. A. Zagrebnov,
+Lieb-Robinson bounds and existence of the thermodynamic limit for a class of
+irreversible quantum dynamics,
+in \emph{Entropy and the Quantum II}, Contemporary Mathematics \textbf{552}
+(2011), 161 to 175.
+\href{https://arxiv.org/abs/1103.1122}{arXiv:1103.1122}.
+
+\bibitem{BMNS2012}
+S. Bachmann, S. Michalakis, B. Nachtergaele, and R. Sims,
+Automorphic equivalence within gapped phases of quantum lattice systems,
+\emph{Communications in Mathematical Physics} \textbf{309} (2012), 835 to 871.
+\href{https://arxiv.org/abs/1102.0842}{arXiv:1102.0842}.
+\href{https://doi.org/10.1007/s00220-011-1380-0}{doi:10.1007/s00220-011-1380-0}.
+
+\bibitem{NSY2019}
+B. Nachtergaele, R. Sims, and A. Young,
+Quasi-locality bounds for quantum lattice systems. Part I.
+Lieb-Robinson bounds, quasi-local maps, and spectral flow automorphisms,
+\emph{Journal of Mathematical Physics} \textbf{60} (2019), 061101.
+\href{https://arxiv.org/abs/1810.02428}{arXiv:1810.02428}.
+\href{https://doi.org/10.1063/1.5095769}{doi:10.1063/1.5095769}.
+
+\bibitem{ClausenScholze}
+D. Clausen and P. Scholze,
+Condensed mathematics,
+lecture notes, 2019.
+\url{https://www.math.uni-bonn.de/people/scholze/Condensed.pdf}.
+
+\end{thebibliography}
+
+\end{document}

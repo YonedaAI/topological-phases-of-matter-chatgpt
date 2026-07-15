@@ -1,0 +1,1483 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{tikz-cd}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
+\usepackage{everypage}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{microtype}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=green!45!black,
+  urlcolor=blue!65!black
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{warning}[theorem]{Warning}
+
+\newcommand{\A}{\mathcal A}
+\newcommand{\Ham}{\mathfrak{Ham}}
+\newcommand{\Gap}{\mathfrak{Gap}}
+\newcommand{\spec}{\operatorname{spec}}
+\newcommand{\dist}{\operatorname{dist}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\id}{\operatorname{id}}
+\newcommand{\status}[1]{\textsc{#1}}
+
+\definecolor{grokgray}{RGB}{110,110,110}
+\AddEverypageHook{%
+  \ifnum\value{page}=1
+    \begin{tikzpicture}[remember picture,overlay]
+      \node[
+        rotate=90,
+        anchor=south,
+        font=\Large\sffamily\bfseries\color{grokgray},
+        inner sep=0pt
+      ] at ([xshift=38pt,yshift=0.52\paperheight]current page.south west)
+      {GrokRxiv:2026.07.thermodynamic-gaps\quad[\,math-ph\,]\quad14 Jul 2026};
+    \end{tikzpicture}
+  \fi
+}
+
+\title{Thermodynamic Spectral Gaps in Parameterized Quantum Lattice Systems:\\
+Definitions, Stability, and a Condensed Moduli Formulation}
+
+\author{Matthew Long\\
+\textit{The YonedaAI Collaboration}\\
+\textit{YonedaAI Research Collective}\\
+Chicago, IL\\
+\texttt{matthew@yonedaai.com} $\cdot$ \url{https://yonedaai.com}}
+
+\date{14 July 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We isolate the analytic content required to speak about a uniformly gapped
+family of quantum lattice systems. Three notions that are often compressed
+into one phrase are kept separate: the literal finite-volume ground-state
+gap, the finite-volume gap above a selected low-energy band, and the bulk gap
+of the positive generator in a ground-state GNS representation. We prove
+elementary separation and compactness results, give explicit pointwise-gapped
+families whose gap infimum vanishes, and formulate a gap-witness object that
+records the state, exhaustion, boundary convention, spectral band, and common
+lower bound. We then state the exact role of Lieb-Robinson estimates,
+quasi-adiabatic spectral flow, Local Topological Quantum Order, and controlled
+perturbation theorems. Condensed and profinite parameter objects organize
+families and descent, but do not supply a spectral gap or its stability. Our
+main proposal separates a fibration of quantitative gap witnesses from its
+qualitative uniformly gapped image subfunctor. The construction is conditional on independent
+analytic input and is designed to prevent pointwise gappedness from being
+mistaken for a thermodynamic phase. We close with precise theorem interfaces
+for formal libraries and with limitations relevant to microscopic and
+effective classifications of topological matter.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+A spectral gap is one of the principal analytic inputs in the mathematical
+definition of a zero-temperature quantum phase. It controls adiabatic
+transport, protects low-energy information, supports clustering statements,
+and allows topological invariants to remain locally constant along a family.
+It is also a frequent source of hidden assumptions. A finite matrix has a
+positive difference between distinct eigenvalues, but that observation says
+nothing about a lower bound uniform in system size. A family can have a
+positive gap at every parameter while its infimum is zero. A bulk GNS
+Hamiltonian can be gapped while open boundaries carry gapless modes.
+
+These distinctions become unavoidable in a condensed-mathematics formulation
+of phases. A condensed or profinite test object can encode a family of
+interactions. Sheaf descent can glue compatible local descriptions. Neither
+operation proves that the thermodynamic generator has an isolated ground
+sector. The gap must remain a witnessed analytic property.
+
+This paper addresses the third analytic problem in a five-paper program:
+
+\[
+\begin{tikzcd}[row sep=large]
+\text{local interactions}
+  \arrow[d]
+\\
+\text{parameterized Hamiltonian object}
+  \arrow[d]
+\\
+\text{uniformly gapped subobject}
+  \arrow[d]
+\\
+\text{stable phase groupoid}
+  \arrow[d]
+\\
+\text{invertible phase spectrum.}
+\end{tikzcd}
+\]
+
+The paper does not construct the final spectrum. It supplies a defensible
+meaning for the third line and explains which established stability results
+can be imported.
+
+\subsection{Contributions}
+
+Our contributions are the following.
+
+\begin{enumerate}[label=\arabic*.]
+  \item We give separate definitions for literal finite-volume gaps,
+  ground-band gaps, uniform finite-volume gaps, GNS bulk gaps, and uniform
+  parameterized GNS gaps.
+
+  \item We prove an elementary compactness theorem for a constant-rank
+  isolated spectral cluster and show why rank change invalidates the common
+  compactness shortcut.
+
+  \item We give three explicit counterexamples: a norm-continuous compact
+  matrix family with pointwise but nonuniform literal gaps, a locally
+  continuous profinite spin family with uniform locality but collapsing GNS
+  gaps, and a sequence of finite ferromagnetic chains whose gaps close in the
+  thermodynamic limit.
+
+  \item We formulate a fibration of quantitative gap witnesses and its
+  propositional image inside the Hamiltonian functor. The witness records
+  enough data to make the predicate meaningful and stable under restriction
+  of the parameter object.
+
+  \item We separate two established analytic mechanisms. Spectral flow
+  transports a low-energy sector along a path already known to have a uniform
+  isolated band. Perturbative gap stability preserves a pre-existing gap only
+  under substantive structural hypotheses such as frustration freeness,
+  quantitative local gaps, and LTQO.
+
+  \item We state formalization contracts for Lean and executable finite-model
+  checks for Haskell. These artifacts represent hypotheses and finite
+  calculations. They do not claim proofs of infinite-volume theorems.
+\end{enumerate}
+
+\subsection{Status vocabulary}
+
+We use five labels throughout:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Label & Meaning \\
+\midrule
+\status{established} & A cited theorem or standard construction under stated assumptions.\\
+\status{proposed} & A definition or moduli construction introduced here.\\
+\status{conjectural} & A precise assertion not proved here.\\
+\status{open} & No proof or counterexample is known in the stated scope.\\
+\status{obstructed} & A theorem or explicit counterexample rules out the claim.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The distinction is important. Formal vocabulary should expose uncertainty,
+not conceal it.
+
+\section{Quantum lattice framework}
+
+\subsection{Local and quasi-local observables}
+
+Let $(\Gamma,d)$ be a countable metric space. We assume uniform local
+finiteness when a volume-growth estimate is required. Each site $x\in\Gamma$
+carries a finite-dimensional Hilbert space $\mathcal H_x$. For a finite set
+$\Lambda\Subset\Gamma$, define
+
+\[
+\A_\Lambda
+=
+\bigotimes_{x\in\Lambda}\mathcal B(\mathcal H_x).
+\]
+
+If $\Lambda\subset\Lambda'$, the canonical inclusion is
+
+\[
+\iota_{\Lambda,\Lambda'}(A)=A\otimes 1_{\Lambda'\setminus\Lambda}.
+\]
+
+These maps are unital and isometric. The local algebra and its C*-completion
+are
+
+\[
+\A_{\mathrm{loc}}
+=
+\bigcup_{\Lambda\Subset\Gamma}\A_\Lambda,
+\qquad
+\A_\Gamma
+=
+\overline{\A_{\mathrm{loc}}}^{\|\cdot\|}.
+\]
+
+\begin{definition}[Interaction]
+An interaction is a map
+\[
+\Phi:\{X\Subset\Gamma\}\longrightarrow\A_{\mathrm{loc}}
+\]
+such that $\Phi(X)=\Phi(X)^*\in\A_X$. Its finite-volume Hamiltonian on
+$\Lambda$ is
+\[
+H^\Phi_\Lambda=\sum_{X\subseteq\Lambda}\Phi(X).
+\]
+\end{definition}
+
+The formal infinite sum of all interaction terms is generally not an element
+of $\A_\Gamma$. Under decay hypotheses, the thermodynamic object is instead a
+strongly continuous automorphism group, often defined first on local
+observables and then extended.
+
+\subsection{F-functions and uniform locality}
+
+\begin{definition}[F-function]
+A nonincreasing function $F:[0,\infty)\to(0,\infty)$ is an F-function on
+$(\Gamma,d)$ if
+\[
+\|F\|
+=
+\sup_{x\in\Gamma}\sum_{y\in\Gamma}F(d(x,y))
+<\infty
+\]
+and
+\[
+C_F
+=
+\sup_{x,y\in\Gamma}
+\frac{1}{F(d(x,y))}
+\sum_{z\in\Gamma}F(d(x,z))F(d(z,y))
+<\infty.
+\]
+For thermodynamic limits on a general countable metric space, we also require
+the uniform tail condition
+\[
+T_F(R):=
+\sup_{x\in\Gamma}
+\sum_{d(x,y)\geq R}F(d(x,y))
+,\qquad
+\lim_{R\to\infty}T_F(R)=0.
+\]
+This condition is automatic for the standard translation-invariant lattice
+examples used below. On $\mathbb Z^\nu$, translation invariance makes the sum
+independent of the base point $x$, so it is the ordinary tail of a convergent
+series. We state the condition separately because pointwise summability is not
+a substitute for a family-uniform tail on arbitrary geometry.
+\end{definition}
+
+For an interaction $\Phi$, set
+
+\[
+\|\Phi\|_F
+=
+\sup_{x,y\in\Gamma}
+\frac{1}{F(d(x,y))}
+\sum_{X\ni x,y}\|\Phi(X)\|.
+\]
+
+Standard choices on $\mathbb Z^\nu$ are a sufficiently fast polynomial tail
+and its exponentially weighted version,
+
+\[
+F(r)=\frac{1}{(1+r)^{\nu+\epsilon}},
+\qquad
+F_a(r)=e^{-ar}F(r).
+\]
+
+\begin{definition}[Uniformly local parameter family]
+Let $S$ be a topological parameter space. A family
+$\Phi=(\Phi_s)_{s\in S}$ is uniformly F-local if
+\[
+M_F(\Phi)=\sup_{s\in S}\|\Phi_s\|_F<\infty.
+\]
+It is locally F-continuous if its restrictions to every fixed finite region
+vary continuously in the corresponding restricted interaction norm.
+\end{definition}
+
+Local F-continuity is a finite-region condition. It does not include the
+separate geometric hypothesis $T_F(R)\to0$, which will be stated whenever a
+family-uniform thermodynamic limit is used.
+
+Uniform locality and parameter continuity are distinct. Global norm
+continuity $S\to\mathcal B_F$ on compact $S$ implies uniform boundedness. It
+is often too strong for product-topology disorder because a change far from a
+fixed observation region can remain large in a supremum over all sites.
+
+\subsection{Uniform Lieb-Robinson control}
+
+The standard Lieb-Robinson argument yields a bound whose constants depend on
+the F-function, the geometry, and $\|\Phi\|_F$. A uniform family bound therefore
+gives constants independent of $s$.
+
+\begin{theorem}[Uniform family Lieb-Robinson estimate]
+\label{thm:uniform-lr}
+Assume $M_F(\Phi)<\infty$. Let $A\in\A_X$ and $B\in\A_Y$ have finite disjoint
+supports. For finite $\Lambda\supset X\cup Y$,
+\[
+\|[\tau_t^{\Lambda,s}(A),B]\|
+\leq
+\frac{2\|A\|\|B\|}{C_F}
+\left(e^{2C_FM_F(\Phi)|t|}-1\right)
+\sum_{x\in X}\sum_{y\in Y}F(d(x,y)).
+\]
+The same right side works for every $s\in S$.
+\end{theorem}
+
+\begin{proof}[Proof status]
+This is an \status{established} uniform-family corollary of the usual
+interaction-norm Lieb-Robinson theorem. The proof is the standard iterated
+commutator estimate. Every occurrence of the interaction norm is bounded by
+the common constant $M_F(\Phi)$. We do not claim a new proof of the sharp
+boundary form of the estimate.
+\end{proof}
+
+\begin{corollary}[Uniform thermodynamic dynamics]
+\label{cor:thermo-dynamics}
+Under the assumptions of \cref{thm:uniform-lr}, and with the additional
+uniform-tail hypothesis $T_F(R)\to0$, finite-volume dynamics converge on local
+observables along any regular exhaustion. The convergence is uniform in $s$
+and on compact time intervals. If the family is also locally F-continuous, the
+map $s\mapsto\tau_t^s(A)$ is norm-continuous for every local $A$.
+\end{corollary}
+
+\begin{proof}[Proof sketch]
+Compare dynamics in two nested volumes by a Duhamel expansion. The difference
+is bounded by a common F-tail outside the smaller region, multiplied by the
+uniform exponential factor from \cref{thm:uniform-lr}. Summability of $F$
+and the separately assumed limit $T_F(R)\to0$ make this tail vanish uniformly
+in the base point. The same estimate separates a parameter variation
+inside a large finite region from the common tail outside it.
+\end{proof}
+
+\begin{warning}
+Neither \cref{thm:uniform-lr} nor \cref{cor:thermo-dynamics} contains a gap
+hypothesis or a gap conclusion. Uniform causal control and a uniform spectral
+gap are logically separate properties.
+\end{warning}
+
+\section{Five gap predicates}
+
+\subsection{Literal finite-volume ground-state gap}
+
+Let $H_\Lambda$ be self-adjoint on the finite-dimensional Hilbert space for
+$\Lambda$. Write
+
+\[
+E_0(\Lambda)=\min\spec(H_\Lambda).
+\]
+
+\begin{definition}[Literal ground-state gap]
+The literal finite-volume ground-state gap is
+\[
+\gamma_{\mathrm{gs}}(\Lambda)
+=
+\inf\bigl(\spec(H_\Lambda)\setminus\{E_0(\Lambda)\}\bigr)
+-E_0(\Lambda),
+\]
+with the convention that every eigenvector at exactly $E_0(\Lambda)$ belongs
+to the ground space.
+\end{definition}
+
+This definition is sensitive to a low-energy level that approaches the ground
+energy and becomes exactly degenerate in a limit.
+
+\subsection{Finite-volume ground-band gap}
+
+\begin{definition}[Selected ground-band gap]
+Choose a compact interval $I_\Lambda$ whose intersection with the spectrum is
+the selected low-energy cluster, and assume that the complementary spectral
+set is nonempty. Define
+\[
+\gamma_{\mathrm{band}}(\Lambda)
+=
+\dist\left(
+\spec(H_\Lambda)\cap I_\Lambda,
+\spec(H_\Lambda)\setminus I_\Lambda
+\right).
+\]
+The rank of the selected spectral projection is part of the convention.
+\end{definition}
+
+This is the natural finite-volume predicate for spectral flow. An isolated
+low-energy band can survive small internal splittings even when the literal
+ground-state gap becomes small.
+
+\subsection{Uniform finite-volume gap}
+
+\begin{definition}[Uniform finite-volume band gap]
+Fix an exhaustion $(\Lambda_n)$, a boundary convention, and selected bands
+$I_{s,n}$. A family has uniform finite-volume gap $\gamma>0$ if
+\[
+\inf_{s\in S}\inf_n
+\gamma_{\mathrm{band}}(s,\Lambda_n)
+\geq\gamma.
+\]
+\end{definition}
+
+The exhaustion and boundary convention cannot be suppressed. Open and
+periodic volumes can display different low-energy behavior.
+
+\subsection{GNS bulk gap}
+
+Let $\omega$ be an infinite-volume ground state for the dynamics $\tau$. Let
+$(\mathcal H_\omega,\pi_\omega,\Omega_\omega)$ be its GNS triple. The dynamics
+is implemented by a positive generator $H_\omega$ with
+$H_\omega\Omega_\omega=0$ \cite{BratteliRobinson2}.
+
+\begin{definition}[GNS bulk gap]
+The GNS gap of the selected ground state is
+\[
+\gamma_{\mathrm{GNS}}(\omega)
+=
+\sup\{\gamma>0:(0,\gamma)\cap\spec(H_\omega)=\varnothing\}.
+\]
+\end{definition}
+
+If the GNS ground vector is unique, the positive gap can be expressed through
+a Poincare-type estimate on the domain of the generator. The representation
+and state remain essential data.
+
+\subsection{Uniform parameterized GNS gap}
+
+\begin{definition}[Uniform bulk-gapped family]
+A family of interactions with selected ground states $(\omega_s)_{s\in S}$ is
+uniformly bulk-gapped if there is $\gamma>0$ such that
+\[
+\gamma_{\mathrm{GNS}}(\omega_s)\geq\gamma
+\qquad
+\text{for all }s\in S.
+\]
+\end{definition}
+
+Pointwise positivity of $\gamma_{\mathrm{GNS}}(\omega_s)$ is not enough.
+Uniformity is a separate quantifier and is the physically relevant one for a
+single parameterized phase object.
+
+\section{Compactness: valid theorem and invalid shortcut}
+
+Compactness does produce a common separation for a finite-dimensional spectral
+cluster when its rank is fixed. The rank condition is the missing hypothesis
+in a common but invalid argument.
+
+\begin{proposition}[Compact constant-rank spectral separation]
+\label{prop:constant-rank}
+Let $S$ be compact and let $H:S\to M_N(\mathbb C)_{\mathrm{sa}}$ be
+norm-continuous. Suppose there is a continuous family of rank-$r$ spectral
+projections $P_s$ and that
+\[
+\spec(H_s|_{P_s\mathbb C^N})
+\cap
+\spec(H_s|_{(1-P_s)\mathbb C^N})
+=\varnothing
+\]
+for every $s$. Then the distance between the two spectral clusters has a
+positive minimum on $S$.
+\end{proposition}
+
+\begin{proof}
+The ordered eigenvalues of a self-adjoint matrix are Lipschitz continuous in
+the operator norm. After choosing which $r$ eigenvalues form the cluster, the
+distance between the two finite sets of continuous eigenvalue functions is a
+continuous positive function on $S$. A positive continuous function on a
+compact space has a positive minimum.
+\end{proof}
+
+\begin{example}[Rank change destroys the conclusion]
+\label{ex:matrix-collapse}
+Let
+\[
+S=\{0\}\cup\{1/n:n\geq2\}
+\]
+and
+\[
+H_s=\operatorname{diag}(0,s,1).
+\]
+This is a norm-continuous family. At $s=1/n$, the literal ground-state gap is
+$1/n$. At $s=0$, the ground space has rank two and the literal gap is $1$.
+Every fiber is literally gapped, but
+\[
+\inf_{s\in S}\gamma_{\mathrm{gs}}(H_s)=0.
+\]
+If the two lowest levels are selected as one band, the band gap is uniformly
+positive. The disagreement is not a paradox. The two predicates encode
+different low-energy sectors.
+\end{example}
+
+\begin{corollary}
+Compactness plus pointwise literal gappedness does not imply a uniform literal
+gap when the ground-state rank changes.
+\end{corollary}
+
+\section{Thermodynamic counterexamples}
+
+\subsection{A moving weak defect}
+
+Let $\Gamma=\mathbb N$ with one qubit at each site. Let
+$p_x=|1\rangle\langle1|_x$. Consider the product interactions whose formal
+Hamiltonians are
+
+\[
+H_\infty=\sum_{x\geq1}p_x,
+\qquad
+H_n=\frac{1}{n}p_n+\sum_{x\neq n}p_x.
+\]
+
+The parameter space $S=\mathbb N\cup\{\infty\}$ is profinite. On every fixed
+finite region, $H_n$ agrees with $H_\infty$ for all sufficiently large $n$.
+The family is locally continuous and uniformly finite range. Its
+Lieb-Robinson constants can therefore be chosen uniformly.
+
+\begin{proposition}[Uniform locality without a uniform gap]
+Each system above has the same unique product ground state. Its GNS excitation
+gap is
+\[
+\gamma_{\mathrm{GNS}}(H_n)=1/n,
+\qquad
+\gamma_{\mathrm{GNS}}(H_\infty)=1.
+\]
+Hence
+\[
+\inf_{s\in S}\gamma_{\mathrm{GNS}}(H_s)=0.
+\]
+\end{proposition}
+
+\begin{proof}
+A single spin flip at site $n$ has energy $1/n$ for $H_n$, and every nonzero
+excitation has energy at least $1/n$. For $H_\infty$, a single spin flip has
+energy $1$ and all other excitations have integer energy at least $1$.
+\end{proof}
+
+The family is not continuous in the global interaction norm that takes a
+supremum over all sites. This example explains why local parameter continuity
+and uniform locality should be stated separately.
+
+\subsection{Finite chains with a closing gap}
+
+For a length-$L$ open spin-$1/2$ ferromagnetic chain, let
+
+\[
+H_L
+=
+\sum_{x=1}^{L-1}\frac{1-P_{x,x+1}}{2},
+\]
+
+where $P_{x,x+1}$ swaps neighboring spins. Each summand is positive and the
+model is frustration free.
+
+\begin{proposition}[Finite positivity does not imply a thermodynamic gap]
+Every finite $H_L$ has a positive gap above its symmetric ground space, but
+\[
+0<\gamma_L
+\leq
+1-\cos(\pi/L)
+\longrightarrow0.
+\]
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Restrict to the one-magnon sector. There the Hamiltonian is proportional to
+the graph Laplacian of the length-$L$ path. Its first nonzero eigenvalue is
+$1-\cos(\pi/L)$ in the stated normalization. The variational principle gives
+the upper bound on the full many-body gap.
+\end{proof}
+
+The infinite isotropic ferromagnetic chain is gapless. A theorem about all
+finite volumes must contain a lower bound independent of $L$ if it is to imply
+a thermodynamic gap.
+
+\section{Spectral flow transports an assumed gap}
+
+Quasi-adiabatic continuation relates uniformly gapped paths to quasi-local
+automorphisms. It is a transport theorem, not a gap-existence theorem.
+
+\subsection{Hypotheses}
+
+Let $s\mapsto\Phi(s)$ be differentiable for $s\in[0,1]$. The standard
+finite-volume-to-thermodynamic spectral-flow theorem assumes, in a typical
+form:
+
+\begin{enumerate}[label=(\alph*)]
+  \item finite-dimensional local spin spaces;
+  \item a regular exhaustion $(\Lambda_n)$ with controlled geometry;
+  \item a decay norm for $\Phi(s)$ and $\partial_s\Phi(s)$ bounded uniformly
+  in $s$;
+  \item a selected finite-volume spectral interval $I_s$;
+  \item a separation $\gamma>0$ between that interval and the rest of the
+  spectrum, uniform in $s$ and $n$.
+\end{enumerate}
+
+Choose a filter $W_\gamma$ adapted to the gap. The finite-volume generator is
+
+\[
+D_{\Lambda_n}(s)
+=
+\int_{\mathbb R}W_\gamma(t)
+\tau_t^{H_{\Lambda_n}(s)}
+\bigl(\partial_sH_{\Lambda_n}(s)\bigr)
+\,dt.
+\]
+
+The decay of the filter and the Lieb-Robinson estimate make this generator
+quasi-local.
+
+\begin{theorem}[Thermodynamic spectral flow]
+\label{thm:spectral-flow}
+Under the stated locality, differentiability, geometry, and uniform
+ground-band gap assumptions, the finite-volume flows converge to a strongly
+continuous cocycle $\alpha_s$ of quasi-local automorphisms of $\A_\Gamma$.
+The thermodynamic ground-state sets satisfy
+\[
+\mathcal S(s)=\mathcal S(0)\circ\alpha_s.
+\]
+\end{theorem}
+
+\begin{proof}[Proof status]
+This is the \status{established} automorphic-equivalence theorem of Bachmann,
+Michalakis, Nachtergaele, and Sims, stated here in the notation of this paper.
+The proof combines a filtered quasi-adiabatic generator, quasi-locality bounds,
+uniform convergence, and transport of the isolated spectral projection.
+\end{proof}
+
+\begin{warning}[No circular use]
+The uniform gap is an input to the filter and to the spectral projection
+transport. \Cref{thm:spectral-flow} cannot be cited to prove that the same path
+has a gap.
+\end{warning}
+
+\subsection{Bulk spectral-flow variants}
+
+There are bulk formulations based on a unique selected ground state with a
+uniform GNS gap and suitable differentiability estimates. These avoid treating
+open-boundary low-energy modes as bulk gap closure. They still assume the
+bulk gap. They do not establish general perturbative stability.
+
+\section{Controlled perturbative gap stability}
+
+General stability of the spectral gap for arbitrary interacting Hamiltonians
+is not available. Strong theorems exist for structured classes. We describe a
+representative frustration-free lane.
+
+\subsection{Frustration-free reference system}
+
+Assume an interaction indexed by sites,
+
+\[
+H_0=\sum_{x\in\Gamma}h_x,
+\]
+
+where $h_x\geq0$ is supported in a ball $b_x(R)$ of common finite radius,
+$\sup_x\|h_x\|<\infty$, and the selected infinite-volume state has zero
+energy on every local term.
+
+Let $H_0^{\mathrm{GNS}}$ be the positive GNS generator. A stability theorem
+starts with
+
+\[
+\gamma_0=\operatorname{gap}(H_0^{\mathrm{GNS}})>0.
+\]
+
+This is a pre-existing bulk gap, not a consequence of frustration freeness.
+
+\subsection{Local gap control}
+
+For controlled local regions $\Lambda(x,n)$, assume a polynomial lower bound
+on the local gap,
+
+\[
+\spec(H_{\Lambda(x,n)})
+\subset
+\{0\}\cup[\gamma_1n^{-\alpha},\infty)
+\]
+
+for constants $\gamma_1>0$ and $\alpha\geq0$. The local gap may decay, but its
+decay is quantified.
+
+\subsection{Local Topological Quantum Order}
+
+Let $P_{b_x(m)}$ project onto the local ground space in a ball of radius $m$.
+A representative LTQO estimate is
+
+\[
+\left\|
+P_{b_x(m)}AP_{b_x(m)}
+-\omega_0(A)P_{b_x(m)}
+\right\|
+\leq
+\|A\|(1+k)^\nu G_0(m-k)
+\]
+
+for $A$ supported in $b_x(k)$ and $m\geq k$. The decay function $G_0$ must
+have enough finite moments relative to the spatial growth, partition growth,
+and local-gap exponent.
+
+This estimate says that local ground states become indistinguishable by an
+observable sufficiently far from the boundary. Its quantitative form is
+essential to the perturbative argument.
+
+\subsection{Anchored perturbations}
+
+Write the perturbation as an anchored interaction
+
+\[
+V=\sum_{x\in\Gamma}\sum_{n\geq0}\Phi(x,n),
+\qquad
+\Phi(x,n)\in\A_{b_x(n)}^{\mathrm{sa}},
+\]
+
+with stretched-exponential decay
+
+\[
+\|\Phi(x,n)\|
+\leq
+\|\Phi\|e^{-an^\theta},
+\qquad
+a>0,
+\quad
+0<\theta\leq1.
+\]
+
+\begin{theorem}[Controlled bulk gap stability]
+\label{thm:controlled-stability}
+Assume regular polynomial geometry, a finite-range positive
+frustration-free reference interaction, a selected GNS sector whose vacuum
+vector is nondegenerate for the implementing bulk generator,
+a positive bulk GNS gap $\gamma_0$, quantitative local gap control, LTQO with
+the required decay moments, and a stretched-exponentially decaying anchored
+perturbation. For every $0<\gamma<\gamma_0$, there is a perturbation threshold
+$s_0(\gamma)>0$ such that $|s|<s_0(\gamma)$ preserves a unique transported
+ground state and a GNS gap at least $\gamma$.
+\end{theorem}
+
+\begin{proof}[Proof status]
+This is an \status{established} theorem in the Nachtergaele-Sims-Young
+stability framework. The proof uses spectral flow to conjugate the perturbed
+Hamiltonian into a form whose ground-state contribution is controlled by
+LTQO, while the local gap bounds dominate the remaining relatively bounded
+terms. We state the hypothesis package because omitting any part would suggest
+a false theorem for arbitrary gapped systems.
+\end{proof}
+
+\begin{remark}[Finite-volume topological degeneracy]
+Nondegeneracy in \cref{thm:controlled-stability} refers to the vacuum vector in
+the selected infinite-volume GNS sector. It does not assert that the local
+ground projections $P_{b_x(m)}$ have rank one. LTQO is designed to control
+locally indistinguishable finite-volume ground spaces, including topologically
+degenerate ones.
+\end{remark}
+
+\begin{remark}
+Earlier finite-volume stability results of Michalakis and collaborators
+provide a closely related LTQO lane. Precise assumptions differ between
+formulations. A paper must cite the version it actually uses.
+\end{remark}
+
+\subsection{What the theorem does not prove}
+
+\Cref{thm:controlled-stability} does not apply automatically to:
+
+\begin{itemize}
+  \item arbitrary frustrated Hamiltonians;
+  \item power-law interactions outside the allowed decay class;
+  \item reference systems without a known bulk gap;
+  \item models lacking local gap control or LTQO;
+  \item families in which the symmetry or ground-state convention changes;
+  \item claims about all open-boundary spectra.
+\end{itemize}
+
+\section{Witness fibration and qualitative gapped subfunctor}
+
+We now state the moduli proposal. It is designed so that gap data cannot be
+lost by notation.
+
+\subsection{Hamiltonian family object}
+
+Let $S$ be a compact Hausdorff or profinite test object. Define schematically
+
+\[
+\Ham_F(S)
+=
+\left\{
+(\Phi_s)_{s\in S}:
+\sup_s\|\Phi_s\|_F<\infty,
+\text{ with local F-continuity}
+\right\}.
+\]
+
+Additional data records symmetry, on-site Hilbert spaces, and the allowed
+coarse geometry. The assignment should be treated as a groupoid or higher
+stack once unitary equivalences and automorphisms are included.
+
+\subsection{Gap witness}
+
+\begin{definition}[Gap witness]
+A gap witness for $\Phi\in\Ham_F(S)$ consists of:
+
+\begin{enumerate}[label=(\roman*)]
+  \item a declared gap predicate, either finite-volume band or GNS bulk;
+  \item an exhaustion and boundary convention in the finite-volume case;
+  \item a selected spectral band of locally constant rank, or selected ground
+  states $\omega_s$ in the GNS case;
+  \item a common number $\gamma>0$;
+  \item verification that the selected predicate is at least $\gamma$ for all
+  $s$ and all required volumes;
+  \item continuity data for the selected projections or states sufficient for
+  the later phase equivalence.
+\end{enumerate}
+\end{definition}
+
+Define the quantitative witness object
+
+\[
+\Gap_F^{\mathrm{wit}}(S)
+=
+\left\{
+(\Phi,\mathsf w):
+\Phi\in\Ham_F(S),
+\ \mathsf w\text{ is a gap witness}
+\right\}.
+\]
+
+The projection
+\[
+p_S:\Gap_F^{\mathrm{wit}}(S)\longrightarrow\Ham_F(S)
+\]
+forgets the witness. It is not generally injective because one family can have
+many lower bounds, states, exhaustions, or theorem providers. Thus the
+witnessed object is a fibration of data over the Hamiltonian functor, not a
+subfunctor in the monomorphism sense.
+
+Define the qualitative gapped image by propositional existence:
+\[
+\Gap_F^{\mathrm{prop}}(S)
+=
+\{\Phi\in\Ham_F(S):\|\exists\mathsf w,\
+(\Phi,\mathsf w)\in\Gap_F^{\mathrm{wit}}(S)\|\}.
+\]
+Here $\|{-}\|$ means that only existence is retained. Equivalently, take the
+image of $p_S$. The qualitative object is a subfunctor of $\Ham_F$ when image
+formation and pullback are implemented in the chosen sheaf or stack category.
+Both constructions are \status{proposed}.
+
+\begin{proposition}[Restriction stability]
+Let $u:T\to S$ be continuous. Pullback of a witnessed family along $u$
+preserves the common lower bound and defines a witnessed family over $T$.
+\end{proposition}
+
+\begin{proof}
+The pulled-back family is indexed by $t\mapsto u(t)$. The uniform locality
+bound over $T$ is no larger than the bound over $S$. Every selected gap is one
+of the gaps already bounded below on $S$, so the same $\gamma$ works. Pull back
+the state, band, and continuity data componentwise.
+\end{proof}
+
+\subsection{Descent is not gap creation}
+
+Suppose a finite jointly surjective family $S_i\to S$ covers the parameter
+object. Compatible interaction families can descend. If every local witness
+comes with the same explicit lower bound and compatible state or band data,
+the witness can also descend in a controlled formulation.
+
+It is invalid to assume only that every restriction has some unspecified
+positive lower bound. The minimum is available for a finite cover, but the
+selected bands and states must agree on overlaps. For varying or infinite
+covers, further uniformity is required. Sheaf descent organizes compatible
+evidence. It does not produce evidence that was not supplied.
+
+If gapped neighborhoods form an open cover of a compact parameter space, then
+compactness provides a finite subcover. Compatible quantitative witnesses on
+that finite subcover yield a common positive minimum. This argument still
+requires one fixed predicate and compatible state or band conventions. A bare
+pointwise statement need not provide such neighborhoods or compatibility.
+
+\subsection{Openness and discriminant locus}
+
+For a norm-continuous finite matrix family with a fixed-rank isolated cluster,
+gappedness is open. For interacting thermodynamic families, openness follows
+only inside a class covered by a stability theorem.
+
+Given a parameter map $f:B\to\Ham_F$, define the witnessed gapped locus
+
+\[
+U_f=B\times_{\Ham_F}\Gap_F^{\mathrm{prop}}
+\]
+
+and the gapless discriminant
+
+\[
+\Sigma_f=B\setminus U_f.
+\]
+
+On underlying parameter sets or spaces, this pullback is a genuine subobject,
+so its complement is meaningful. The larger pullback with
+$\Gap_F^{\mathrm{wit}}$ is instead a bundle of witnesses over $U_f$ and must
+not be subtracted from $B$. The notation is meaningful only after the gap
+predicate, image construction, and witness category are fixed. A topological
+phase label is expected to be locally constant on $U_f$ after quotienting by
+the chosen stable gapped equivalences.
+
+\section{Relations among the predicates}
+
+The following table summarizes safe implications.
+
+\begin{center}
+\begin{tabular}{p{0.32\textwidth}p{0.56\textwidth}}
+\toprule
+Statement & Status and qualification \\
+\midrule
+Uniform finite-volume gap implies a bulk GNS gap
+& \status{established} in controlled limits with stated uniqueness,
+regularity, and boundary assumptions. Not a definition-level implication.\\[3pt]
+Bulk GNS gap implies open-boundary finite-volume gap
+& \status{obstructed} in general by topological boundary modes.\\[3pt]
+Every finite volume is gapped implies a thermodynamic gap
+& \status{obstructed} by the ferromagnetic-chain example.\\[3pt]
+Pointwise parameter gaps imply a common gap
+& \status{obstructed} without constant-rank or stability hypotheses.\\[3pt]
+Uniform locality implies a uniform gap
+& \status{obstructed} by the moving weak-defect example.\\[3pt]
+Uniform gapped path implies quasi-local automorphic transport
+& \status{established} under spectral-flow locality and regularity assumptions.\\[3pt]
+Small perturbations preserve an arbitrary interacting gap
+& \status{open} as a universal theorem; \status{established} only for
+controlled structural classes.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Worked finite examples}
+
+\subsection{Two-level constant-rank family}
+
+Let
+
+\[
+H_s=
+\begin{pmatrix}
+-1 & s\\
+s & 1
+\end{pmatrix},
+\qquad
+s\in[-1,1].
+\]
+
+The eigenvalues are $\pm\sqrt{1+s^2}$, so the separation is
+$2\sqrt{1+s^2}\geq2$. The negative spectral projection has constant rank one.
+This is the elementary setting where compactness and continuity correctly
+produce a common gap.
+
+\subsection{A stable product-spin perturbation}
+
+For $N$ qubits, consider
+
+\[
+H_0=\sum_{x=1}^N p_x,
+\qquad
+V=\sum_{x=1}^N v_x,
+\]
+
+with $\|v_x\|\leq\epsilon$ and commuting diagonal $v_x$. If every excited
+on-site level remains at least $1-2\epsilon$ above the local ground level,
+then the many-body product gap is at least $1-2\epsilon$, independent of $N$.
+This direct estimate uses the product and commuting structure. It is not a
+general theorem for noncommuting perturbations.
+
+\subsection{Bulk and boundary conventions}
+
+An open topological chain can have boundary modes with a splitting that
+vanishes exponentially in length, while the periodic bulk has a stable gap.
+The literal open-chain ground-state gap, the open-chain ground-band gap, and
+the bulk GNS gap answer different questions. A phase definition intended to
+ignore protected edge degeneracy should use a band or bulk predicate and say
+so explicitly.
+
+\section{Formal and executable representations}
+
+\subsection{Lean theorem interfaces}
+
+A Lean library can honestly represent the logical dependency graph without
+formalizing the full analytic proofs. It should contain:
+
+\begin{itemize}
+  \item finite sites, finite supports, and finite-volume Hamiltonian data;
+  \item a parameter family and a predicate expressing a common norm bound;
+  \item literal finite-spectrum gaps and selected-band gaps;
+  \item a structure containing a positive common gap witness;
+  \item an abstract GNS-gap predicate whose provider is an explicit interface;
+  \item an abstract spectral-flow provider that requires a uniform gap witness;
+  \item an abstract stability provider that lists LTQO and local-gap inputs;
+  \item status and provenance fields for each imported analytic result.
+\end{itemize}
+
+The preferred design uses structures and theorem-provider typeclasses rather
+than global axioms. A concrete development can instantiate the interface when
+the relevant theorem has been formalized. No declaration should suggest that
+Lean proved an infinite-volume spectral gap merely because a finite list of
+eigenvalues was checked.
+
+\subsection{Haskell demonstrations}
+
+Executable code accompanying this paper checks finite calculations:
+
+\begin{enumerate}[label=\arabic*.]
+  \item ordered-spectrum gap extraction;
+  \item selected-band separation;
+  \item the matrix family in \cref{ex:matrix-collapse};
+  \item the $L^{-2}$ closing upper bound for the ferromagnetic chain;
+  \item finite prefixes of the moving weak-defect gap sequence;
+  \item predicates distinguishing pointwise positivity from a declared common
+  lower bound.
+\end{enumerate}
+
+These checks are \status{computational}. They catch convention and
+implementation errors. They are not thermodynamic proofs.
+
+\section{Main results in concise form}
+
+We collect the paper's conclusions.
+
+\begin{theorem}[Separation theorem]
+Uniform F-locality, local parameter continuity, and pointwise positive GNS
+gaps do not imply a parameter-uniform GNS gap, even for a profinite family of
+finite-range commuting product interactions with a common unique ground
+state.
+\end{theorem}
+
+\begin{proof}
+The moving weak-defect family supplies all stated properties and has gaps
+$1/n$ along a sequence converging to the parameter $\infty$.
+\end{proof}
+
+\begin{theorem}[Witness necessity]
+Any moduli assignment that records only an interaction family and the statement
+that each fiber is gapped cannot distinguish the moving weak-defect family from
+a uniformly gapped family. A uniform phase subobject must therefore record or
+require a common quantitative lower bound, together with the gap convention.
+\end{theorem}
+
+\begin{proof}
+The fiberwise predicate has the same truth value in both cases. The desired
+distinction depends on the infimum across parameters and, in finite volume,
+across the exhaustion. This information is not recoverable from a bare list of
+positive truth values.
+\end{proof}
+
+\begin{theorem}[Conditional phase transport]
+For a differentiable uniformly local path equipped with a uniform
+finite-volume ground-band witness satisfying the hypotheses of
+\cref{thm:spectral-flow}, the endpoints have quasi-locally automorphically
+equivalent thermodynamic ground-state sets.
+\end{theorem}
+
+\begin{proof}
+Apply \cref{thm:spectral-flow}. The word ``conditional'' records that the gap
+witness is an input rather than a conclusion.
+\end{proof}
+
+\begin{theorem}[Controlled local stability]
+Within the frustration-free LTQO class described in
+\cref{thm:controlled-stability}, the witnessed bulk-gapped predicate is open
+under sufficiently small perturbations in the stated anchored interaction
+norm.
+\end{theorem}
+
+\begin{proof}
+The stability theorem provides a positive perturbation radius and a common
+lower bound smaller than the original bulk gap. Restrict the proposed gap
+image subfunctor to the theorem's structural class.
+\end{proof}
+
+\section{Discussion}
+
+\subsection{Why a numerical gap function is insufficient}
+
+Writing $\operatorname{gap}(H)$ suggests a canonical real number. In the
+thermodynamic setting, the notation hides choices. Which finite volumes and
+boundaries are used? Is a near-degenerate ground multiplet one band or several
+levels? Which infinite-volume state and representation are selected? Is the
+claim about a bulk generator or an edge spectrum? A gap witness makes these
+choices data rather than prose.
+
+\subsection{Why condensed mathematics still helps}
+
+The negative conclusion would be too strong if it said condensed mathematics
+adds nothing. It adds a coherent category for continuous and profinite
+families, finite-resolution disorder, symmetry objects, and descent. It can
+organize restrictions and gluing of an already established uniform gap
+witness. It can also place the gapless locus inside a parameterized moduli
+problem. The point is narrower: categorical organization does not replace the
+many-body estimate.
+
+\subsection{Relation to topological phase transitions}
+
+On a witnessed gapped region $U$, a stable phase invariant should be locally
+constant. A path connecting different labels must leave $U$ and meet the
+discriminant $\Sigma$. The local topology of $\Sigma$ may carry a relative
+charge when a generalized cohomology invariant is defined. This reasoning
+depends on the gap predicate. If pointwise but nonuniform families are admitted
+as single gapped objects, the phase label can fail to have the stability needed
+for this interpretation.
+
+\subsection{Relation to effective field theory}
+
+A low-energy field theory presupposes a controlled separation of scales. A
+uniform thermodynamic gap is one possible input for a topological effective
+description, but it does not alone construct the continuum approximation.
+Conversely, a field-theoretic bordism class does not prove that a microscopic
+Hamiltonian realizes a uniform gap. The microscopic-to-effective comparison
+must preserve the gap claim as a separate verified property.
+
+\subsection{Noninvertible phases}
+
+The gap predicates developed here apply to invertible and noninvertible
+systems. A later invertible phase spectrum captures only the sector with a
+stacking inverse. General topological order requires excitation and defect
+categories in addition to a gap witness. The analytic foundation is shared,
+but the classification object is larger.
+
+\section{Limitations and open problems}
+
+The present work has deliberate limits.
+
+\begin{enumerate}[label=\arabic*.]
+  \item We do not prove a new universal gap-stability theorem. We expose the
+  assumptions of established controlled theorems.
+
+  \item We do not prove descent for a fully constructed higher stack of GNS
+  representations. The witness fibration and its qualitative image are
+  proposals whose precise categorical targets remain to be built.
+
+  \item We use finite-dimensional on-site spaces in the principal framework.
+  Unbounded on-site terms and bosonic systems require domain and topology
+  refinements.
+
+  \item We do not treat mobility gaps as spectral gaps. Mobility-gap invariants
+  often require Sobolev or localization algebras and different stability
+  inputs.
+
+  \item We do not identify a bulk GNS gap with a boundary gap. A framework for
+  bulk-boundary pairs should record both predicates and their comparison map.
+
+  \item We do not assert that the set of uniformly gapped interactions is open
+  in every natural interaction topology. Openness is established only inside
+  the scope of an applicable stability theorem.
+
+  \item We do not infer a thermodynamic theorem from Haskell tests or a Lean
+  interface. Formal provenance remains visible.
+\end{enumerate}
+
+The most immediate open problem is to construct a category of parameterized
+ground-state representations in which uniform gap witnesses satisfy descent
+and in which spectral flow is a natural transformation. A second problem is
+to compare finite-volume band witnesses with bulk GNS witnesses under minimal
+boundary assumptions. A third is to extend the controlled stability lane to
+larger frustrated and long-range classes without hiding model-specific input.
+
+\section{Conclusion}
+
+A uniformly gapped family is more than a family whose fibers are each gapped.
+It consists of a locality-controlled interaction family, a declared spectral
+predicate, a ground-band or state convention, and one lower bound that survives
+the thermodynamic and parameter limits. This paper has given that statement a
+precise moduli form.
+
+The key logical pattern is:
+
+\[
+\boxed{
+\begin{array}{c}
+\text{uniform locality}
+\quad+\quad
+\text{explicit gap witness}
+\\[4pt]
+\Downarrow\ \text{under stated hypotheses}
+\\[4pt]
+\text{spectral flow or controlled perturbative stability}
+\\[4pt]
+\Downarrow
+\\[4pt]
+\text{stable phase data on the witnessed gapped locus.}
+\end{array}}
+\]
+
+Condensed mathematics can organize this locus across continuous, profinite,
+and inverse-limit parameters. The spectral gap itself remains an analytic
+theorem. Preserving that division of labor is necessary for a credible
+condensed-mathematical theory of topological phases and transitions.
+
+\appendix
+
+\section{Gap-claim audit protocol}
+
+This appendix gives a compact protocol for checking a thermodynamic gap claim
+before it enters a phase-classification argument. It is intended for research
+papers, formal interfaces, and code-backed examples.
+
+\subsection{Object declaration}
+
+The claim should first identify the microscopic object:
+
+\begin{enumerate}[label=\textbf{O\arabic*.}]
+  \item State the metric lattice or coarse space and its volume-growth or tail
+  properties.
+  \item State the local Hilbert spaces or local observable algebras.
+  \item Give the interaction and its decay norm.
+  \item State the symmetry action and whether it is fixed along the family.
+  \item Distinguish a bounded observable from a formal interaction generator.
+\end{enumerate}
+
+Failure at this stage means that no thermodynamic spectral predicate has yet
+been defined.
+
+\subsection{Spectral predicate declaration}
+
+The claim should then choose exactly one primary predicate:
+
+\begin{enumerate}[label=\textbf{G\arabic*.}]
+  \item Literal finite-volume ground-state gap.
+  \item Finite-volume separation above a selected low-energy band.
+  \item Uniform finite-volume band gap along a declared exhaustion and boundary
+  convention.
+  \item Bulk GNS gap for a selected infinite-volume ground state.
+  \item Uniform bulk GNS gap for a parameterized family of selected states.
+\end{enumerate}
+
+If more than one predicate is used, the comparison theorem must be cited with
+its uniqueness, regularity, exhaustion, and boundary assumptions. Similar
+notation is not a proof that the predicates coincide.
+
+\subsection{Quantifier audit}
+
+For a family indexed by $S$ and volumes indexed by $n$, write the quantifiers
+in full. The desired statement is typically
+
+\[
+\exists\gamma>0\ \forall s\in S\ \forall n\geq n_0:
+\gamma_{s,n}\geq\gamma.
+\]
+
+The weaker statement
+
+\[
+\forall s\in S\ \forall n\ \exists\gamma_{s,n}>0:
+\gamma_{s,n}\geq\gamma_{s,n}
+\]
+
+is nearly automatic for a finite matrix after exact degeneracies are grouped.
+It contains no common thermodynamic scale. Changing the order of these
+quantifiers changes the physical assertion.
+
+\subsection{Evidence ladder}
+
+Classify the available evidence at one of four levels:
+
+\begin{center}
+\begin{tabular}{p{0.18\textwidth}p{0.70\textwidth}}
+\toprule
+Level & Required evidence \\
+\midrule
+Finite computation
+& Exact diagonalization or certified finite arithmetic for declared sizes. It
+does not establish a thermodynamic lower bound.\\[4pt]
+Scaling evidence
+& A reproducible finite-size study with error bars and an explicit ansatz. It
+can support a conjecture but is not a gap theorem.\\[4pt]
+Model theorem
+& A proof specialized to the interaction, such as a martingale, transfer
+operator, integrability, or frustration-free estimate.\\[4pt]
+Stability
+& Verification that a reference system and perturbation satisfy every
+hypothesis of a cited uniform stability result.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The result status should match the strongest completed level.
+
+\subsection{Boundary audit}
+
+For each finite-volume statement, record:
+
+\begin{itemize}
+  \item open, periodic, twisted, or symmetry-breaking boundary conditions;
+  \item whether boundary terms are uniformly bounded and local;
+  \item whether edge modes belong to the selected ground band;
+  \item whether the claimed phase invariant is bulk, boundary, or relative;
+  \item which comparison, if any, relates the finite system to a GNS bulk
+  representation.
+\end{itemize}
+
+A bulk-boundary correspondence can predict protected edge behavior. It does
+not justify calling the open-boundary literal gap a bulk gap.
+
+\subsection{Perturbation audit}
+
+Before citing a stability theorem, verify:
+
+\begin{enumerate}[label=\textbf{P\arabic*.}]
+  \item The reference gap is already proved in the theorem's required sense.
+  \item The reference interaction belongs to the theorem's structural class.
+  \item Local gap or LTQO estimates have the required quantitative decay.
+  \item The perturbation belongs to the stated normed interaction class.
+  \item The perturbation strength is below a volume-independent threshold.
+  \item The selected symmetry and ground-state conventions are preserved.
+\end{enumerate}
+
+The phrase ``small local perturbation'' is insufficient without a norm,
+threshold, and hypothesis match.
+
+\section{Machine-readable witness schema}
+
+The mathematical witness can be mirrored by a data record. The following is a
+language-independent schema rather than an implementation mandate:
+
+\begin{align*}
+\mathsf{GapWitness}=\{\,&
+\mathsf{predicate},
+\mathsf{parameterSpace},
+\mathsf{interactionClass},
+\mathsf{stateOrBand},\\
+&\mathsf{exhaustion},
+\mathsf{boundary},
+\mathsf{lowerBound},
+\mathsf{provider},
+\mathsf{status}\,\}.
+\end{align*}
+
+Here $\mathsf{provider}$ points to a proof, a cited theorem with discharged
+hypotheses, or a computation. The status field prevents a finite numerical
+check from being silently promoted to a thermodynamic theorem. Pullback along
+a parameter map retains the same witness provider only when every provider
+hypothesis is stable under that pullback.
+
+\begin{proposition}[Witness monotonicity]
+If a witness proves a lower bound $\gamma>0$, then it also proves every lower
+bound $\gamma'$ with $0<\gamma'\leq\gamma$.
+\end{proposition}
+
+\begin{proof}
+For every indexed spectrum, the inequality
+$\operatorname{gap}\geq\gamma$ implies
+$\operatorname{gap}\geq\gamma'$ by transitivity of the order on real numbers.
+All other witness fields are unchanged.
+\end{proof}
+
+\begin{proposition}[Finite-cover minimum]
+Suppose a finite cover $S_1,\ldots,S_m$ of $S$ carries compatible witnesses
+for the same predicate, state or band convention, exhaustion, and boundary
+data, with lower bounds $\gamma_i>0$. Then
+\[
+\gamma=\min_{1\leq i\leq m}\gamma_i
+\]
+is a positive global lower bound.
+\end{proposition}
+
+\begin{proof}
+Every parameter belongs to at least one $S_i$, where its gap is at least
+$\gamma_i\geq\gamma$. The minimum of finitely many positive real numbers is
+positive. Compatibility is needed to ensure that all local inequalities refer
+to the same spectral predicate.
+\end{proof}
+
+This elementary proposition explains the useful but limited role of finite
+descent. It combines supplied quantitative witnesses. It does not infer them
+from qualitative local gappedness.
+
+\begin{thebibliography}{99}
+
+\bibitem{BMNS2012}
+S. Bachmann, S. Michalakis, B. Nachtergaele, and R. Sims,
+``Automorphic equivalence within gapped phases of quantum lattice systems,''
+\emph{Communications in Mathematical Physics} 309 (2012), 835--871.
+\url{https://arxiv.org/abs/1102.0842}.
+
+\bibitem{BachmannNachtergaele2014}
+S. Bachmann and B. Nachtergaele,
+``On gapped phases with a continuous symmetry and boundary operators,''
+\emph{Journal of Statistical Physics} 154 (2014), 91--112.
+\url{https://arxiv.org/abs/1307.0716}.
+
+\bibitem{BravyiHastingsMichalakis2010}
+S. Bravyi, M. Hastings, and S. Michalakis,
+``Topological quantum order: stability under local perturbations,''
+\emph{Journal of Mathematical Physics} 51 (2010), 093512.
+\url{https://arxiv.org/abs/1001.0344}.
+
+\bibitem{BratteliRobinson2}
+O. Bratteli and D. W. Robinson,
+\emph{Operator Algebras and Quantum Statistical Mechanics 2: Equilibrium
+States, Models in Quantum Statistical Mechanics},
+second edition, Springer, 1997.
+
+\bibitem{ClausenScholze}
+D. Clausen and P. Scholze,
+``Lectures on condensed mathematics,'' lecture notes.
+\url{https://www.math.uni-bonn.de/people/scholze/Condensed.pdf}.
+
+\bibitem{Hastings2004}
+M. Hastings,
+``Lieb-Schultz-Mattis in higher dimensions,''
+\emph{Physical Review B} 69 (2004), 104431.
+\url{https://arxiv.org/abs/cond-mat/0305505}.
+
+\bibitem{KomaNachtergaele1997}
+T. Koma and B. Nachtergaele,
+``The spectral gap of the ferromagnetic XXZ-chain,''
+\emph{Letters in Mathematical Physics} 40 (1997), 1--16.
+\url{https://arxiv.org/abs/cond-mat/9512120}.
+
+\bibitem{MichalakisZwolak2013}
+S. Michalakis and J. P. Zwolak,
+``Stability of frustration-free Hamiltonians,''
+\emph{Communications in Mathematical Physics} 322 (2013), 277--302.
+\url{https://arxiv.org/abs/1109.1588}.
+
+\bibitem{MoonOgata2020}
+A. Moon and Y. Ogata,
+``Automorphic equivalence within gapped phases in the bulk,''
+\emph{Journal of Functional Analysis} 278 (2020), 108422.
+\url{https://arxiv.org/abs/1906.05479}.
+
+\bibitem{NachtergaeleSims2010}
+B. Nachtergaele and R. Sims,
+``Lieb-Robinson bounds in quantum many-body physics,''
+in \emph{Entropy and the Quantum}, Contemporary Mathematics 529 (2010).
+\url{https://arxiv.org/abs/1004.2086}.
+
+\bibitem{NSY2019}
+B. Nachtergaele, R. Sims, and A. Young,
+``Quasi-locality bounds for quantum lattice systems, Part I,''
+\emph{Journal of Mathematical Physics} 60 (2019), 061101.
+\url{https://arxiv.org/abs/1810.02428}.
+
+\bibitem{NSY2023}
+B. Nachtergaele, R. Sims, and A. Young,
+``Stability of the bulk gap for frustration-free topologically ordered quantum
+lattice systems,''
+\emph{Letters in Mathematical Physics} 113 (2023).
+\url{https://arxiv.org/abs/2102.07209}.
+
+\bibitem{SimsWarzel}
+R. Sims and S. Warzel,
+``Decay of determinantal and pfaffian correlation functionals in one-dimensional
+lattices,''
+\emph{Communications in Mathematical Physics} 347 (2016), 903--931.
+\url{https://arxiv.org/abs/1509.00450}.
+
+\end{thebibliography}
+
+\end{document}
