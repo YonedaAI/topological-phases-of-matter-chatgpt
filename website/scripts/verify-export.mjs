@@ -35,6 +35,7 @@ const routes = [
   { path: "", socialTitle: "Topological Phases of Matter in Condensed Mathematics", schemaTypes: ["WebSite", "Person"] },
   { path: "papers", socialTitle: "Research Papers | Spectral Ledger", schemaTypes: ["CollectionPage", "ItemList"] },
   { path: "artifacts", socialTitle: "Code, Proofs, and Reviews | Spectral Ledger", schemaTypes: [] },
+  { path: "pipeline", socialTitle: "Pipeline Metrics | Spectral Ledger", schemaTypes: ["WebPage", "Dataset"] },
   ...papers.map((paper) => ({
     path: `papers/${paper.slug}`,
     socialTitle: paper.title,
@@ -170,6 +171,55 @@ for (const route of routes) {
     const itemList = schemaNodes.find((node) => node["@type"] === "ItemList");
     if (!Array.isArray(itemList?.itemListElement) || itemList.itemListElement.length !== papers.length) {
       fail("/papers/ ItemList must enumerate all six papers");
+    }
+  }
+
+  if (route.path === "pipeline") {
+    const metricContract = {
+      "codex-sessions": "34",
+      "model-invocations": "78",
+      "approved-runtime": "3 h 31 m 12 s",
+      "codex-tokens": "1,813,129,602",
+    };
+    for (const [metric, expectedValue] of Object.entries(metricContract)) {
+      const rendered = $(`[data-pipeline-metric="${metric}"]`).text().replace(/\s+/g, " ").trim();
+      if (rendered !== expectedValue) {
+        fail(`/pipeline/ ${metric} metric must be ${expectedValue}; found ${rendered || "nothing"}`);
+      }
+    }
+    const invocationCounts = $("[data-pipeline-invocations]")
+      .map((_, element) => Number($(element).attr("data-pipeline-invocations")))
+      .get();
+    if (invocationCounts.length !== 4 || invocationCounts.some((value) => !Number.isInteger(value))) {
+      fail("/pipeline/ must expose four numeric invocation groups");
+    } else if (invocationCounts.reduce((total, value) => total + value, 0) !== 78) {
+      fail("/pipeline/ invocation groups must sum to 78");
+    }
+
+    const tokenValues = $("[data-pipeline-token]")
+      .map((_, element) => Number($(element).attr("data-pipeline-token")))
+      .get();
+    const [gross, input, cached, uncached, output, reasoning, native, isolated] = tokenValues;
+    if (tokenValues.length !== 8 || tokenValues.some((value) => !Number.isInteger(value))) {
+      fail("/pipeline/ must expose eight numeric token ledger entries");
+    } else {
+      if (cached + uncached !== input) fail("/pipeline/ cached and uncached input must sum to input");
+      if (input + output !== gross) fail("/pipeline/ input and output must sum to the gross token total");
+      if (native + isolated !== gross) fail("/pipeline/ Codex session subtotals must sum to the gross token total");
+      if (reasoning > output) fail("/pipeline/ reasoning output must remain a subset of output");
+    }
+    if ($('[data-pipeline-spend="not-recorded"]').length !== 1) {
+      fail("/pipeline/ must explicitly mark monetary spend as not recorded");
+    }
+    const cacheComposition = $('.cache-composition[role="img"]').attr("aria-label") ?? "";
+    if (!cacheComposition.includes("97.75 percent cached")
+      || !cacheComposition.includes("2.25 percent uncached")) {
+      fail("/pipeline/ cache composition must expose its computed percentages accessibly");
+    }
+    for (const stage of ["code", "review", "fix", "verify", "deploy"]) {
+      if ($(`[data-pipeline-stage="${stage}"]`).length !== 1) {
+        fail(`/pipeline/ is missing the ${stage} stage`);
+      }
     }
   }
 

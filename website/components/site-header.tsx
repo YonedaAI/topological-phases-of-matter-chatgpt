@@ -15,6 +15,7 @@ export function SiteHeader() {
           <Link href="/#program">Program</Link>
           <Link href="/papers/">Papers</Link>
           <Link href="/artifacts/">Code + proofs</Link>
+          <Link href="/pipeline/">Pipeline</Link>
         </nav>
       </div>
     </header>

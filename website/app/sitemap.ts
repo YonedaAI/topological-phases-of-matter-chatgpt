@@ -31,6 +31,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.8,
     },
+    {
+      url: `${origin}/pipeline/`,
+      lastModified: new Date("2026-07-15"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     ...paperPages,
   ];
 }

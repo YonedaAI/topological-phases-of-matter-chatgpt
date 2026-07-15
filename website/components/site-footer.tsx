@@ -14,6 +14,7 @@ export function SiteFooter() {
         <div className="footer-links">
           <Link href="/papers/">Six papers</Link>
           <Link href="/artifacts/">Haskell, Lean, reviews</Link>
+          <Link href="/pipeline/">Pipeline metrics</Link>
           <a href="/reviews/final-cross-paper-mathematical-audit.md">Cross-paper audit</a>
         </div>
         <p className="footer-fineprint">
